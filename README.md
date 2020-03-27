@@ -10,7 +10,7 @@ Suggested approaches (simpler to more complex):
 
 * majority voting based on language family (the language genera in train and
 test data will probably have no overlap)
-  * RR: done, accuracy 61.7% on all features in dev data
+  * RR: done, accuracy 61.7% on all features in dev data ([see Issue #2](https://github.com/ufal/ST2020/issues/2))
 * determined by closest language (try to find the most similar language based
   on the filled in features as well as language family and GPS, copy values
   from that language, if a value is missing then e.g. take the second most
