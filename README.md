@@ -1,3 +1,30 @@
+# ÚFAL team
+
+## Members
+
+Rudolf Rosa, Dan Zeman, Martin Vastl
+
+## Plan
+
+Suggested approaches (simpler to more complex):
+
+* majority voting based on language family (the language genera in train and
+test data will probably have no overlap)
+* determined by closest language (try to find the most similar language based
+  on the filled in features as well as language family and GPS, copy values
+  from that language, if a value is missing then e.g. take the second most
+  similar language etc.)
+* combination, use weighted voting (weight = language similarity)
+* looking for intralingual causation or correlation (such as
+    [SVO implies SV](https://wals.info/combinations/82A_81A#2/17.9/153.0), or
+  [postposition imply OV](https://wals.info/feature/95A#2/14.9/152.8) ),
+  probably using some statistical methods such as
+  [CCA](https://en.wikipedia.org/wiki/Canonical_correlation)
+
+The [shared task website](https://sigtyp.github.io/st2020.html) also lists some existing work on the topic:
+* [Daumé III and Campbell 2017](https://arxiv.org/abs/0907.0785)
+* [Bjerva et al. 2019](https://arxiv.org/abs/1903.10950)
+
 # SIGTYP 2020 Shared Task : Prediction of Typological Features
 
 To participate in the shared task, you will build a system that can predict typological properties of languages, given a handful of observed features. Training examples and development examples will be provided. All submitted systems will be compared on a held-out test set.
