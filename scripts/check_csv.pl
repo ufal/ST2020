@@ -66,19 +66,29 @@ while(<>)
         push(@data, \@f);
     }
 }
+###!!! While I originally targeted both file formats, the code from here on assumes the order of columns of the non-original file.
+if($original)
+{
+    die("Cannot do this with the original file.");
+}
 # Hash the observed features and values.
 my %h;
+my %lh; # hash indexed by language code
 foreach my $language (@data)
 {
+    my $lcode = $language->[1];
     # Remember observed features and values.
-    for(my $i = 3; $i <= $#headers; $i++)
+    for(my $i = 1; $i <= $#headers; $i++)
     {
+        my $feature = $headers[$i];
         # There seem to be multiple ways of indicating an unknown value. Unify them.
-        $language->[$i] = '?' if(!defined($language->[$i]) || $language->[$i] eq 'nan' || $language->[$i] eq '?');
-        $h{$headers[$i]}{$language->[$i]}++;
+        $language->[$i] = '?' if(!defined($language->[$i]) || $language->[$i] eq '' || $language->[$i] eq 'nan' || $language->[$i] eq '?');
+        $h{$feature}{$language->[$i]}++;
+        $lh{$lcode}{$feature} = $language->[$i];
     }
 }
-list_features_and_values(\@headers, \%h);
+#list_features_and_values(\@headers, \%h);
+compute_pairwise_cooccurrence(\@headers, \%lh);
 
 
 
@@ -112,6 +122,67 @@ sub list_features_and_values
             print("  $value\t$h->{$headers->[$i]}{$value}\t$p\n");
         }
         print("\n");
+    }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Computes pairwise cooccurrence of two feature values in a language.
+#------------------------------------------------------------------------------
+sub compute_pairwise_cooccurrence
+{
+    my $headers = shift; # array ref
+    my $lh = shift; # hash ref
+    my @languages = keys(%{$lh});
+    my %cooc;
+    foreach my $l (@languages)
+    {
+        foreach my $f (@{$headers})
+        {
+            next if(!exists($lh->{$l}{$f}));
+            my $fv = $lh->{$l}{$f};
+            next if($fv eq '?');
+            foreach my $g (@{$headers})
+            {
+                next if($g eq $f);
+                next if(!exists($lh->{$l}{$g}));
+                my $gv = $lh->{$l}{$g};
+                next if($gv eq '?');
+                $cooc{$f}{$fv}{$g}{$gv}++;
+                ###!!! DEBUG
+                #print("$l\n");
+                #print("$f = $fv\n");
+                #print("$g = $gv\n");
+                #print("\n");
+            }
+        }
+    }
+    # Now look at the cooccurrences disregarding individual languages.
+    my %coocflat;
+    foreach my $f (@{$headers})
+    {
+        my @fvalues = keys(%{$cooc{$f}});
+        foreach my $fv (@fvalues)
+        {
+            foreach my $g (keys(%{$cooc{$f}{$fv}}))
+            {
+                # Cooccurrences are symmetric, hence do not report both $f+$g and $g+$f.
+                next if($g le $f);
+                my @gvalues = keys(%{$cooc{$f}{$fv}{$g}});
+                foreach my $gv (@gvalues)
+                {
+                    my $keystring = "$f == $fv && $g == $gv";
+                    $coocflat{$keystring} = $cooc{$f}{$fv}{$g}{$gv};
+                }
+            }
+        }
+    }
+    my @keys = sort {$coocflat{$b} <=> $coocflat{$a}} (keys(%coocflat));
+    foreach my $key (@keys)
+    {
+        last if($coocflat{$key} <= 5);
+        print("$coocflat{$key}\t$key\n");
     }
 }
 
