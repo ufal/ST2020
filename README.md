@@ -4,6 +4,9 @@
 
 Rudolf Rosa, Dan Zeman, Martin Vastl
 
+(Nová registrace 12.4.2020; v té předchozí byl jen Dan a Ruda a nemáme ani žádný záznam, co přesně jsme tam napsali.
+Nyní tedy název týmu = "ÚFAL", afiliace = "Charles University, Faculty of Mathematics and Physics, ÚFAL, Prague, Czechia".)
+
 ## Plan
 
 Suggested approaches (simpler to more complex):
