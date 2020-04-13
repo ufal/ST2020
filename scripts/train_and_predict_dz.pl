@@ -144,7 +144,8 @@ sub predict_masked_features
         if(scalar(@model)>0)
         {
             # Save the winning prediction in the language-feature hash.
-            $lhl->{$qf} = model_take_strongest(@model);
+            #$lhl->{$qf} = model_take_strongest(@model);
+            $lhl->{$qf} = model_weighted_vote(@model);
         }
     }
 }
@@ -163,7 +164,27 @@ sub model_take_strongest
     @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
     my $prediction = $model[0]{v};
     print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
-    # Now save the winning prediction in the language-feature hash.
+    return $prediction;
+}
+
+
+
+#------------------------------------------------------------------------------
+# We let the individual signals based on available features vote. The votes are
+# weighted by the strength of the signal (probability × log count).
+#------------------------------------------------------------------------------
+sub model_weighted_vote
+{
+    my @model = @_;
+    my %votes;
+    foreach my $signal (@model)
+    {
+        my $weight = $signal->{p}*log($signal->{c});
+        $votes{$signal->{v}} += $weight;
+    }
+    my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
+    my $prediction = $options[0];
+    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($debug);
     return $prediction;
 }
 
