@@ -28,6 +28,9 @@ my ($trainh, $trainlh) = hash_features($trainheaders, $traindata, 0);
 my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($trainheaders, $trainlh);
 print STDERR ("Reading the development data...\n");
 my ($devheaders, $devdata) = read_csv("$data_folder/dev_x.csv");
+# Read the gold standard development data. It will help us with debugging and error analysis.
+print STDERR ("Reading the development gold standard data...\n");
+my ($devgheaders, $devgdata) = read_csv("$data_folder/dev_y.csv");
 print STDERR ("Found ", scalar(@{$devheaders}), " headers.\n");
 print STDERR ("Found ", scalar(@{$devdata}), " language lines.\n");
 my $ndevlangs = scalar(@{$devdata});
@@ -35,6 +38,7 @@ my $ndevfeats = scalar(@{$devheaders})-1; # first column is ord number; except f
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
 my ($devh, $devlh) = hash_features($devheaders, $devdata, 0);
+my ($devgh, $devglh) = hash_features($devgheaders, $devgdata, 0);
 my @features = keys(%{$devh});
 my $nnan = 0;
 my $nqm = 0;
@@ -90,7 +94,7 @@ print STDERR ("Note that the non-empty features always include 8 non-typologic f
 print STDERR ("Predicting the masked features...\n");
 foreach my $l (@languages)
 {
-    predict_masked_features($devlh->{$l}, $trainprob, $traincooc);
+    predict_masked_features($devlh->{$l}, $trainprob, $traincooc, $devglh->{$l});
 }
 print STDERR ("Writing the completed file...\n");
 write_csv($devheaders, $devlh);
@@ -109,7 +113,8 @@ sub predict_masked_features
     my $lhl = shift; # hash ref: feature-value hash of one language
     my $prob = shift; # hash ref: conditional probabilities of features given other features
     my $cooc = shift; # hash ref: cooccurrence counts of feature-value pairs
-    print STDERR ("Language $devlh->{$l}{wals_code} ($devlh->{$l}{name}):\n") if($debug);
+    my $goldlhl = shift; # hash ref: gold standard version of $lhl, used for debugging and analysis
+    print STDERR ("Language $lhl->{wals_code} ($lhl->{name}):\n") if($debug);
     my @features = keys(%{$lhl});
     my @rfeatures = grep {$lhl->{$_} !~ m/^nan|\?$/} (@features);
     my @qfeatures = grep {$lhl->{$_} eq '?'} (@features);
@@ -146,6 +151,14 @@ sub predict_masked_features
             # Save the winning prediction in the language-feature hash.
             $lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
             #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
+            if(defined($goldlhl))
+            {
+                if($lhl->{$qf} ne $goldlhl->{$qf})
+                {
+                    print STDERR ("Language $lhl->{name} wrong prediction $qf == $lhl->{$qf}\n");
+                    print STDERR ("  should be $goldlhl->{$qf}\n");
+                }
+            }
         }
     }
 }
