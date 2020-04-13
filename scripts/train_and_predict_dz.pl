@@ -105,7 +105,7 @@ write_csv($devheaders, $devlh);
 #------------------------------------------------------------------------------
 sub predict_masked_features
 {
-    my $debug = 0; # print all predictions with explanation to STDERR
+    local $debug = 0; # print all predictions with explanation to STDERR
     my $lhl = shift; # hash ref: feature-value hash of one language
     my $prob = shift; # hash ref: conditional probabilities of features given other features
     my $cooc = shift; # hash ref: cooccurrence counts of feature-value pairs
@@ -143,14 +143,28 @@ sub predict_masked_features
         print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
         if(scalar(@model)>0)
         {
-            # We want a high probability but we also want it to be based on a sufficiently large count.
-            @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
-            my $prediction = $model[0]{v};
-            print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
-            # Now save the winning prediction in the language-feature hash.
-            $lhl->{$qf} = $prediction;
+            # Save the winning prediction in the language-feature hash.
+            $lhl->{$qf} = model_take_strongest(@model);
         }
     }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Strongest signal: high probability and enough instances the probability is
+# based on. We take the prediction suggested by the strongest signal and ignore
+# the other suggestions.
+#------------------------------------------------------------------------------
+sub model_take_strongest
+{
+    my @model = @_;
+    # We want a high probability but we also want it to be based on a sufficiently large count.
+    @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+    my $prediction = $model[0]{v};
+    print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
+    # Now save the winning prediction in the language-feature hash.
+    return $prediction;
 }
 
 
