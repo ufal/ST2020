@@ -80,6 +80,53 @@ my $avgreg = $sumreg/$nl;
 print STDERR ("On average, a language has $avgreg non-empty features and $avgqm features to predict.\n");
 print STDERR ("Minimum knowledge is $minreg non-empty features; in that case, $minreg_qm features are to be predicted.\n");
 print STDERR ("Note that the non-empty features always include 7 non-typologic features: code, name, latitude, longitude, genus, family, countrycodes.\n");
+# Predict the masked features.
+###!!! This is the first shot...
+print STDERR ("Predicting the masked features...\n");
+foreach my $l (@languages)
+{
+    print STDERR ("Language $devlh->{$l}{wals_code} ($devlh->{$l}{name}):\n");
+    my @features = keys(%{$devlh->{$l}});
+    my @rfeatures = grep {$devlh->{$l}{$_} !~ m/^nan|\?$/} (@features);
+    my @qfeatures = grep {$devlh->{$l}{$_} eq '?'} (@features);
+    foreach my $qf (@qfeatures)
+    {
+        print STDERR ("  Predicting $qf:\n");
+        my @model;
+        foreach my $rf (@rfeatures)
+        {
+            if(exists($trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}))
+            {
+                my @qvalues = keys(%{$trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}});
+                foreach my $qv (@qvalues)
+                {
+                    push(@model,
+                    {
+                        'p' => $trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}{$qv},
+                        'c' => $traincooc->{$rf}{$devlh->{$l}{$rf}}{$qf}{$qv},
+                        'v' => $qv,
+                        'rf' => $rf,
+                        'rv' => $devlh->{$l}{$rf}
+                    });
+                    #print STDERR ("    Cooccurrence with $rf == $devlh->{$l}{$rf} => $qv (p=$trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}{$qv}).\n");
+                }
+            }
+            else
+            {
+                #print STDERR ("    No cooccurrence with $rf == $devlh->{$l}{$rf}.\n");
+            }
+        }
+        print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n");
+        if(scalar(@model)>0)
+        {
+            # We want a high probability but we also want it to be based on a sufficiently large count.
+            @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+            my $prediction = $model[0]{v};
+            print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n");
+        }
+    }
+    exit; ###!!!
+}
 
 
 
