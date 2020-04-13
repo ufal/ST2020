@@ -17,55 +17,9 @@ GetOptions
     'original' => \$original
 );
 
-my @headers = ();
-my $nf;
-my $iline = 0;
-my @data; # the table, without the header line
-while(<>)
-{
-    $iline++;
-    s/\r?\n$//;
-    # In the non-original (comma-separated) file, we must distinguish commas inside quotes from those outside.
-    unless($original)
-    {
-        $_ = process_quoted_commas($_, $rcomma);
-    }
-    my @f = ();
-    if(scalar(@headers)==0)
-    {
-        # In the original dev.csv, the headers are separated by one or more spaces, while the rest is separated by tabulators!
-        if($original)
-        {
-            @f = split(/\s+/, $_);
-        }
-        else
-        {
-            @f = split(/,/, $_);
-        }
-        @headers = map {restore_commas($_, $rcomma)} (@f);
-        $nf = scalar(@headers);
-    }
-    else
-    {
-        if($original)
-        {
-            @f = split(/\t/, $_);
-        }
-        else
-        {
-            @f = split(/,/, $_);
-        }
-        @f = map {restore_commas($_, $rcomma)} (@f);
-        my $n = scalar(@f);
-        # The number of values may be less than the number of columns if the trailing columns are empty.
-        # However, the number of values must not be greater than the number of columns (which would happen if a value contained the separator character).
-        if($n > $nf)
-        {
-            print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n.\n");
-        }
-        push(@data, \@f);
-    }
-}
+my ($headers, $data) = read_csv();
+print("Found ", scalar(@{$headers}), " headers.\n");
+print("Found ", scalar(@{$data}), " language lines.\n");
 ###!!! While I originally targeted both file formats, the code from here on assumes the order of columns of the non-original file.
 if($original)
 {
@@ -74,13 +28,13 @@ if($original)
 # Hash the observed features and values.
 my %h;
 my %lh; # hash indexed by language code
-foreach my $language (@data)
+foreach my $language (@{$data})
 {
     my $lcode = $language->[1];
     # Remember observed features and values.
-    for(my $i = 1; $i <= $#headers; $i++)
+    for(my $i = 1; $i <= $#{$headers}; $i++)
     {
-        my $feature = $headers[$i];
+        my $feature = $headers->[$i];
         # There seem to be multiple ways of indicating an unknown value. Unify them.
         $language->[$i] = '?' if(!defined($language->[$i]) || $language->[$i] eq '' || $language->[$i] eq 'nan' || $language->[$i] eq '?');
         $h{$feature}{$language->[$i]}++;
@@ -88,7 +42,7 @@ foreach my $language (@data)
     }
 }
 #list_features_and_values(\@headers, \%h);
-compute_pairwise_cooccurrence(\@headers, \%lh);
+compute_pairwise_cooccurrence($headers, \%lh);
 
 
 
@@ -133,7 +87,7 @@ sub list_features_and_values
 sub compute_pairwise_cooccurrence
 {
     my $headers = shift; # array ref
-    my $lh = shift; # hash ref
+    my $lh = shift; # hash ref: features indexed by language
     my @languages = keys(%{$lh});
     my %cooc;
     foreach my $l (@languages)
@@ -150,16 +104,12 @@ sub compute_pairwise_cooccurrence
                 my $gv = $lh->{$l}{$g};
                 next if($gv eq '?');
                 $cooc{$f}{$fv}{$g}{$gv}++;
-                ###!!! DEBUG
-                #print("$l\n");
-                #print("$f = $fv\n");
-                #print("$g = $gv\n");
-                #print("\n");
             }
         }
     }
     # Now look at the cooccurrences disregarding individual languages.
     my %coocflat;
+    my %probflat;
     foreach my $f (@{$headers})
     {
         my @fvalues = keys(%{$cooc{$f}});
@@ -167,23 +117,106 @@ sub compute_pairwise_cooccurrence
         {
             foreach my $g (keys(%{$cooc{$f}{$fv}}))
             {
-                # Cooccurrences are symmetric, hence do not report both $f+$g and $g+$f.
-                next if($g le $f);
                 my @gvalues = keys(%{$cooc{$f}{$fv}{$g}});
+                # What is the total number of cases when $f=$fv cooccurred with a nonempty value of $g?
+                my $nffvg = 0;
                 foreach my $gv (@gvalues)
                 {
-                    my $keystring = "$f == $fv && $g == $gv";
+                    $nffvg += $cooc{$f}{$fv}{$g}{$gv};
+                }
+                foreach my $gv (@gvalues)
+                {
+                    my $keystring = "$f == $fv => $g == $gv";
                     $coocflat{$keystring} = $cooc{$f}{$fv}{$g}{$gv};
+                    # Conditional probability of $g=$gv given $f=$fv.
+                    my $p = $cooc{$f}{$fv}{$g}{$gv} / $nffvg;
+                    $probflat{$keystring} = $p;
                 }
             }
         }
     }
-    my @keys = sort {$coocflat{$b} <=> $coocflat{$a}} (keys(%coocflat));
+    my @keys = sort {$probflat{$b}*$coocflat{$b} <=> $probflat{$a}*$coocflat{$a}} (keys(%coocflat));
     foreach my $key (@keys)
     {
-        last if($coocflat{$key} <= 5);
-        print("$coocflat{$key}\t$key\n");
+        next if($probflat{$key} <= 0.5);
+        next if($coocflat{$key} <= 5);
+        print("$probflat{$key}\t$coocflat{$key}\t$key\n");
     }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Reads the input CSV (comma-separated values) file: either from STDIN, or from
+# files supplied as arguments. Returns a list of column headers and a list of
+# table rows (both as array refs).
+#------------------------------------------------------------------------------
+sub read_csv
+{
+    # @_ can optionally contain the list of files to read from.
+    # If it does not exist, @ARGV will be tried. If it is empty, read from STDIN.
+    my $myfiles = 0;
+    my @oldargv;
+    if(scalar(@_) > 0)
+    {
+        $myfiles = 1;
+        @oldargv = @ARGV;
+        @ARGV = @_;
+    }
+    my @headers = ();
+    my $nf;
+    my $iline = 0;
+    my @data; # the table, without the header line
+    while(<>)
+    {
+        $iline++;
+        s/\r?\n$//;
+        # In the non-original (comma-separated) file, we must distinguish commas inside quotes from those outside.
+        unless($original)
+        {
+            $_ = process_quoted_commas($_, $rcomma);
+        }
+        my @f = ();
+        if(scalar(@headers)==0)
+        {
+            # In the original dev.csv, the headers are separated by one or more spaces, while the rest is separated by tabulators!
+            if($original)
+            {
+                @f = split(/\s+/, $_);
+            }
+            else
+            {
+                @f = split(/,/, $_);
+            }
+            @headers = map {restore_commas($_, $rcomma)} (@f);
+            $nf = scalar(@headers);
+        }
+        else
+        {
+            if($original)
+            {
+                @f = split(/\t/, $_);
+            }
+            else
+            {
+                @f = split(/,/, $_);
+            }
+            @f = map {restore_commas($_, $rcomma)} (@f);
+            my $n = scalar(@f);
+            # The number of values may be less than the number of columns if the trailing columns are empty.
+            # However, the number of values must not be greater than the number of columns (which would happen if a value contained the separator character).
+            if($n > $nf)
+            {
+                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n.\n");
+            }
+            push(@data, \@f);
+        }
+    }
+    if($myfiles)
+    {
+        @ARGV = @oldargv;
+    }
+    return (\@headers, \@data);
 }
 
 
