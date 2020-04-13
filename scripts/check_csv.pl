@@ -49,7 +49,7 @@ sub hash_features
     {
         my $lcode = $language->[1];
         # Remember observed features and values.
-        for(my $i = 1; $i <= $#{$headers}; $i++)
+        for(my $i = 0; $i <= $#{$headers}; $i++)
         {
             my $feature = $headers->[$i];
             # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).

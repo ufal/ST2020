@@ -79,19 +79,20 @@ my $avgqm = $sumqm/$nl;
 my $avgreg = $sumreg/$nl;
 print STDERR ("On average, a language has $avgreg non-empty features and $avgqm features to predict.\n");
 print STDERR ("Minimum knowledge is $minreg non-empty features; in that case, $minreg_qm features are to be predicted.\n");
-print STDERR ("Note that the non-empty features always include 7 non-typologic features: code, name, latitude, longitude, genus, family, countrycodes.\n");
+print STDERR ("Note that the non-empty features always include 8 non-typologic features: ord, code, name, latitude, longitude, genus, family, countrycodes.\n");
 # Predict the masked features.
 ###!!! This is the first shot...
 print STDERR ("Predicting the masked features...\n");
+my $debug = 0; # print all predictions with explanation to STDERR
 foreach my $l (@languages)
 {
-    print STDERR ("Language $devlh->{$l}{wals_code} ($devlh->{$l}{name}):\n");
+    print STDERR ("Language $devlh->{$l}{wals_code} ($devlh->{$l}{name}):\n") if($debug);
     my @features = keys(%{$devlh->{$l}});
     my @rfeatures = grep {$devlh->{$l}{$_} !~ m/^nan|\?$/} (@features);
     my @qfeatures = grep {$devlh->{$l}{$_} eq '?'} (@features);
     foreach my $qf (@qfeatures)
     {
-        print STDERR ("  Predicting $qf:\n");
+        print STDERR ("  Predicting $qf:\n") if($debug);
         my @model;
         foreach my $rf (@rfeatures)
         {
@@ -116,17 +117,20 @@ foreach my $l (@languages)
                 #print STDERR ("    No cooccurrence with $rf == $devlh->{$l}{$rf}.\n");
             }
         }
-        print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n");
+        print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
         if(scalar(@model)>0)
         {
             # We want a high probability but we also want it to be based on a sufficiently large count.
             @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
             my $prediction = $model[0]{v};
-            print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n");
+            print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
+            # Now save the winning prediction in the language-feature hash.
+            $devlh->{$l}{$qf} = $prediction;
         }
     }
-    exit; ###!!!
 }
+print STDERR ("Writing the completed file...\n");
+write_csv($devheaders, $devlh);
 
 
 
@@ -147,7 +151,7 @@ sub hash_features
     {
         my $lcode = $language->[1];
         # Remember observed features and values.
-        for(my $i = 1; $i <= $#{$headers}; $i++)
+        for(my $i = 0; $i <= $#{$headers}; $i++)
         {
             my $feature = $headers->[$i];
             # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
@@ -224,6 +228,47 @@ sub compute_pairwise_cooccurrence
 #==============================================================================
 # Input and output functions.
 #==============================================================================
+
+
+
+#------------------------------------------------------------------------------
+# Takes the column headers (needed because of their order) and the current
+# language-feature hash with the newly predicted values and prints them as
+# a CSV file to STDOUT.
+#------------------------------------------------------------------------------
+sub write_csv
+{
+    my $headers = shift; # array ref
+    my $lh = shift; # hash ref
+    my @headers = map {escape_commas($_)} (@{$headers});
+    print(join(',', @headers), "\n");
+    my @languages = sort {$lh->{$a}{''} <=> $lh->{$b}{''}} (keys(%{$lh}));
+    foreach my $l (@languages)
+    {
+        my @values = map {escape_commas($lh->{$l}{$_})} (@{$headers});
+        print(join(',', @values), "\n");
+    }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Takes a value of a CSV cell and makes sure that it is enclosed in quotation
+# marks if it contains a comma.
+#------------------------------------------------------------------------------
+sub escape_commas
+{
+    my $string = shift;
+    if($string =~ m/"/) # "
+    {
+        die("A CSV value must not contain a double quotation mark");
+    }
+    if($string =~ m/,/)
+    {
+        $string = '"'.$string.'"';
+    }
+    return $string;
+}
 
 
 
