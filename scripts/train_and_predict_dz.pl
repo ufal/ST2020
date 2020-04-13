@@ -4,6 +4,11 @@
 # Copyright © 2020 Dan Zeman <zeman@ufal.mff.cuni.cz>
 # License: GNU GPL
 
+# Usage:
+#   cd $REPO_ROOT
+#   perl scripts/train_and_predict.pl > data/devdz.csv
+#   python3 scripts/evaluate_from_csv.py --input_file data/dev_x.csv --output_file data/devdz.csv --golden_file data/dev_y.csv
+
 use utf8;
 use open ':utf8';
 binmode(STDIN, ':utf8');
@@ -83,38 +88,56 @@ print STDERR ("Note that the non-empty features always include 8 non-typologic f
 # Predict the masked features.
 ###!!! This is the first shot...
 print STDERR ("Predicting the masked features...\n");
-my $debug = 0; # print all predictions with explanation to STDERR
 foreach my $l (@languages)
 {
+    predict_masked_features($devlh->{$l}, $trainprob, $traincooc);
+}
+print STDERR ("Writing the completed file...\n");
+write_csv($devheaders, $devlh);
+
+
+
+#------------------------------------------------------------------------------
+# Takes the hash of features of a language, some of the features are masked
+# (their value is '?'). Predicts the values of the masked features based on the
+# values of the unmasked features. Writes the predicted values directly to the
+# hash, i.e., replaces the question marks.
+#------------------------------------------------------------------------------
+sub predict_masked_features
+{
+    my $debug = 0; # print all predictions with explanation to STDERR
+    my $lhl = shift; # hash ref: feature-value hash of one language
+    my $prob = shift; # hash ref: conditional probabilities of features given other features
+    my $cooc = shift; # hash ref: cooccurrence counts of feature-value pairs
     print STDERR ("Language $devlh->{$l}{wals_code} ($devlh->{$l}{name}):\n") if($debug);
-    my @features = keys(%{$devlh->{$l}});
-    my @rfeatures = grep {$devlh->{$l}{$_} !~ m/^nan|\?$/} (@features);
-    my @qfeatures = grep {$devlh->{$l}{$_} eq '?'} (@features);
+    my @features = keys(%{$lhl});
+    my @rfeatures = grep {$lhl->{$_} !~ m/^nan|\?$/} (@features);
+    my @qfeatures = grep {$lhl->{$_} eq '?'} (@features);
     foreach my $qf (@qfeatures)
     {
         print STDERR ("  Predicting $qf:\n") if($debug);
         my @model;
         foreach my $rf (@rfeatures)
         {
-            if(exists($trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}))
+            if(exists($prob->{$rf}{$lhl->{$rf}}{$qf}))
             {
-                my @qvalues = keys(%{$trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}});
+                my @qvalues = keys(%{$prob->{$rf}{$lhl->{$rf}}{$qf}});
                 foreach my $qv (@qvalues)
                 {
                     push(@model,
                     {
-                        'p' => $trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}{$qv},
-                        'c' => $traincooc->{$rf}{$devlh->{$l}{$rf}}{$qf}{$qv},
+                        'p' => $prob->{$rf}{$lhl->{$rf}}{$qf}{$qv},
+                        'c' => $cooc->{$rf}{$lhl->{$rf}}{$qf}{$qv},
                         'v' => $qv,
                         'rf' => $rf,
-                        'rv' => $devlh->{$l}{$rf}
+                        'rv' => $lhl->{$rf}
                     });
-                    #print STDERR ("    Cooccurrence with $rf == $devlh->{$l}{$rf} => $qv (p=$trainprob->{$rf}{$devlh->{$l}{$rf}}{$qf}{$qv}).\n");
+                    #print STDERR ("    Cooccurrence with $rf == $lhl->{$rf} => $qv (p=$prob->{$rf}{$lhl->{$rf}}{$qf}{$qv}).\n");
                 }
             }
             else
             {
-                #print STDERR ("    No cooccurrence with $rf == $devlh->{$l}{$rf}.\n");
+                #print STDERR ("    No cooccurrence with $rf == $lhl->{$rf}.\n");
             }
         }
         print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
@@ -125,12 +148,10 @@ foreach my $l (@languages)
             my $prediction = $model[0]{v};
             print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
             # Now save the winning prediction in the language-feature hash.
-            $devlh->{$l}{$qf} = $prediction;
+            $lhl->{$qf} = $prediction;
         }
     }
 }
-print STDERR ("Writing the completed file...\n");
-write_csv($devheaders, $devlh);
 
 
 
