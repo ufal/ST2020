@@ -26,23 +26,43 @@ if($original)
     die("Cannot do this with the original file.");
 }
 # Hash the observed features and values.
-my %h;
-my %lh; # hash indexed by language code
-foreach my $language (@{$data})
+my ($h, $lh) = hash_features($headers, $data, 1);
+#list_features_and_values($headers, $h);
+compute_pairwise_cooccurrence($headers, $lh);
+
+
+
+#------------------------------------------------------------------------------
+# Converts the input table to two hashes (returns two hash references).
+# The first hash is indexed by features and values; contains number of occur-
+# rences. The second hash is indexed by languages and features; contains
+# feature values.
+#------------------------------------------------------------------------------
+sub hash_features
 {
-    my $lcode = $language->[1];
-    # Remember observed features and values.
-    for(my $i = 1; $i <= $#{$headers}; $i++)
+    my $headers = shift; # array ref
+    my $data = shift; # array ref
+    my $qm_is_nan = shift; # convert question marks to 'nan'?
+    my %h;
+    my %lh; # hash indexed by language code
+    foreach my $language (@{$data})
     {
-        my $feature = $headers->[$i];
-        # There seem to be multiple ways of indicating an unknown value. Unify them.
-        $language->[$i] = '?' if(!defined($language->[$i]) || $language->[$i] eq '' || $language->[$i] eq 'nan' || $language->[$i] eq '?');
-        $h{$feature}{$language->[$i]}++;
-        $lh{$lcode}{$feature} = $language->[$i];
+        my $lcode = $language->[1];
+        # Remember observed features and values.
+        for(my $i = 1; $i <= $#{$headers}; $i++)
+        {
+            my $feature = $headers->[$i];
+            # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
+            $language->[$i] = 'nan' if(!defined($language->[$i]) || $language->[$i] eq '' || $language->[$i] eq 'nan');
+            # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
+            # If desired, we can convert question marks to 'nan' here.
+            $language->[$i] = 'nan' if($language->[$i] eq '?' && $qm_is_nan);
+            $h{$feature}{$language->[$i]}++;
+            $lh{$lcode}{$feature} = $language->[$i];
+        }
     }
+    return (\%h, \%lh);
 }
-#list_features_and_values(\@headers, \%h);
-compute_pairwise_cooccurrence($headers, \%lh);
 
 
 
@@ -61,7 +81,7 @@ sub list_features_and_values
         my $sum = 0;
         foreach my $value (@values)
         {
-            unless($value eq '?')
+            unless($value eq 'nan')
             {
                 $sum += $h->{$headers->[$i]}{$value}
             }
@@ -69,7 +89,7 @@ sub list_features_and_values
         foreach my $value (@values)
         {
             my $p = '';
-            unless($value eq '?')
+            unless($value eq 'nan')
             {
                 $p = $h->{$headers->[$i]}{$value} / $sum;
             }
@@ -96,13 +116,13 @@ sub compute_pairwise_cooccurrence
         {
             next if(!exists($lh->{$l}{$f}));
             my $fv = $lh->{$l}{$f};
-            next if($fv eq '?');
+            next if($fv eq 'nan');
             foreach my $g (@{$headers})
             {
                 next if($g eq $f);
                 next if(!exists($lh->{$l}{$g}));
                 my $gv = $lh->{$l}{$g};
-                next if($gv eq '?');
+                next if($gv eq 'nan');
                 $cooc{$f}{$fv}{$g}{$gv}++;
             }
         }
@@ -143,6 +163,12 @@ sub compute_pairwise_cooccurrence
         print("$probflat{$key}\t$coocflat{$key}\t$key\n");
     }
 }
+
+
+
+#==============================================================================
+# Input and output functions.
+#==============================================================================
 
 
 
