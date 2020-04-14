@@ -28,7 +28,7 @@ test data will probably have no overlap)
   [CCA](https://en.wikipedia.org/wiki/Canonical_correlation)
 
 The [shared task website](https://sigtyp.github.io/st2020.html) also lists some existing work on the topic:
-* [Daumé III and Campbell 2017](https://arxiv.org/abs/0907.0785)
+* [Daumé III and Campbell 2007](https://arxiv.org/abs/0907.0785)
 * [Bjerva et al. 2019](https://arxiv.org/abs/1903.10950)
 
 # SIGTYP 2020 Shared Task : Prediction of Typological Features
