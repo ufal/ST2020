@@ -31,6 +31,7 @@ GetOptions
 #     {nf} ........ number of features (headers)
 #     {nl} ........ number of languages
 #   Filled by hash_features()
+#     {lcodes} .... list of wals codes of known languages (index to lh)
 #     {lh} ........ data from {table} indexed by {language}{feature}
 #     {lhclean} ... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
@@ -136,8 +137,8 @@ foreach my $f (@features)
 print STDERR ("Found $nnan nan values.\n");
 print STDERR ("Found $nqm ? values to be predicted.\n");
 print STDERR ("Found $nreg regular non-empty values.\n");
-my @languages = keys(%{$devdata{lh}});
-my $nl = scalar(@languages);
+my @languages = @{$devdata{lcodes}};
+my $nl = $devdata{nl};
 my $sumqm = 0;
 my $sumreg = 0;
 my $minreg;
@@ -305,10 +306,11 @@ sub model_weighted_vote
 
 #------------------------------------------------------------------------------
 # Converts the input table to hashes.
-#     {lh} ........ data from {table} indexed by {language}{feature}
-#     {lhclean} ... like {lh} but contains only non-empty values (that are not
+#   {lcodes} ...... list of wals codes of known languages (index to lh)
+#   {lh} .......... data from {table} indexed by {language}{feature}
+#   {lhclean} ..... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
-#     {fvcount} ... hash indexed by {feature}{value} => count of that value
+#   {fvcount} ..... hash indexed by {feature}{value} => count of that value
 #------------------------------------------------------------------------------
 sub hash_features
 {
@@ -317,9 +319,11 @@ sub hash_features
     my %h;
     my %lh; # hash indexed by language code
     my %lhclean; # like %lh but only non-empty values
+    my @lcodes;
     foreach my $language (@{$data->{table}})
     {
         my $lcode = $language->[1];
+        push(@lcodes, $lcode);
         # Remember observed features and values.
         for(my $i = 0; $i <= $#{$data->{features}}; $i++)
         {
@@ -337,6 +341,7 @@ sub hash_features
             }
         }
     }
+    $data->{lcodes} = \@lcodes;
     $data->{lh} = \%lh;
     $data->{lhclean} = \%lhclean;
     $data->{fvcount} = \%h;
