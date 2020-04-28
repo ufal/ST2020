@@ -57,10 +57,10 @@ compute_pairwise_cooccurrence(\%traindata);
 print STDERR ("Computing entropy of each feature...\n");
 if($debug)
 {
-    my @features_by_entropy = sort {$data->{fentropy}{$a} <=> $data->{fentropy}{$b}} (@{$data->{features}});
+    my @features_by_entropy = sort {$traindata->{fentropy}{$a} <=> $traindata->{fentropy}{$b}} (@{$traindata->{features}});
     foreach my $feature (@features_by_entropy)
     {
-        print STDERR ("  $entropy{$feature} = H($feature)\n");
+        print STDERR ("  $traindata->{fentropy}{$feature} = H($feature)\n");
     }
 }
 # Compute conditional entropy of each pair of features.
