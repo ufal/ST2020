@@ -464,12 +464,14 @@ sub get_conditional_entropy
         # For each pair $fv, $gv, count p($fv,$gv) and add it to the entropy.
         foreach my $fv (keys(%{$data->{cooc}{$f}}))
         {
+            next if($fv eq 'nan');
             # If $sumfg > 0, $sumf should not be 0 either, but to be safe...
             my $pfv = $data->{fvprob}{$f}{$fv};
             if(exists($data->{cooc}{$f}{$fv}{$g}) && defined($data->{cooc}{$f}{$fv}{$g}))
             {
                 foreach my $gv (keys(%{$data->{cooc}{$f}{$fv}{$g}}))
                 {
+                    next if($gv eq 'nan');
                     my $pfvgv = $data->{cooc}{$f}{$fv}{$g}{$gv} / $sumfg;
                     if($pfvgv > 0 && $pfv > 0)
                     {
