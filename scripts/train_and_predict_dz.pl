@@ -77,7 +77,7 @@ if(1)
         {
             next if($g =~ m/^(index|wals_code|name)$/ || $g eq $f);
             # Conditional entropy of $g given $f:
-            $condentropy{$f}{$g} = get_conditional_entropy($traindata{lh}, $traindata{cooc}, $f, $g);
+            $condentropy{$f}{$g} = get_conditional_entropy(\%traindata, $f, $g);
             # And mutual information of $f and $g:
             $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
         }
@@ -85,9 +85,9 @@ if(1)
     if($debug)
     {
         my @feature_pairs;
-        foreach my $f (@{$traindata{features}})
+        foreach my $f (keys(%condentropy))
         {
-            foreach my $g (@{$traindata{features}})
+            foreach my $g (keys(%{$condentropy{$f}}))
             {
                 push(@feature_pairs, [$f, $g]);
             }
