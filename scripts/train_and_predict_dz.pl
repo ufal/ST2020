@@ -65,15 +65,17 @@ if($debug)
     }
 }
 # Compute conditional entropy of each pair of features.
-if(0)
+if(1)
 {
     print STDERR ("Computing conditional entropy of each pair of features...\n");
     my %condentropy;
     my %information;
     foreach my $f (@{$traindata{features}})
     {
+        next if($f =~ m/^(index|wals_code|name)$/);
         foreach my $g (@{$traindata{features}})
         {
+            next if($g =~ m/^(index|wals_code|name)$/ || $g eq $f);
             # Conditional entropy of $g given $f:
             $condentropy{$f}{$g} = get_conditional_entropy($traindata{lh}, $traindata{cooc}, $f, $g);
             # And mutual information of $f and $g:
