@@ -22,14 +22,29 @@ GetOptions
     'debug' => \$debug
 );
 
+#==============================================================================
+# The main data structure for a seat of language descriptions read from CSV:
+# %data:
+#   Filled by read_csv(): -----------------------------------------------------
+#     {features} .. names of features = headers of columns in the table
+#     {table} ..... the table: array of arrays
+#     {nf} ........ number of features (headers)
+#     {nl} ........ number of languages
+#   Filled by
+#     {lh} ........ data from {table} indexed by {language}{feature}
+#     {lhclean} ... like {lh} but contains only non-empty values (that are not
+#                   '', 'nan' or '?')
+#     {fvcount} ... hash indexed by {feature}{value} => count of that value
+#==============================================================================
+
 my $data_folder = 'data';
 print STDERR ("Reading the training data...\n");
-my ($trainheaders, $traindata) = read_csv("$data_folder/train_y.csv");
-print STDERR ("Found ", scalar(@{$trainheaders}), " headers.\n");
-print STDERR ("Found ", scalar(@{$traindata}), " language lines.\n");
+my %traindata = read_csv("$data_folder/train_y.csv");
+print STDERR ("Found $traindata{nf} headers.\n");
+print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
-my ($trainh, $trainlh) = hash_features($trainheaders, $traindata, 0);
+my ($trainh, $trainlh) = hash_features($traindata{features}, $traindata{table}, 0);
 my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($trainheaders, $trainlh);
 # Compute entropy of each feature.
 print STDERR ("Computing entropy of each feature...\n");
@@ -47,48 +62,51 @@ if($debug)
     }
 }
 # Compute conditional entropy of each pair of features.
-print STDERR ("Computing conditional entropy of each pair of features...\n");
-my %condentropy;
-my %information;
-foreach my $f (keys(%{$trainh}))
+if(0)
 {
-    foreach my $g (keys(%{$trainh}))
-    {
-        # Conditional entropy of $g given $f:
-        $condentropy{$f}{$g} = get_conditional_entropy($trainlh, $traincooc, $f, $g);
-        # And mutual information of $f and $g:
-        $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
-    }
-}
-if($debug)
-{
-    my @feature_pairs;
+    print STDERR ("Computing conditional entropy of each pair of features...\n");
+    my %condentropy;
+    my %information;
     foreach my $f (keys(%{$trainh}))
     {
         foreach my $g (keys(%{$trainh}))
         {
-            push(@feature_pairs, [$f, $g]);
+            # Conditional entropy of $g given $f:
+            $condentropy{$f}{$g} = get_conditional_entropy($trainlh, $traincooc, $f, $g);
+            # And mutual information of $f and $g:
+            $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
         }
     }
-    my @feature_pairs_by_information = sort {$information{$b->[0]}{$b->[1]} <=> $information{$a->[0]}{$a->[1]}} (@feature_pairs);
-    foreach my $fg (@feature_pairs_by_information)
+    if($debug)
     {
-        print STDERR ("  $information{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
+        my @feature_pairs;
+        foreach my $f (keys(%{$trainh}))
+        {
+            foreach my $g (keys(%{$trainh}))
+            {
+                push(@feature_pairs, [$f, $g]);
+            }
+        }
+        my @feature_pairs_by_information = sort {$information{$b->[0]}{$b->[1]} <=> $information{$a->[0]}{$a->[1]}} (@feature_pairs);
+        foreach my $fg (@feature_pairs_by_information)
+        {
+            print STDERR ("  $information{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
+        }
     }
 }
 print STDERR ("Reading the development data...\n");
-my ($devheaders, $devdata) = read_csv("$data_folder/dev_x.csv");
+my %devdata = read_csv("$data_folder/dev_x.csv");
 # Read the gold standard development data. It will help us with debugging and error analysis.
 print STDERR ("Reading the development gold standard data...\n");
-my ($devgheaders, $devgdata) = read_csv("$data_folder/dev_y.csv");
-print STDERR ("Found ", scalar(@{$devheaders}), " headers.\n");
-print STDERR ("Found ", scalar(@{$devdata}), " language lines.\n");
-my $ndevlangs = scalar(@{$devdata});
-my $ndevfeats = scalar(@{$devheaders})-1; # first column is ord number; except for that, counting everything including the language code and name
+my %devgdata = read_csv("$data_folder/dev_y.csv");
+print STDERR ("Found $devdata{nf} headers.\n");
+print STDERR ("Found $devdata{nl} language lines.\n");
+my $ndevlangs = $devdata{nl};
+my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
-my ($devh, $devlh) = hash_features($devheaders, $devdata, 0);
-my ($devgh, $devglh) = hash_features($devgheaders, $devgdata, 0);
+my ($devh, $devlh) = hash_features($devdata{features}, $devdata{table}, 0);
+my ($devgh, $devglh) = hash_features($devgdata{features}, $devgdata{table}, 0);
 my @features = keys(%{$devh});
 my $nnan = 0;
 my $nqm = 0;
@@ -147,7 +165,7 @@ foreach my $l (@languages)
     predict_masked_features($devlh->{$l}, $trainprob, $traincooc, $devglh->{$l});
 }
 print STDERR ("Writing the completed file...\n");
-write_csv($devheaders, $devlh);
+write_csv($devdata{features}, $devlh);
 
 
 
@@ -590,7 +608,14 @@ sub read_csv
     {
         @ARGV = @oldargv;
     }
-    return (\@headers, \@data);
+    my %data =
+    (
+        'features' => \@headers,
+        'table'    => \@data,
+        'nf'       => scalar(@headers),
+        'nl'       => scalar(@data)
+    );
+    return %data;
 }
 
 
