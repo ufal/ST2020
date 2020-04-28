@@ -322,10 +322,10 @@ sub hash_features
 {
     my $data = shift; # hash ref
     my $qm_is_nan = shift; # convert question marks to 'nan'?
-    my %h;
+    my @lcodes;
     my %lh; # hash indexed by language code
     my %lhclean; # like %lh but only non-empty values
-    my @lcodes;
+    my %fvcount;
     foreach my $language (@{$data->{table}})
     {
         my $lcode = $language->[1];
@@ -339,18 +339,18 @@ sub hash_features
             # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
             # If desired, we can convert question marks to 'nan' here.
             $language->[$i] = 'nan' if($language->[$i] eq '?' && $qm_is_nan);
-            $h{$feature}{$language->[$i]}++;
             $lh{$lcode}{$feature} = $language->[$i];
             unless($language->[$i] eq 'nan' || $language->[$i] eq '?')
             {
                 $lhclean{$lcode}{$feature} = $language->[$i];
+                $fvcount{$feature}{$language->[$i]}++;
             }
         }
     }
     $data->{lcodes} = \@lcodes;
     $data->{lh} = \%lh;
     $data->{lhclean} = \%lhclean;
-    $data->{fvcount} = \%h;
+    $data->{fvcount} = \%fvcount;
 }
 
 
