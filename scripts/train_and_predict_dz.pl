@@ -156,10 +156,28 @@ sub predict_masked_features
         {
             if($debug)
             {
-                @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+                # Sort source features: the one with strongest possible prediction first.
+                my %rfeatures;
                 foreach my $cooc (@model)
                 {
-                    print STDERR ("    Cooccurrence with $cooc->{rf} == $lhl->{$cooc->{rf}} => $cooc->{v} (p=$cooc->{p}).\n");
+                    if(!defined($rfeatures{$cooc->{rf}}) || $cooc->{p} > $rfeatures{$cooc->{rf}})
+                    {
+                        $rfeatures{$cooc->{rf}} = $cooc->{p};
+                    }
+                }
+                my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
+                @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+                foreach my $rfeature (@rfeatures)
+                {
+                    my $rvalue = $lhl->{$rfeature};
+                    # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
+                    foreach my $cooc (@model)
+                    {
+                        if($cooc->{rf} eq $rfeature)
+                        {
+                            print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}).\n");
+                        }
+                    }
                 }
             }
             # Save the winning prediction in the language-feature hash.
