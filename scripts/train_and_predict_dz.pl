@@ -80,6 +80,11 @@ if(1)
             $condentropy{$f}{$g} = get_conditional_entropy(\%traindata, $f, $g);
             # And mutual information of $f and $g:
             $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
+            ###!!! Sanity check.
+            if($information{$f}{$g} < 0)
+            {
+                die("Something is wrong. Mutual information must not be negative but it is for\n\tf = $f\n\tg = $g\n");
+            }
         }
     }
     if($debug)
