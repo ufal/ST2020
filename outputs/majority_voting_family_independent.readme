@@ -1,0 +1,5 @@
+
+Majority voting based on all languages, disregarding any features and
+anthing (a baseline).
+
+Accuracy on dev data 53.32%
