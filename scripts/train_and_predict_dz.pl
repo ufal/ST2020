@@ -79,7 +79,7 @@ if(1)
             # Conditional entropy of $g given $f:
             $condentropy{$f}{$g} = get_conditional_entropy(\%traindata, $f, $g);
             # And mutual information of $f and $g:
-            $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
+            $information{$f}{$g} = $traindata{fentropy}{$g} - $condentropy{$f}{$g};
             ###!!! Sanity check.
             if($information{$f}{$g} < 0)
             {
