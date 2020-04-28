@@ -341,7 +341,7 @@ sub hash_features
             $language->[$i] = 'nan' if($language->[$i] eq '?' && $qm_is_nan);
             $h{$feature}{$language->[$i]}++;
             $lh{$lcode}{$feature} = $language->[$i];
-            unless($language->[$i] eq 'nan')
+            unless($language->[$i] eq 'nan' || $language->[$i] eq '?')
             {
                 $lhclean{$lcode}{$feature} = $language->[$i];
             }
@@ -377,16 +377,14 @@ sub compute_pairwise_cooccurrence
     {
         foreach my $f (@{$data->{features}})
         {
-            next if(!exists($data->{lh}{$l}{$f}));
-            my $fv = $data->{lh}{$l}{$f};
-            next if($fv eq 'nan' || $fv eq '?');
+            next if(!exists($data->{lhclean}{$l}{$f}));
+            my $fv = $data->{lhclean}{$l}{$f};
             $fcount{$f}++;
             foreach my $g (@{$data->{features}})
             {
                 next if($g eq $f);
-                next if(!exists($data->{lh}{$l}{$g}));
+                next if(!exists($data->{lhclean}{$l}{$g}));
                 my $gv = $data->{lh}{$l}{$g};
-                next if($gv eq 'nan' || $gv eq '?');
                 $fgcount{$f}{$g}++;
                 $cooc{$f}{$fv}{$g}{$gv}++;
             }
