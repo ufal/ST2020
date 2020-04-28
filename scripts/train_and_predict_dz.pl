@@ -160,9 +160,10 @@ sub predict_masked_features
                 my %rfeatures;
                 foreach my $cooc (@model)
                 {
-                    if(!defined($rfeatures{$cooc->{rf}}) || $cooc->{p} > $rfeatures{$cooc->{rf}})
+                    my $plogc = $cooc->{p}*log($cooc->{c});
+                    if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
                     {
-                        $rfeatures{$cooc->{rf}} = $cooc->{p};
+                        $rfeatures{$cooc->{rf}} = $plogc;
                     }
                 }
                 my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
@@ -175,7 +176,8 @@ sub predict_masked_features
                     {
                         if($cooc->{rf} eq $rfeature)
                         {
-                            print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}).\n");
+                            my $plogc = $cooc->{p}*log($cooc->{c});
+                            print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$plogc).\n");
                         }
                     }
                 }
