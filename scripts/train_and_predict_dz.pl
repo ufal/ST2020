@@ -437,32 +437,22 @@ sub compute_pairwise_cooccurrence
 #------------------------------------------------------------------------------
 sub get_conditional_entropy
 {
-    my $lh = shift; # hash ref: features indexed by language
-    my $cooc = shift; # hash ref: cooccurrences of feature values
+    my $data = shift; # hash ref
     my $f = shift; # the feature whose value we will know
     my $g = shift; # the feature whose value we will predict
     # p($fv,$gv) ... probability that $f=$fv and $g=$gv in the same language
     # Examine cooccurrences of feature values within one language. Our pre-
     # computed %cooc hash is indexed {$f}{$fv}{$g}{$gv} but we now need
     # {$f}{$g}{$fv}{$gv}.
-    # Count how many times $f had a non-empty value.
-    my $sumf = 0;
-    foreach my $l (keys(%{$lh}))
-    {
-        if(exists($lh->{$l}{$f}) && defined($lh->{$l}{$f}) && $lh->{$l}{$f} ne '' && $lh->{$l}{$f} !~ m/^(nan|\?)$/)
-        {
-            $sumf++;
-        }
-    }
     # Count how many times non-empty values of $f and $g cooccurred in one language.
     my $sumfg = 0;
-    foreach my $fv (keys(%{$cooc->{$f}}))
+    foreach my $fv (keys(%{$data->{cooc}{$f}}))
     {
-        if(exists($cooc->{$f}{$fv}{$g}) && defined($cooc->{$f}{$fv}{$g}))
+        if(exists($data->{cooc}{$f}{$fv}{$g}) && defined($data->{cooc}{$f}{$fv}{$g}))
         {
-            foreach my $gv (keys(%{$cooc->{$f}{$fv}{$g}}))
+            foreach my $gv (keys(%{$data->{cooc}{$f}{$fv}{$g}}))
             {
-                $sumfg += $cooc->{$f}{$fv}{$g}{$gv};
+                $sumfg += $data->{cooc}{$f}{$fv}{$g}{$gv};
             }
         }
     }
@@ -470,24 +460,15 @@ sub get_conditional_entropy
     if($sumfg > 0)
     {
         # For each pair $fv, $gv, count p($fv,$gv) and add it to the entropy.
-        foreach my $fv (keys(%{$cooc->{$f}}))
+        foreach my $fv (keys(%{$data->{cooc}{$f}}))
         {
-            # Count how many times $fv occurred in any language.
-            my $cfv = 0;
-            foreach my $l (keys(%{$lh}))
-            {
-                if(exists($lh->{$l}{$f}) && $lh->{$l}{$f} eq $fv)
-                {
-                    $cfv++;
-                }
-            }
             # If $sumfg > 0, $sumf should not be 0 either, but to be safe...
-            my $pfv = $sumf > 0 ? $cfv / $sumf : 0;
-            if(exists($cooc->{$f}{$fv}{$g}) && defined($cooc->{$f}{$fv}{$g}))
+            my $pfv = $data->{fvprob}{$f}{$fv};
+            if(exists($data->{cooc}{$f}{$fv}{$g}) && defined($data->{cooc}{$f}{$fv}{$g}))
             {
-                foreach my $gv (keys(%{$cooc->{$f}{$fv}{$g}}))
+                foreach my $gv (keys(%{$data->{cooc}{$f}{$fv}{$g}}))
                 {
-                    my $pfvgv = $cooc->{$f}{$fv}{$g}{$gv} / $sumfg;
+                    my $pfvgv = $data->{cooc}{$f}{$fv}{$g}{$gv} / $sumfg;
                     if($pfvgv > 0 && $pfv > 0)
                     {
                         $entropy -= $pfvgv * log($pfvgv/$pfv);
