@@ -330,6 +330,8 @@ sub hash_features
     my %lhclean; # like %lh but only non-empty values
     my %fcount;
     my %fvcount;
+    my %fvprob;
+    my %fentropy;
     foreach my $language (@{$data->{table}})
     {
         my $lcode = $language->[1];
@@ -353,16 +355,13 @@ sub hash_features
         }
     }
     # Compute unconditional probability of each feature value and entropy of each feature.
-    my %fvprob;
-    my %fentropy;
     foreach my $f (@{$data->{features}})
     {
         $fentropy{$f} = 0;
-        next if($data->{fcount}{$f}==0);
-        foreach my $fv (keys(%{$data->{fvcount}{$f}}))
+        next if($fcount{$f}==0);
+        foreach my $fv (keys(%{$fvcount{$f}}))
         {
-            next if($fv eq 'nan');
-            my $p = $data->{fvcount}{$f}{$fv} / $data->{fcount}{$f};
+            my $p = $fvcount{$f}{$fv} / $fcount{$f};
             if($p < 0 || $p > 1)
             {
                 die("Something is wrong: p = $p");
