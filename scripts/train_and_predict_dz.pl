@@ -14,8 +14,13 @@ use open ':utf8';
 binmode(STDIN, ':utf8');
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
+use Getopt::Long;
 
-
+my $debug = 0; # print all predictions with explanation to STDERR
+GetOptions
+(
+    'debug' => \$debug
+);
 
 my $data_folder = 'data';
 print STDERR ("Reading the training data...\n");
@@ -109,7 +114,6 @@ write_csv($devheaders, $devlh);
 #------------------------------------------------------------------------------
 sub predict_masked_features
 {
-    local $debug = 0; # print all predictions with explanation to STDERR
     my $lhl = shift; # hash ref: feature-value hash of one language
     my $prob = shift; # hash ref: conditional probabilities of features given other features
     my $cooc = shift; # hash ref: cooccurrence counts of feature-value pairs
