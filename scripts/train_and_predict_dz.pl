@@ -43,6 +43,9 @@ GetOptions
 #     {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
+#     {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
+#     {centropy} .. hash {f}{g} => conditional entropy(g|f)
+#     {information} ... hash {f}{g} => mutual information between f and g
 #==============================================================================
 
 my $data_folder = 'data';
@@ -65,43 +68,23 @@ if($debug)
     }
 }
 # Compute conditional entropy of each pair of features.
-if(1)
+print STDERR ("Computing conditional entropy of each pair of features...\n");
+if($debug)
 {
-    print STDERR ("Computing conditional entropy of each pair of features...\n");
-    my %condentropy;
-    my %information;
-    foreach my $f (@{$traindata{features}})
+    my @feature_pairs;
+    foreach my $f (keys(%{$traindata{centropy}}))
     {
         next if($f =~ m/^(index|wals_code|name)$/);
-        foreach my $g (@{$traindata{features}})
+        foreach my $g (keys(%{$traindata{centropy}{$f}}))
         {
             next if($g =~ m/^(index|wals_code|name)$/ || $g eq $f);
-            # Conditional entropy of $g given $f:
-            $condentropy{$f}{$g} = get_conditional_entropy(\%traindata, $f, $g);
-            # And mutual information of $f and $g:
-            $information{$f}{$g} = $traindata{fentropy}{$g} - $condentropy{$f}{$g};
-            ###!!! Sanity check.
-            if($information{$f}{$g} < 0)
-            {
-                die("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g} for\n\tf = $f\n\tg = $g\n\tH(g) = $traindata{fentropy}{$g}\n\tH(g|f) = $condentropy{$f}{$g}");
-            }
+            push(@feature_pairs, [$f, $g]);
         }
     }
-    if($debug)
+    my @feature_pairs_by_information = sort {$traindata{information}{$b->[0]}{$b->[1]} <=> $traindata{information}{$a->[0]}{$a->[1]}} (@feature_pairs);
+    foreach my $fg (@feature_pairs_by_information)
     {
-        my @feature_pairs;
-        foreach my $f (keys(%condentropy))
-        {
-            foreach my $g (keys(%{$condentropy{$f}}))
-            {
-                push(@feature_pairs, [$f, $g]);
-            }
-        }
-        my @feature_pairs_by_information = sort {$information{$b->[0]}{$b->[1]} <=> $information{$a->[0]}{$a->[1]}} (@feature_pairs);
-        foreach my $fg (@feature_pairs_by_information)
-        {
-            print STDERR ("  $information{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
-        }
+        print STDERR ("  $traindata{information}{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
     }
 }
 print STDERR ("Reading the development data...\n");
@@ -388,6 +371,9 @@ sub hash_features
 #   {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #   {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #   {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
+#   {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
+#   {centropy} .. hash {f}{g} => conditional entropy(g|f)
+#   {information} ... hash {f}{g} => mutual information between f and g
 #------------------------------------------------------------------------------
 sub compute_pairwise_cooccurrence
 {
@@ -395,6 +381,9 @@ sub compute_pairwise_cooccurrence
     my %fgcount;
     my %cooc;
     my %prob;
+    my %jprob;
+    my %centropy;
+    my %information;
     foreach my $l (@{$data->{lcodes}})
     {
         foreach my $f (@{$data->{features}})
@@ -405,18 +394,20 @@ sub compute_pairwise_cooccurrence
             {
                 next if($g eq $f);
                 next if(!exists($data->{lhclean}{$l}{$g}));
-                my $gv = $data->{lh}{$l}{$g};
+                my $gv = $data->{lhclean}{$l}{$g};
                 $fgcount{$f}{$g}++;
                 $cooc{$f}{$fv}{$g}{$gv}++;
             }
         }
     }
-    # Now look at the cooccurrences disregarding individual languages and compute conditional probabilities.
+    # Now look at the cooccurrences disregarding individual languages and compute
+    # conditional probabilities, joint probabilities, and conditional entropy.
     foreach my $f (@{$data->{features}})
     {
         my @fvalues = keys(%{$cooc{$f}});
         foreach my $fv (@fvalues)
         {
+            my $pfv = $data->{fvprob}{$f}{$fv};
             foreach my $g (keys(%{$cooc{$f}{$fv}}))
             {
                 my @gvalues = keys(%{$cooc{$f}{$fv}{$g}});
@@ -430,55 +421,39 @@ sub compute_pairwise_cooccurrence
                 {
                     # Conditional probability of $g=$gv given $f=$fv.
                     $prob{$f}{$fv}{$g}{$gv} = $cooc{$f}{$fv}{$g}{$gv} / $nffvg;
+                    # Joint probability of $f=$fv and $g=$gv.
+                    my $pfvgv = $cooc{$f}{$fv}{$g}{$gv} / $fgcount{$f}{$g};
+                    # Conditional entropy of $g given $f.
+                    if($pfvgv > 0 && $pfv > 0)
+                    {
+                        $centropy{$f}{$g} -= $pfvgv * log($pfvgv/$pfv);
+                    }
+                    $jprob{$f}{$fv}{$g}{$gv} = $pfvgv;
                 }
+            }
+        }
+    }
+    # Once we have conditional entropies we can compute mutual information.
+    foreach my $f (keys(%centropy))
+    {
+        foreach my $g (keys(%{$centropy{$f}}))
+        {
+            # $centropy{$f}{$g} is H(g|f), i.e., entropy of g given f.
+            # Mutual information of $f and $g:
+            $information{$f}{$g} = $data->{fentropy}{$g} - $centropy{$f}{$g};
+            ###!!! Sanity check.
+            if($information{$f}{$g} < 0)
+            {
+                die("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g} for\n\tf = $f\n\tg = $g\n\tH(g) = $data->{fentropy}{$g}\n\tH(g|f) = $centropy{$f}{$g}");
             }
         }
     }
     $data->{fgcount} = \%fgcount;
     $data->{cooc} = \%cooc;
     $data->{cprob} = \%prob;
-}
-
-
-
-#------------------------------------------------------------------------------
-# Computes conditional entropy of feature g given feature f.
-#------------------------------------------------------------------------------
-sub get_conditional_entropy
-{
-    my $data = shift; # hash ref
-    my $f = shift; # the feature whose value we will know
-    my $g = shift; # the feature whose value we will predict
-    # p($fv,$gv) ... probability that $f=$fv and $g=$gv in the same language
-    # Examine cooccurrences of feature values within one language. Our pre-
-    # computed %cooc hash is indexed {$f}{$fv}{$g}{$gv} but we now need
-    # {$f}{$g}{$fv}{$gv}.
-    # Count how many times non-empty values of $f and $g cooccurred in one language.
-    my $sumfg = $data->{fgcount}{$f}{$g};
-    my $entropy = 0;
-    if($sumfg > 0)
-    {
-        # For each pair $fv, $gv, count p($fv,$gv) and add it to the entropy.
-        foreach my $fv (keys(%{$data->{cooc}{$f}}))
-        {
-            next if($fv eq 'nan');
-            # If $sumfg > 0, $sumf should not be 0 either, but to be safe...
-            my $pfv = $data->{fvprob}{$f}{$fv};
-            if(exists($data->{cooc}{$f}{$fv}{$g}) && defined($data->{cooc}{$f}{$fv}{$g}))
-            {
-                foreach my $gv (keys(%{$data->{cooc}{$f}{$fv}{$g}}))
-                {
-                    next if($gv eq 'nan');
-                    my $pfvgv = $data->{cooc}{$f}{$fv}{$g}{$gv} / $sumfg;
-                    if($pfvgv > 0 && $pfv > 0)
-                    {
-                        $entropy -= $pfvgv * log($pfvgv/$pfv);
-                    }
-                }
-            }
-        }
-    }
-    return $entropy;
+    $data->{jprob} = \%jprob;
+    $data->{centropy} = \%centropy;
+    $data->{information} = \%information;
 }
 
 
