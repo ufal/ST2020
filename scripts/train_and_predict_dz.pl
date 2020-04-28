@@ -154,34 +154,6 @@ sub predict_masked_features
         print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
         if(scalar(@model)>0)
         {
-            if($debug)
-            {
-                # Sort source features: the one with strongest possible prediction first.
-                my %rfeatures;
-                foreach my $cooc (@model)
-                {
-                    my $plogc = $cooc->{p}*log($cooc->{c});
-                    if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
-                    {
-                        $rfeatures{$cooc->{rf}} = $plogc;
-                    }
-                }
-                my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
-                @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
-                foreach my $rfeature (@rfeatures)
-                {
-                    my $rvalue = $lhl->{$rfeature};
-                    # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
-                    foreach my $cooc (@model)
-                    {
-                        if($cooc->{rf} eq $rfeature)
-                        {
-                            my $plogc = $cooc->{p}*log($cooc->{c});
-                            print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$plogc).\n");
-                        }
-                    }
-                }
-            }
             # Save the winning prediction in the language-feature hash.
             $lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
             #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
@@ -191,6 +163,34 @@ sub predict_masked_features
                 {
                     print STDERR ("Language $lhl->{name} wrong prediction $qf == $lhl->{$qf}\n");
                     print STDERR ("  should be $goldlhl->{$qf}\n");
+                    if($debug)
+                    {
+                        # Sort source features: the one with strongest possible prediction first.
+                        my %rfeatures;
+                        foreach my $cooc (@model)
+                        {
+                            my $plogc = $cooc->{p}*log($cooc->{c});
+                            if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
+                            {
+                                $rfeatures{$cooc->{rf}} = $plogc;
+                            }
+                        }
+                        my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
+                        @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+                        foreach my $rfeature (@rfeatures)
+                        {
+                            my $rvalue = $lhl->{$rfeature};
+                            # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
+                            foreach my $cooc (@model)
+                            {
+                                if($cooc->{rf} eq $rfeature)
+                                {
+                                    my $plogc = $cooc->{p}*log($cooc->{c});
+                                    print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$plogc).\n");
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
