@@ -122,6 +122,9 @@ sub predict_masked_features
     my @features = keys(%{$lhl});
     my @rfeatures = grep {$lhl->{$_} !~ m/^nan|\?$/} (@features);
     my @qfeatures = grep {$lhl->{$_} eq '?'} (@features);
+    my $nrf = scalar(@rfeatures);
+    my $nqf = scalar(@qfeatures);
+    print STDERR ("  $nrf features known, $nqf features to be predicted.\n") if($debug);
     foreach my $qf (@qfeatures)
     {
         print STDERR ("  Predicting $qf:\n") if($debug);
@@ -141,7 +144,6 @@ sub predict_masked_features
                         'rf' => $rf,
                         'rv' => $lhl->{$rf}
                     });
-                    print STDERR ("    Cooccurrence with $rf == $lhl->{$rf} => $qv (p=$prob->{$rf}{$lhl->{$rf}}{$qf}{$qv}).\n") if($debug);
                 }
             }
             else
@@ -152,6 +154,14 @@ sub predict_masked_features
         print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
         if(scalar(@model)>0)
         {
+            if($debug)
+            {
+                @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+                foreach my $cooc (@model)
+                {
+                    print STDERR ("    Cooccurrence with $cooc->{rf} == $lhl->{$cooc->{rf}} => $cooc->{v} (p=$cooc->{p}).\n");
+                }
+            }
             # Save the winning prediction in the language-feature hash.
             $lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
             #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
