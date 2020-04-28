@@ -30,7 +30,7 @@ GetOptions
 #     {table} ..... the table: array of arrays
 #     {nf} ........ number of features (headers)
 #     {nl} ........ number of languages
-#   Filled by
+#   Filled by hash_features()
 #     {lh} ........ data from {table} indexed by {language}{feature}
 #     {lhclean} ... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
@@ -44,14 +44,14 @@ print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
-my ($trainh, $trainlh) = hash_features($traindata{features}, $traindata{table}, 0);
-my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($traindata{features}, $trainlh);
+hash_features(\%traindata, 0);
+my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($traindata{features}, $traindata{lh});
 # Compute entropy of each feature.
 print STDERR ("Computing entropy of each feature...\n");
 my %entropy;
-foreach my $feature (keys(%{$trainh}))
+foreach my $feature (@{$traindata{features}})
 {
-    $entropy{$feature} = get_entropy($trainh, $feature);
+    $entropy{$feature} = get_entropy($traindata{fvcount}, $feature);
 }
 if($debug)
 {
@@ -67,12 +67,12 @@ if(0)
     print STDERR ("Computing conditional entropy of each pair of features...\n");
     my %condentropy;
     my %information;
-    foreach my $f (keys(%{$trainh}))
+    foreach my $f (@{$traindata{features}})
     {
-        foreach my $g (keys(%{$trainh}))
+        foreach my $g (@{$traindata{features}})
         {
             # Conditional entropy of $g given $f:
-            $condentropy{$f}{$g} = get_conditional_entropy($trainlh, $traincooc, $f, $g);
+            $condentropy{$f}{$g} = get_conditional_entropy($traindata{lh}, $traincooc, $f, $g);
             # And mutual information of $f and $g:
             $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
         }
@@ -80,9 +80,9 @@ if(0)
     if($debug)
     {
         my @feature_pairs;
-        foreach my $f (keys(%{$trainh}))
+        foreach my $f (@{$traindata{features}})
         {
-            foreach my $g (keys(%{$trainh}))
+            foreach my $g (@{$traindata{features}})
             {
                 push(@feature_pairs, [$f, $g]);
             }
@@ -105,35 +105,35 @@ my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
-my ($devh, $devlh) = hash_features($devdata{features}, $devdata{table}, 0);
-my ($devgh, $devglh) = hash_features($devgdata{features}, $devgdata{table}, 0);
-my @features = keys(%{$devh});
+hash_features(\%devdata, 0);
+hash_features(\%devgdata, 0);
+my @features = @{$devdata{features}};
 my $nnan = 0;
 my $nqm = 0;
 my $nreg = 0;
 foreach my $f (@features)
 {
-    my @values = keys(%{$devh->{$f}});
+    my @values = keys(%{$devdata{fvcount}{$f}});
     foreach my $v (@values)
     {
         if($v eq 'nan')
         {
-            $nnan += $devh->{$f}{$v};
+            $nnan += $devdata{fvcount}{$f}{$v};
         }
         elsif($v eq '?')
         {
-            $nqm += $devh->{$f}{$v};
+            $nqm += $devdata{fvcount}{$f}{$v};
         }
         else
         {
-            $nreg += $devh->{$f}{$v};
+            $nreg += $devdata{fvcount}{$f}{$v};
         }
     }
 }
 print STDERR ("Found $nnan nan values.\n");
 print STDERR ("Found $nqm ? values to be predicted.\n");
 print STDERR ("Found $nreg regular non-empty values.\n");
-my @languages = keys(%{$devlh});
+my @languages = keys(%{$devdata{lh}});
 my $nl = scalar(@languages);
 my $sumqm = 0;
 my $sumreg = 0;
@@ -141,9 +141,9 @@ my $minreg;
 my $minreg_qm;
 foreach my $l (@languages)
 {
-    my @features = keys(%{$devlh->{$l}});
-    my $nqm = scalar(grep {$devlh->{$l}{$_} eq '?'} (@features));
-    my $nreg = scalar(grep {$devlh->{$l}{$_} !~ m/^nan|\?$/} (@features));
+    my @features = keys(%{$devdata{lh}{$l}});
+    my $nqm = scalar(grep {$devdata{lh}{$l}{$_} eq '?'} (@features));
+    my $nreg = scalar(grep {$devdata{lh}{$l}{$_} !~ m/^nan|\?$/} (@features));
     $sumqm += $nqm;
     $sumreg += $nreg;
     if(!defined($minreg) || $nreg<$minreg)
@@ -162,10 +162,10 @@ print STDERR ("Note that the non-empty features always include 8 non-typologic f
 print STDERR ("Predicting the masked features...\n");
 foreach my $l (@languages)
 {
-    predict_masked_features($devlh->{$l}, $trainprob, $traincooc, $devglh->{$l});
+    predict_masked_features($devdata{lh}{$l}, $trainprob, $traincooc, $devgdata{lh}{$l});
 }
 print STDERR ("Writing the completed file...\n");
-write_csv($devdata{features}, $devlh);
+write_csv($devdata{features}, $devdata{lh});
 
 
 
@@ -301,25 +301,26 @@ sub model_weighted_vote
 
 
 #------------------------------------------------------------------------------
-# Converts the input table to two hashes (returns two hash references).
-# The first hash is indexed by features and values; contains number of occur-
-# rences. The second hash is indexed by languages and features; contains
-# feature values.
+# Converts the input table to hashes.
+#     {lh} ........ data from {table} indexed by {language}{feature}
+#     {lhclean} ... like {lh} but contains only non-empty values (that are not
+#                   '', 'nan' or '?')
+#     {fvcount} ... hash indexed by {feature}{value} => count of that value
 #------------------------------------------------------------------------------
 sub hash_features
 {
-    my $headers = shift; # array ref
-    my $data = shift; # array ref
+    my $data = shift; # hash ref
     my $qm_is_nan = shift; # convert question marks to 'nan'?
     my %h;
     my %lh; # hash indexed by language code
-    foreach my $language (@{$data})
+    my %lhclean; # like %lh but only non-empty values
+    foreach my $language (@{$data->{table}})
     {
         my $lcode = $language->[1];
         # Remember observed features and values.
-        for(my $i = 0; $i <= $#{$headers}; $i++)
+        for(my $i = 0; $i <= $#{$data->{features}}; $i++)
         {
-            my $feature = $headers->[$i];
+            my $feature = $data->{features}[$i];
             # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
             $language->[$i] = 'nan' if(!defined($language->[$i]) || $language->[$i] eq '' || $language->[$i] eq 'nan');
             # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
@@ -327,9 +328,15 @@ sub hash_features
             $language->[$i] = 'nan' if($language->[$i] eq '?' && $qm_is_nan);
             $h{$feature}{$language->[$i]}++;
             $lh{$lcode}{$feature} = $language->[$i];
+            unless($language->[$i] eq 'nan')
+            {
+                $lhclean{$lcode}{$feature} = $language->[$i];
+            }
         }
     }
-    return (\%h, \%lh);
+    $data->{lh} = \%lh;
+    $data->{lhclean} = \%lhclean;
+    $data->{fvcount} = \%h;
 }
 
 
