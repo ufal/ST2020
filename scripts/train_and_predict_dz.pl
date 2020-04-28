@@ -431,6 +431,10 @@ sub get_entropy
         foreach my $value (@values)
         {
             my $p = $distribution->{$value} / $sum;
+            if($p < 0 || $p > 1)
+            {
+                die("Something is wrong: count($feature=$value) = $distribution->{$value}\ncount($feature) = $sum\n");
+            }
             $entropy -= $p * log($p);
         }
     }
