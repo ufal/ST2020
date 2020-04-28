@@ -448,7 +448,7 @@ sub compute_pairwise_cooccurrence
                 print STDERR ("\tf = $f\n");
                 print STDERR ("\tg = $g\n");
                 print STDERR ("\tH(g) = $data->{fentropy}{$g}\n");
-                print STDERR ("\tH(g|f) = $centropy{$f}{$g}");
+                print STDERR ("\tH(g|f) = $centropy{$f}{$g}\n");
                 print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
                 print STDERR ("\t\t$fgcount{$f}{$g} = number of nonempty cooccurrences of f and g\n");
                 die;
