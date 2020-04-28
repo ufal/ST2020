@@ -1,43 +1,34 @@
 #!/usr/bin/env python3
 #coding: utf-8
 
+# Rudolf Rosa
+
 import sys
 from collections import defaultdict
+import csv
+
 
 import logging
 logging.basicConfig(
     format='%(asctime)s %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
-    level=logging.WARN)
+    level=logging.DEBUG)
+    #level=logging.WARN)
 
-CODE = 0
-NAME = 1
-LAT = 2
-LON = 3
-GENUS = 4
-FAM = 5
-COUNTRY = 6
-FEATS = 7
+CODE = 1
+FAM = 6
 
 # lang family -> lang code -> feature -> value
 data = defaultdict(dict)
 
-allfeats = set()
-allfamilies = set()
+with open('../data/train_y.csv') as train:
+    d2 = csv.DictReader(train)
+    for dictline in d2:
+        code = dictline['wals_code']
+        fam = dictline['family']
+        data[fam][code] = dictline
 
-with open('data/train.csv') as train:
-    train.readline()  # skip header
-    for line in train:
-        fields = line.rstrip().split('\t')
-        data[fields[FAM]][fields[CODE]] = dict()
-        langdict = data[fields[FAM]][fields[CODE]]
-        feats = fields[FEATS].split('|')
-        for feat in feats:
-            #logging.info(feat)
-            name, value = feat.split('=', 1)
-            langdict[name] = value
-            allfeats.add(name)
-
+allfeats = list(dictline.keys())
 allfamilies = set(data.keys())
 
 # family -> feature -> value -> count
@@ -50,8 +41,9 @@ for family in allfamilies:
     for lang in data[family]:
         for feat in data[family][lang]:
             value = data[family][lang][feat]
-            counts[family][feat][value] += 1
-            counts[0][feat][value] += 1
+            if value:
+                counts[family][feat][value] += 1
+                counts[0][feat][value] += 1
 
 # precompute maxima
 # family -> feat -> maxvalue
@@ -74,27 +66,23 @@ for family in allfamilies:
             maxvalue = maxes[0][feat]
         maxes[family][feat] = maxvalue
 
-# predict and measure accuracies
-correct = 0
-total = 0
+# predict
 
-with open('data/dev.csv') as dev:
-    dev.readline()  # skip header
-    for line in dev:
-        fields = line.rstrip().split('\t')
-        feats = fields[FEATS].split('|')
-        for feat in feats:
-            name, value = feat.split('=', 1)
-            #logging.debug(fields[NAME] + " " + name)
-            family = fields[FAM]
-            if family in maxes:
-                maxvalue = maxes[family][name]
-            else:
-                maxvalue = maxes[0][name]
-            total += 1
-            if maxvalue == value:
-                correct += 1
-
-print('Total', 'Correct', 'Accuracy', sep='\t')
-print(total, correct, (correct/total*100), sep='\t')
+with open('../data/dev_x.csv') as dev, open('output', 'w') as output:
+    d2 = csv.DictReader(dev)
+    outwriter = csv.DictWriter(output, allfeats)
+    outwriter.writeheader()
+    for dictline in d2:
+        family = dictline['family']
+        for feat in dictline:
+            if dictline[feat] == '?':
+                # predict
+                if family in maxes:
+                    maxvalue = maxes[family][feat]
+                    logging.debug('Predicting {} for {} based on {}'.format(maxvalue, feat, family))
+                else:
+                    maxvalue = maxes[0][feat]
+                    logging.debug('Predicting {} for {}'.format(maxvalue, feat))
+                dictline[feat] = maxvalue
+        outwriter.writerow(dictline)
 
