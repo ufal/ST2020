@@ -141,7 +141,7 @@ sub predict_masked_features
                         'rf' => $rf,
                         'rv' => $lhl->{$rf}
                     });
-                    #print STDERR ("    Cooccurrence with $rf == $lhl->{$rf} => $qv (p=$prob->{$rf}{$lhl->{$rf}}{$qf}{$qv}).\n");
+                    print STDERR ("    Cooccurrence with $rf == $lhl->{$rf} => $qv (p=$prob->{$rf}{$lhl->{$rf}}{$qf}{$qv}).\n") if($debug);
                 }
             }
             else
