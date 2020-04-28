@@ -37,9 +37,9 @@ GetOptions
 #                   '', 'nan' or '?')
 #     {fcount} .... hash {f} => count of languages where f is not empty
 #     {fvcount} ... hash indexed by {feature}{value} => count of that value
-#   Filled by compute_pairwise_cooccurrence()
 #     {fvprob} .... hash {f}{fv} => probability that f=fv
 #     {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
+#   Filled by compute_pairwise_cooccurrence()
 #     {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
@@ -318,6 +318,8 @@ sub model_weighted_vote
 #                   '', 'nan' or '?')
 #   {fcount} ...... hash {f} => count of languages where f is not empty
 #   {fvcount} ..... hash indexed by {feature}{value} => count of that value
+#   {fvprob} ...... hash {f}{fv} => probability that f=fv
+#   {fentropy} .... hash {f} => entropy of distribution of non-empty values of f
 #------------------------------------------------------------------------------
 sub hash_features
 {
@@ -350,11 +352,32 @@ sub hash_features
             }
         }
     }
+    # Compute unconditional probability of each feature value and entropy of each feature.
+    my %fvprob;
+    my %fentropy;
+    foreach my $f (@{$data->{features}})
+    {
+        $fentropy{$f} = 0;
+        next if($data->{fcount}{$f}==0);
+        foreach my $fv (keys(%{$data->{fvcount}{$f}}))
+        {
+            next if($fv eq 'nan');
+            my $p = $data->{fvcount}{$f}{$fv} / $data->{fcount}{$f};
+            if($p < 0 || $p > 1)
+            {
+                die("Something is wrong: p = $p");
+            }
+            $fvprob{$f}{$fv} = $p;
+            $fentropy{$f} -= $p * log($p);
+        }
+    }
     $data->{lcodes} = \@lcodes;
     $data->{lh} = \%lh;
     $data->{lhclean} = \%lhclean;
     $data->{fcount} = \%fcount;
     $data->{fvcount} = \%fvcount;
+    $data->{fvprob} = \%fvprob;
+    $data->{fentropy} = \%fentropy;
 }
 
 
@@ -363,8 +386,6 @@ sub hash_features
 # Computes pairwise cooccurrence of two feature values in a language.
 # Computes conditional probability P(g=gv|f=fv).
 # Filled by compute_pairwise_cooccurrence()
-#   {fvprob} .... hash {f}{fv} => probability that f=fv
-#   {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
 #   {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #   {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #   {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
@@ -391,25 +412,6 @@ sub compute_pairwise_cooccurrence
             }
         }
     }
-    # Compute unconditional probability of each feature value and entropy of each feature.
-    my %fvprob;
-    my %fentropy;
-    foreach my $f (@{$data->{features}})
-    {
-        $fentropy{$f} = 0;
-        next if($data->{fcount}{$f}==0);
-        foreach my $fv (keys(%{$data->{fvcount}{$f}}))
-        {
-            next if($fv eq 'nan');
-            my $p = $data->{fvcount}{$f}{$fv} / $data->{fcount}{$f};
-            if($p < 0 || $p > 1)
-            {
-                die("Something is wrong: p = $p");
-            }
-            $fvprob{$f}{$fv} = $p;
-            $fentropy{$f} -= $p * log($p);
-        }
-    }
     # Now look at the cooccurrences disregarding individual languages and compute conditional probabilities.
     foreach my $f (@{$data->{features}})
     {
@@ -433,8 +435,6 @@ sub compute_pairwise_cooccurrence
             }
         }
     }
-    $data->{fvprob} = \%fvprob;
-    $data->{fentropy} = \%fentropy;
     $data->{fgcount} = \%fgcount;
     $data->{cooc} = \%cooc;
     $data->{cprob} = \%prob;
