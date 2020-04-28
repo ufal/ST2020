@@ -35,9 +35,9 @@ GetOptions
 #     {lh} ........ data from {table} indexed by {language}{feature}
 #     {lhclean} ... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
+#     {fcount} .... hash {f} => count of languages where f is not empty
 #     {fvcount} ... hash indexed by {feature}{value} => count of that value
 #   Filled by compute_pairwise_cooccurrence()
-#     {fcount} .... hash {f} => count of languages where f is not empty
 #     {fvprob} .... hash {f}{fv} => probability that f=fv
 #     {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
 #     {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
@@ -316,6 +316,7 @@ sub model_weighted_vote
 #   {lh} .......... data from {table} indexed by {language}{feature}
 #   {lhclean} ..... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
+#   {fcount} ...... hash {f} => count of languages where f is not empty
 #   {fvcount} ..... hash indexed by {feature}{value} => count of that value
 #------------------------------------------------------------------------------
 sub hash_features
@@ -325,6 +326,7 @@ sub hash_features
     my @lcodes;
     my %lh; # hash indexed by language code
     my %lhclean; # like %lh but only non-empty values
+    my %fcount;
     my %fvcount;
     foreach my $language (@{$data->{table}})
     {
@@ -343,6 +345,7 @@ sub hash_features
             unless($language->[$i] eq 'nan' || $language->[$i] eq '?')
             {
                 $lhclean{$lcode}{$feature} = $language->[$i];
+                $fcount{$feature}++;
                 $fvcount{$feature}{$language->[$i]}++;
             }
         }
@@ -350,6 +353,7 @@ sub hash_features
     $data->{lcodes} = \@lcodes;
     $data->{lh} = \%lh;
     $data->{lhclean} = \%lhclean;
+    $data->{fcount} = \%fcount;
     $data->{fvcount} = \%fvcount;
 }
 
@@ -359,7 +363,6 @@ sub hash_features
 # Computes pairwise cooccurrence of two feature values in a language.
 # Computes conditional probability P(g=gv|f=fv).
 # Filled by compute_pairwise_cooccurrence()
-#   {fcount} .... hash {f} => count of languages where f is not empty
 #   {fvprob} .... hash {f}{fv} => probability that f=fv
 #   {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
 #   {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
@@ -369,7 +372,6 @@ sub hash_features
 sub compute_pairwise_cooccurrence
 {
     my $data = shift; # hash ref
-    my %fcount;
     my %fgcount;
     my %cooc;
     my %prob;
@@ -379,7 +381,6 @@ sub compute_pairwise_cooccurrence
         {
             next if(!exists($data->{lhclean}{$l}{$f}));
             my $fv = $data->{lhclean}{$l}{$f};
-            $fcount{$f}++;
             foreach my $g (@{$data->{features}})
             {
                 next if($g eq $f);
@@ -396,11 +397,11 @@ sub compute_pairwise_cooccurrence
     foreach my $f (@{$data->{features}})
     {
         $fentropy{$f} = 0;
-        next if($fcount{$f}==0);
+        next if($data->{fcount}{$f}==0);
         foreach my $fv (keys(%{$data->{fvcount}{$f}}))
         {
             next if($fv eq 'nan');
-            my $p = $data->{fvcount}{$f}{$fv} / $fcount{$f};
+            my $p = $data->{fvcount}{$f}{$fv} / $data->{fcount}{$f};
             if($p < 0 || $p > 1)
             {
                 die("Something is wrong: p = $p");
@@ -432,7 +433,6 @@ sub compute_pairwise_cooccurrence
             }
         }
     }
-    $data->{fcount} = \%fcount;
     $data->{fvprob} = \%fvprob;
     $data->{fentropy} = \%fentropy;
     $data->{fgcount} = \%fgcount;
