@@ -618,6 +618,10 @@ sub read_csv
     {
         @ARGV = @oldargv;
     }
+    if(scalar(@headers) > 0 && $headers[0] eq '')
+    {
+        $headers[0] = 'index';
+    }
     my %data =
     (
         'features' => \@headers,
