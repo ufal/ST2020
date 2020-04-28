@@ -37,6 +37,7 @@ GetOptions
 #                   '', 'nan' or '?')
 #     {fvcount} ... hash indexed by {feature}{value} => count of that value
 #   Filled by compute_pairwise_cooccurrence()
+#     {fcount} .... hash {f} => count of languages where f is not empty
 #     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #==============================================================================
@@ -55,7 +56,7 @@ print STDERR ("Computing entropy of each feature...\n");
 my %entropy;
 foreach my $feature (@{$traindata{features}})
 {
-    $entropy{$feature} = get_entropy($traindata{fvcount}, $feature);
+    $entropy{$feature} = get_entropy(\%traindata, $feature);
 }
 if($debug)
 {
@@ -352,23 +353,25 @@ sub hash_features
 #------------------------------------------------------------------------------
 # Computes pairwise cooccurrence of two feature values in a language.
 # Computes conditional probability P(g=gv|f=fv).
-#   Filled by compute_pairwise_cooccurrence()
-#     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
-#     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
+# Filled by compute_pairwise_cooccurrence()
+#   {fcount} .... hash {f} => count of languages where f is not empty
+#   {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
+#   {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #------------------------------------------------------------------------------
 sub compute_pairwise_cooccurrence
 {
     my $data = shift; # hash ref
-    my @languages = keys(%{$data->{lh}});
+    my %fcount;
     my %cooc;
     my %prob;
-    foreach my $l (@languages)
+    foreach my $l (@{$data->{lcodes}})
     {
         foreach my $f (@{$data->{features}})
         {
             next if(!exists($data->{lh}{$l}{$f}));
             my $fv = $data->{lh}{$l}{$f};
             next if($fv eq 'nan' || $fv eq '?');
+            $fcount{$f}++;
             foreach my $g (@{$data->{features}})
             {
                 next if($g eq $f);
@@ -402,6 +405,7 @@ sub compute_pairwise_cooccurrence
             }
         }
     }
+    $data->{fcount} = \%fcount;
     $data->{cooc} = \%cooc;
     $data->{cprob} = \%prob;
 }
@@ -413,18 +417,14 @@ sub compute_pairwise_cooccurrence
 #------------------------------------------------------------------------------
 sub get_entropy
 {
-    my $h = shift; # hashed feature values
+    my $data = shift; # hash ref
     my $feature = shift; # feature name: entropy of the values of this feature
     # For feature A, get all its possible values across all languages and their
     # probabilities (relative frequencies). Compute entropy of the probability
     # distribution.
-    my $distribution = $h->{$feature};
+    my $distribution = $data->{fvcount}{$feature};
     my @values = keys(%{$distribution});
-    my $sum = 0;
-    foreach my $value (@values)
-    {
-        $sum += $distribution->{$value};
-    }
+    my $sum = $data->{fcount}{$feature};
     my $entropy = 0;
     if($sum > 0)
     {
