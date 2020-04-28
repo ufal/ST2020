@@ -444,7 +444,14 @@ sub compute_pairwise_cooccurrence
             ###!!! Sanity check.
             if($information{$f}{$g} < 0)
             {
-                die("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g} for\n\tf = $f\n\tg = $g\n\tH(g) = $data->{fentropy}{$g}\n\tH(g|f) = $centropy{$f}{$g}");
+                print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
+                print STDERR ("\tf = $f\n");
+                print STDERR ("\tg = $g\n");
+                print STDERR ("\tH(g) = $data->{fentropy}{$g}\n");
+                print STDERR ("\tH(g|f) = $centropy{$f}{$g}");
+                print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
+                print STDERR ("\t\t$fgcount{$f}{$g} = number of nonempty cooccurrences of f and g\n");
+                die;
             }
         }
     }
