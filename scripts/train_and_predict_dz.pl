@@ -40,6 +40,7 @@ GetOptions
 #     {fcount} .... hash {f} => count of languages where f is not empty
 #     {fvprob} .... hash {f}{fv} => probability that f=fv
 #     {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
+#     {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #==============================================================================
@@ -354,6 +355,7 @@ sub hash_features
 #   {fcount} .... hash {f} => count of languages where f is not empty
 #   {fvprob} .... hash {f}{fv} => probability that f=fv
 #   {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
+#   {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #   {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #   {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #------------------------------------------------------------------------------
@@ -361,6 +363,7 @@ sub compute_pairwise_cooccurrence
 {
     my $data = shift; # hash ref
     my %fcount;
+    my %fgcount;
     my %cooc;
     my %prob;
     foreach my $l (@{$data->{lcodes}})
@@ -377,6 +380,7 @@ sub compute_pairwise_cooccurrence
                 next if(!exists($data->{lh}{$l}{$g}));
                 my $gv = $data->{lh}{$l}{$g};
                 next if($gv eq 'nan' || $gv eq '?');
+                $fgcount{$f}{$g}++;
                 $cooc{$f}{$fv}{$g}{$gv}++;
             }
         }
@@ -426,6 +430,7 @@ sub compute_pairwise_cooccurrence
     $data->{fcount} = \%fcount;
     $data->{fvprob} = \%fvprob;
     $data->{fentropy} = \%fentropy;
+    $data->{fgcount} = \%fgcount;
     $data->{cooc} = \%cooc;
     $data->{cprob} = \%prob;
 }
@@ -445,17 +450,7 @@ sub get_conditional_entropy
     # computed %cooc hash is indexed {$f}{$fv}{$g}{$gv} but we now need
     # {$f}{$g}{$fv}{$gv}.
     # Count how many times non-empty values of $f and $g cooccurred in one language.
-    my $sumfg = 0;
-    foreach my $fv (keys(%{$data->{cooc}{$f}}))
-    {
-        if(exists($data->{cooc}{$f}{$fv}{$g}) && defined($data->{cooc}{$f}{$fv}{$g}))
-        {
-            foreach my $gv (keys(%{$data->{cooc}{$f}{$fv}{$g}}))
-            {
-                $sumfg += $data->{cooc}{$f}{$fv}{$g}{$gv};
-            }
-        }
-    }
+    my $sumfg = $data->{fgcount}{$f}{$g};
     my $entropy = 0;
     if($sumfg > 0)
     {
