@@ -7,3 +7,5 @@ the missing feature value is chosen by majority voting of these.
 If there are no languages from the same language family, majority voting of
 all languages in the training data is used.
 
+Accuracy on dev data 60.65%
+
