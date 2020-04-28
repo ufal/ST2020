@@ -35,6 +35,9 @@ GetOptions
 #     {lhclean} ... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
 #     {fvcount} ... hash indexed by {feature}{value} => count of that value
+#   Filled by compute_pairwise_cooccurrence()
+#     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
+#     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #==============================================================================
 
 my $data_folder = 'data';
@@ -45,7 +48,7 @@ print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
-my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($traindata{features}, $traindata{lh});
+compute_pairwise_cooccurrence(\%traindata);
 # Compute entropy of each feature.
 print STDERR ("Computing entropy of each feature...\n");
 my %entropy;
@@ -72,7 +75,7 @@ if(0)
         foreach my $g (@{$traindata{features}})
         {
             # Conditional entropy of $g given $f:
-            $condentropy{$f}{$g} = get_conditional_entropy($traindata{lh}, $traincooc, $f, $g);
+            $condentropy{$f}{$g} = get_conditional_entropy($traindata{lh}, $traindata{cooc}, $f, $g);
             # And mutual information of $f and $g:
             $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
         }
@@ -162,7 +165,7 @@ print STDERR ("Note that the non-empty features always include 8 non-typologic f
 print STDERR ("Predicting the masked features...\n");
 foreach my $l (@languages)
 {
-    predict_masked_features($devdata{lh}{$l}, $trainprob, $traincooc, $devgdata{lh}{$l});
+    predict_masked_features($devdata{lh}{$l}, $traindata{cprob}, $traindata{cooc}, $devgdata{lh}{$l});
 }
 print STDERR ("Writing the completed file...\n");
 write_csv($devdata{features}, $devdata{lh});
@@ -344,34 +347,35 @@ sub hash_features
 #------------------------------------------------------------------------------
 # Computes pairwise cooccurrence of two feature values in a language.
 # Computes conditional probability P(g=gv|f=fv).
-# Returns two hash references indexed {f}{fv}{g}{gv}: $cooc and $prob.
+#   Filled by compute_pairwise_cooccurrence()
+#     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
+#     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #------------------------------------------------------------------------------
 sub compute_pairwise_cooccurrence
 {
-    my $headers = shift; # array ref
-    my $lh = shift; # hash ref: features indexed by language
-    my @languages = keys(%{$lh});
+    my $data = shift; # hash ref
+    my @languages = keys(%{$data->{lh}});
     my %cooc;
     my %prob;
     foreach my $l (@languages)
     {
-        foreach my $f (@{$headers})
+        foreach my $f (@{$data->{features}})
         {
-            next if(!exists($lh->{$l}{$f}));
-            my $fv = $lh->{$l}{$f};
+            next if(!exists($data->{lh}{$l}{$f}));
+            my $fv = $data->{lh}{$l}{$f};
             next if($fv eq 'nan' || $fv eq '?');
-            foreach my $g (@{$headers})
+            foreach my $g (@{$data->{features}})
             {
                 next if($g eq $f);
-                next if(!exists($lh->{$l}{$g}));
-                my $gv = $lh->{$l}{$g};
+                next if(!exists($data->{lh}{$l}{$g}));
+                my $gv = $data->{lh}{$l}{$g};
                 next if($gv eq 'nan' || $gv eq '?');
                 $cooc{$f}{$fv}{$g}{$gv}++;
             }
         }
     }
     # Now look at the cooccurrences disregarding individual languages and compute conditional probabilities.
-    foreach my $f (@{$headers})
+    foreach my $f (@{$data->{features}})
     {
         my @fvalues = keys(%{$cooc{$f}});
         foreach my $fv (@fvalues)
@@ -393,7 +397,8 @@ sub compute_pairwise_cooccurrence
             }
         }
     }
-    return (\%cooc, \%prob);
+    $data->{cooc} = \%cooc;
+    $data->{cprob} = \%prob;
 }
 
 
