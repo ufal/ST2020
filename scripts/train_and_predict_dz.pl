@@ -45,7 +45,7 @@ print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 my ($trainh, $trainlh) = hash_features($traindata{features}, $traindata{table}, 0);
-my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($trainheaders, $trainlh);
+my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($traindata{features}, $trainlh);
 # Compute entropy of each feature.
 print STDERR ("Computing entropy of each feature...\n");
 my %entropy;
