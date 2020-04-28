@@ -31,6 +31,21 @@ print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 my ($trainh, $trainlh) = hash_features($trainheaders, $traindata, 0);
 my ($traincooc, $trainprob) = compute_pairwise_cooccurrence($trainheaders, $trainlh);
+# Compute entropy of each feature.
+print STDERR ("Computing entropy of each feature...\n");
+my %entropy;
+foreach my $feature (keys(%{$trainh}))
+{
+    $entropy{$feature} = get_entropy($trainh, $feature);
+}
+if($debug)
+{
+    my @features_by_entropy = sort {$entropy{$a} <=> $entropy{$b}} (keys(%entropy));
+    foreach my $feature (@features_by_entropy)
+    {
+        print STDERR ("  $entropy{$feature} = H($feature)\n");
+    }
+}
 print STDERR ("Reading the development data...\n");
 my ($devheaders, $devdata) = read_csv("$data_folder/dev_x.csv");
 # Read the gold standard development data. It will help us with debugging and error analysis.
@@ -324,6 +339,37 @@ sub compute_pairwise_cooccurrence
         }
     }
     return (\%cooc, \%prob);
+}
+
+
+
+#------------------------------------------------------------------------------
+# Computes entropy of a probability distribution.
+#------------------------------------------------------------------------------
+sub get_entropy
+{
+    my $h = shift; # hashed feature values
+    my $feature = shift; # feature name: entropy of the values of this feature
+    # For feature A, get all its possible values across all languages and their
+    # probabilities (relative frequencies). Compute entropy of the probability
+    # distribution.
+    my $distribution = $h->{$feature};
+    my @values = keys(%{$distribution});
+    my $sum = 0;
+    foreach my $value (@values)
+    {
+        $sum += $distribution->{$value};
+    }
+    my $entropy = 0;
+    if($sum > 0)
+    {
+        foreach my $value (@values)
+        {
+            my $p = $distribution->{$value} / $sum;
+            $entropy -= $p * log($p);
+        }
+    }
+    return $entropy;
 }
 
 
