@@ -83,7 +83,7 @@ if(1)
             ###!!! Sanity check.
             if($information{$f}{$g} < 0)
             {
-                die("Something is wrong. Mutual information must not be negative but it is for\n\tf = $f\n\tg = $g\n");
+                die("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g} for\n\tf = $f\n\tg = $g\n");
             }
         }
     }
