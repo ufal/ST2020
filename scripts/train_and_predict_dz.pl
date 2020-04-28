@@ -46,6 +46,36 @@ if($debug)
         print STDERR ("  $entropy{$feature} = H($feature)\n");
     }
 }
+# Compute conditional entropy of each pair of features.
+print STDERR ("Computing conditional entropy of each pair of features...\n");
+my %condentropy;
+my %information;
+foreach my $f (keys(%{$trainh}))
+{
+    foreach my $g (keys(%{$trainh}))
+    {
+        # Conditional entropy of $g given $f:
+        $condentropy{$f}{$g} = get_conditional_entropy($trainlh, $traincooc, $f, $g);
+        # And mutual information of $f and $g:
+        $information{$f}{$g} = $entropy{$g} - $condentropy{$f}{$g};
+    }
+}
+if($debug)
+{
+    my @feature_pairs;
+    foreach my $f (keys(%{$trainh}))
+    {
+        foreach my $g (keys(%{$trainh}))
+        {
+            push(@feature_pairs, [$f, $g]);
+        }
+    }
+    my @feature_pairs_by_information = sort {$information{$b->[0]}{$b->[1]} <=> $information{$a->[0]}{$a->[1]}} (@feature_pairs);
+    foreach my $fg (@feature_pairs_by_information)
+    {
+        print STDERR ("  $information{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
+    }
+}
 print STDERR ("Reading the development data...\n");
 my ($devheaders, $devdata) = read_csv("$data_folder/dev_x.csv");
 # Read the gold standard development data. It will help us with debugging and error analysis.
@@ -367,6 +397,75 @@ sub get_entropy
         {
             my $p = $distribution->{$value} / $sum;
             $entropy -= $p * log($p);
+        }
+    }
+    return $entropy;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Computes conditional entropy of feature g given feature f.
+#------------------------------------------------------------------------------
+sub get_conditional_entropy
+{
+    my $lh = shift; # hash ref: features indexed by language
+    my $cooc = shift; # hash ref: cooccurrences of feature values
+    my $f = shift; # the feature whose value we will know
+    my $g = shift; # the feature whose value we will predict
+    # p($fv,$gv) ... probability that $f=$fv and $g=$gv in the same language
+    # Examine cooccurrences of feature values within one language. Our pre-
+    # computed %cooc hash is indexed {$f}{$fv}{$g}{$gv} but we now need
+    # {$f}{$g}{$fv}{$gv}.
+    # Count how many times $f had a non-empty value.
+    my $sumf = 0;
+    foreach my $l (keys(%{$lh}))
+    {
+        if(exists($lh->{$l}{$f}) && defined($lh->{$l}{$f}) && $lh->{$l}{$f} ne '' && $lh->{$l}{$f} !~ m/^(nan|\?)$/)
+        {
+            $sumf++;
+        }
+    }
+    # Count how many times non-empty values of $f and $g cooccurred in one language.
+    my $sumfg = 0;
+    foreach my $fv (keys(%{$cooc->{$f}}))
+    {
+        if(exists($cooc->{$f}{$fv}{$g}) && defined($cooc->{$f}{$fv}{$g}))
+        {
+            foreach my $gv (keys(%{$cooc->{$f}{$fv}{$g}}))
+            {
+                $sumfg += $cooc->{$f}{$fv}{$g}{$gv};
+            }
+        }
+    }
+    my $entropy = 0;
+    if($sumfg > 0)
+    {
+        # For each pair $fv, $gv, count p($fv,$gv) and add it to the entropy.
+        foreach my $fv (keys(%{$cooc->{$f}}))
+        {
+            # Count how many times $fv occurred in any language.
+            my $cfv = 0;
+            foreach my $l (keys(%{$lh}))
+            {
+                if(exists($lh->{$l}{$f}) && $lh->{$l}{$f} eq $fv)
+                {
+                    $cfv++;
+                }
+            }
+            # If $sumfg > 0, $sumf should not be 0 either, but to be safe...
+            my $pfv = $sumf > 0 ? $cfv / $sumf : 0;
+            if(exists($cooc->{$f}{$fv}{$g}) && defined($cooc->{$f}{$fv}{$g}))
+            {
+                foreach my $gv (keys(%{$cooc->{$f}{$fv}{$g}}))
+                {
+                    my $pfvgv = $cooc->{$f}{$fv}{$g}{$gv} / $sumfg;
+                    if($pfvgv > 0 && $pfv > 0)
+                    {
+                        $entropy -= $pfvgv * log($pfvgv/$pfv);
+                    }
+                }
+            }
         }
     }
     return $entropy;
