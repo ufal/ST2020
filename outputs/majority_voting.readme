@@ -1,0 +1,9 @@
+
+Majority voting based on language family.
+
+If there are other languages from the same language family in training data,
+the missing feature value is chosen by majority voting of these.
+
+If there are no languages from the same language family, majority voting of
+all languages in the training data is used.
+
