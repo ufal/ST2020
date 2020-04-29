@@ -521,7 +521,7 @@ sub write_csv
     my $lh = shift; # hash ref
     my @headers = map {escape_commas($_)} (@{$headers});
     print(join(',', @headers), "\n");
-    my @languages = sort {$lh->{$a}{''} <=> $lh->{$b}{''}} (keys(%{$lh}));
+    my @languages = sort {$lh->{$a}{index} <=> $lh->{$b}{index}} (keys(%{$lh}));
     foreach my $l (@languages)
     {
         my @values = map {escape_commas($lh->{$l}{$_})} (@{$headers});
