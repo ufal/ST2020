@@ -1,0 +1,11 @@
+
+Conditional probability that feature f = fv given that g = gv
+  multiplied by the log count of cooccurrence
+  multiplied by the mutual information of features f and g
+Only the strongest signal (source feature) is taken, all other source features are ignored.
+
+perl scripts/train_and_predict_dz.pl > outputs/cond_prob_info.csv
+python3 scripts/evaluate_from_csv.py --input_file data/dev_x.csv --output_file outputs/cond_prob_info.csv --golden_file data/dev_y.csv
+
+Accuracy on dev data 69.86%
+
