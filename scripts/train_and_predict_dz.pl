@@ -306,8 +306,16 @@ sub model_information_vote
     }
     (@model);
     my %votes;
+    my $nfeatures = 3;
+    my $last_feature = '';
     foreach my $item (@model)
     {
+        if($item->{rf} ne $last_feature)
+        {
+            $last_feature = $item->{rf};
+            $nfeatures--;
+        }
+        last if($nfeatures <= 0);
         $votes{$item->{v}} += $item->{p} * $item->{information};
     }
     my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
