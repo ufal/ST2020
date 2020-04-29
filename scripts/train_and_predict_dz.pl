@@ -153,7 +153,7 @@ print STDERR ("Note that the non-empty features always include 8 non-typologic f
 print STDERR ("Predicting the masked features...\n");
 foreach my $l (@languages)
 {
-    predict_masked_features($devdata{lh}{$l}, $traindata{cprob}, $traindata{cooc}, $devgdata{lh}{$l});
+    predict_masked_features(\%traindata, $devdata{lh}{$l}, $devgdata{lh}{$l});
 }
 print STDERR ("Writing the completed file...\n");
 write_csv($devdata{features}, $devdata{lh});
@@ -168,9 +168,8 @@ write_csv($devdata{features}, $devdata{lh});
 #------------------------------------------------------------------------------
 sub predict_masked_features
 {
+    my $traindata = shift; # hash ref
     my $lhl = shift; # hash ref: feature-value hash of one language
-    my $prob = shift; # hash ref: conditional probabilities of features given other features
-    my $cooc = shift; # hash ref: cooccurrence counts of feature-value pairs
     my $goldlhl = shift; # hash ref: gold standard version of $lhl, used for debugging and analysis
     print STDERR ("Language $lhl->{wals_code} ($lhl->{name}):\n") if($debug);
     my @features = keys(%{$lhl});
@@ -185,19 +184,22 @@ sub predict_masked_features
         my @model;
         foreach my $rf (@rfeatures)
         {
-            if(exists($prob->{$rf}{$lhl->{$rf}}{$qf}))
+            if(exists($traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}))
             {
-                my @qvalues = keys(%{$prob->{$rf}{$lhl->{$rf}}{$qf}});
+                my @qvalues = keys(%{$traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}});
                 foreach my $qv (@qvalues)
                 {
-                    push(@model,
-                    {
-                        'p' => $prob->{$rf}{$lhl->{$rf}}{$qf}{$qv},
-                        'c' => $cooc->{$rf}{$lhl->{$rf}}{$qf}{$qv},
+                    my %record =
+                    (
+                        'p' => $traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}{$qv},
+                        'c' => $traindata->{cooc}{$rf}{$lhl->{$rf}}{$qf}{$qv},
                         'v' => $qv,
                         'rf' => $rf,
                         'rv' => $lhl->{$rf}
-                    });
+                    );
+                    $record{plogc} = $record{p} * log($record{c});
+                    $record{plogcinf} = $record{plogc} * $traindata->{information}{$rf}{$qf};
+                    push(@model, \%record);
                 }
             }
             else
@@ -239,8 +241,7 @@ sub predict_masked_features
                             {
                                 if($cooc->{rf} eq $rfeature)
                                 {
-                                    my $plogc = $cooc->{p}*log($cooc->{c});
-                                    print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$plogc).\n");
+                                    print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$cooc->{plogc}, plogcinf=$cooc->{plogcinf}).\n");
                                 }
                             }
                         }
@@ -262,7 +263,25 @@ sub model_take_strongest
 {
     my @model = @_;
     # We want a high probability but we also want it to be based on a sufficiently large count.
-    @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+    @model = sort {$b->{plogc} <=> $a->{plogc}} (@model);
+    my $prediction = $model[0]{v};
+    print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
+    return $prediction;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Strongest signal: high probability and enough instances the probability is
+# based on. We take the prediction suggested by the strongest signal and ignore
+# the other suggestions.
+# Here the signal is: cond prob * log count * mutual information
+#------------------------------------------------------------------------------
+sub model_take_strongest_information
+{
+    my @model = @_;
+    # We want a high probability but we also want it to be based on a sufficiently large count.
+    @model = sort {$b->{plogcinf} <=> $a->{plogcinf}} (@model);
     my $prediction = $model[0]{v};
     print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
     return $prediction;
@@ -451,26 +470,24 @@ sub compute_pairwise_cooccurrence
             # (we do not want to recognize the empty value as something that can be predicted):
             $information{$f}{$g} = $fgventropy{$f}{$g} - $centropy{$f}{$g};
             ###!!! Sanity check.
+            # Due to imprecise computation with extremely small numbers, sometimes
+            # we get very slightly below zero. Let's tolerate it and let's treat
+            # the same interval above zero symmetrically.
+            if($information{$f}{$g} > -1e-15 && $information{$f}{$g} < 1e-15)
+            {
+                $information{$f}{$g} = 0;
+            }
             if($information{$f}{$g} < 0)
             {
-                # Due to imprecise computation with extremely small numbers, sometimes we get very slightly below zero.
-                # Let's tolerate it.
-                if($information{$f}{$g} > -1e-15)
-                {
-                    $information{$f}{$g} = 0;
-                }
-                else
-                {
-                    print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
-                    print STDERR ("\tf = $f\n");
-                    print STDERR ("\tg = $g\n");
-                    print STDERR ("\tH(g) = $fgventropy{$f}{$g} (only in languages where f is not empty)\n");
-                    print STDERR ("\tH(g|f) = $centropy{$f}{$g}\n");
-                    print STDERR ("\t\t$data->{fcount}{$f} = number of nonempty occurrences of f\n");
-                    print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
-                    print STDERR ("\t\t$fgcount{$f}{$g} = number of nonempty cooccurrences of f and g\n");
-                    die;
-                }
+                print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
+                print STDERR ("\tf = $f\n");
+                print STDERR ("\tg = $g\n");
+                print STDERR ("\tH(g) = $fgventropy{$f}{$g} (only in languages where f is not empty)\n");
+                print STDERR ("\tH(g|f) = $centropy{$f}{$g}\n");
+                print STDERR ("\t\t$data->{fcount}{$f} = number of nonempty occurrences of f\n");
+                print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
+                print STDERR ("\t\t$fgcount{$f}{$g} = number of nonempty cooccurrences of f and g\n");
+                die;
             }
         }
     }
