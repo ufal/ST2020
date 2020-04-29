@@ -261,7 +261,7 @@ sub predict_masked_features
         }
     }
     print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
-    printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted) unless($n_predicted==0);
+    printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
     print STDERR ("\n");
 }
 
