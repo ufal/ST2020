@@ -473,7 +473,7 @@ sub write_csv
     my @languages = sort {$lh->{$a}{index} <=> $lh->{$b}{index}} (keys(%{$lh}));
     foreach my $l (@languages)
     {
-        my @values = map {escape_commas($lh->{$l}{$_})} (@{$headers});
+        my @values = map {escape_commas($lh->{$l}{$_})} (@{$data->{features}});
         print(join(',', @values), "\n");
     }
 }
