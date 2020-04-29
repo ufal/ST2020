@@ -107,7 +107,11 @@ sub predict_masked_features
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
         my $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
-        print STDERR ("Language $lhl->{wals_code} ($lhl->{name}):\n") if($debug);
+        if($debug)
+        {
+            print STDERR ("----------------------------------------------------------------------\n");
+            print STDERR ("Language $lhl->{wals_code} ($lhl->{name}, $lhl->{family}/$lhl->{genus}, $lhl->{countrycodes}):\n");
+        }
         my @features = keys(%{$lhl});
         # Always process the features in the same order. Not only because of diagnostic outputs
         # but also to get the same results in cases where two features both seem to be of same
@@ -180,6 +184,7 @@ sub predict_masked_features
                             @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
                             foreach my $rfeature (@rfeatures)
                             {
+                                print STDERR ("    Mutual information with $rfeature == $traindata->{information}{$rfeature}{$qf}\n");
                                 my $rvalue = $lhl->{$rfeature};
                                 # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
                                 foreach my $cooc (@model)
