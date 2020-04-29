@@ -69,7 +69,12 @@ for _ in range(N):
         for feat in feats_use:
             true_value = dictline[feat]
             if true_value:
-                # TODO should this be from the true distro of labels?
+                # TODO need to often change only a few values -- first sample
+                # the number of values to change, then change only some of
+                # them? Or for each, first throw a dice to decide whether to
+                # change it?
+                # TODO !!!!!! ??????
+                # if randon.choice((True,False)):
                 sampled_value = random.choice(feat_values_tuples[feat])
                 sampledline[feat] = sampled_value
                 total += 1
