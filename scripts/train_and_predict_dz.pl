@@ -166,31 +166,32 @@ sub predict_masked_features
                     }
                     else
                     {
-                        print STDERR ("Language $lhl->{name} wrong prediction $qf == $lhl->{$qf}\n");
-                        print STDERR ("  should be $goldlhl->{$qf}\n");
+                        print STDERR ("Language $lhl->{name} wrong prediction $qf\n");
+                        print STDERR ("  predicted == $lhl->{$qf}\n");
+                        print STDERR ("  should be == $goldlhl->{$qf}\n");
                         if($debug)
                         {
                             # Sort source features: the one with strongest possible prediction first.
                             my %rfeatures;
-                            foreach my $cooc (@model)
+                            foreach my $item (@model)
                             {
-                                if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
+                                if(!defined($rfeatures{$item->{rf}}) || $item->{score} > $rfeatures{$item->{rf}})
                                 {
-                                    $rfeatures{$cooc->{rf}} = $cooc->{plogcinf};
+                                    $rfeatures{$item->{rf}} = $item->{score};
                                 }
                             }
                             my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
-                            @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+                            @model = sort {$b->{score} <=> $a->{score}} (@model);
                             foreach my $rfeature (@rfeatures)
                             {
                                 print STDERR ("    Mutual information with $rfeature == $traindata->{information}{$rfeature}{$qf}\n");
                                 my $rvalue = $lhl->{$rfeature};
                                 # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
-                                foreach my $cooc (@model)
+                                foreach my $item (@model)
                                 {
-                                    if($cooc->{rf} eq $rfeature)
+                                    if($item->{rf} eq $rfeature)
                                     {
-                                        print STDERR ("      Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$cooc->{plogc}, plogcinf=$cooc->{plogcinf}).\n");
+                                        print STDERR ("      Cooccurrence with $rfeature == $rvalue => $item->{v} (score=$item->{score}, p=$item->{p}, c=$item->{c}, plogc=$item->{plogc}, plogcinf=$item->{plogcinf}).\n");
                                     }
                                 }
                             }
@@ -215,10 +216,15 @@ sub predict_masked_features
 sub model_take_strongest
 {
     my @model = @_;
+    # Our score is conditional probability multiplied by log joint count.
     # We want a high probability but we also want it to be based on a sufficiently large count.
-    @model = sort {$b->{plogc} <=> $a->{plogc}} (@model);
+    foreach my $item (@model)
+    {
+        $item->{score} = $item->{plogc};
+    }
+    @model = sort {$b->{score} <=> $a->{score}} (@model);
     my $prediction = $model[0]{v};
-    print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
+    print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
     return $prediction;
 }
 
@@ -233,10 +239,15 @@ sub model_take_strongest
 sub model_take_strongest_information
 {
     my @model = @_;
+    # Our score is conditional probability multiplied by log joint count and the mutual information of the two features.
     # We want a high probability but we also want it to be based on a sufficiently large count.
-    @model = sort {$b->{plogcinf} <=> $a->{plogcinf}} (@model);
+    foreach my $item (@model)
+    {
+        $item->{score} = $item->{plogcinf};
+    }
+    @model = sort {$b->{score} <=> $a->{score}} (@model);
     my $prediction = $model[0]{v};
-    print STDERR ("    p=$model[0]{p} (count $model[0]{c}) => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
+    print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
     return $prediction;
 }
 
@@ -249,11 +260,16 @@ sub model_take_strongest_information
 sub model_weighted_vote
 {
     my @model = @_;
-    my %votes;
-    foreach my $signal (@model)
+    # Our score is conditional probability multiplied by log joint count.
+    # We want a high probability but we also want it to be based on a sufficiently large count.
+    foreach my $item (@model)
     {
-        my $weight = $signal->{p}*log($signal->{c});
-        $votes{$signal->{v}} += $weight;
+        $item->{score} = $item->{plogc};
+    }
+    my %votes;
+    foreach my $item (@model)
+    {
+        $votes{$item->{v}} += $item->{score};
     }
     my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
     my $prediction = $options[0];
