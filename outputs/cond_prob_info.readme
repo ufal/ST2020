@@ -18,5 +18,10 @@ However, our common evaluation script thinks I'm a bit worse than that:
 python3 scripts/evaluate_from_csv.py --input_file data/dev_x.csv --output_file outputs/cond_prob_info.csv --golden_file data/dev_y.csv
 Accuracy is 70.11%
 
+Also, I am struggling to make the prediction deterministic. So far it still oscilates between several possible outcomes:
+correct 1136 out of 1596, accuracy 71.18% (external evaluation 70.11%)
+correct 1135 out of 1596, accuracy 71.12% (external evaluation 70.05%)
+correct 1132 out of 1596, accuracy 70.93% (external evaluation 69.86%)
+
 Accuracy on dev data 70.11%
 

@@ -190,7 +190,7 @@ sub predict_masked_features
                                 {
                                     if($cooc->{rf} eq $rfeature)
                                     {
-                                        print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$cooc->{plogc}, plogcinf=$cooc->{plogcinf}).\n");
+                                        print STDERR ("      Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$cooc->{plogc}, plogcinf=$cooc->{plogcinf}).\n");
                                     }
                                 }
                             }
