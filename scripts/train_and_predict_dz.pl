@@ -42,6 +42,8 @@ GetOptions
 #   Filled by compute_pairwise_cooccurrence()
 #     {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #     {fgvcount} .. hash {f}{g}{gv} => count of g=gv in languages where f is not empty
+#     {fgvprob} ... hash {f}{g}{gv} => probability of g=gv given that f is not empty
+#     {fgventropy}  hash {f}{g} => entropy of g given that f is not empty
 #     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #     {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
@@ -371,6 +373,8 @@ sub hash_features
 # Filled by compute_pairwise_cooccurrence()
 #   {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
 #   {fgvcount} .. hash {f}{g}{gv} => count of g=gv in languages where f is not empty
+#   {fgvprob} ... hash {f}{g}{gv} => probability of g=gv given that f is not empty
+#   {fgventropy}  hash {f}{g} => entropy of g given that f is not empty
 #   {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #   {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #   {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
@@ -382,6 +386,8 @@ sub compute_pairwise_cooccurrence
     my $data = shift; # hash ref
     my %fgcount;
     my %fgvcount;
+    my %fgvprob;
+    my %fgventropy;
     my %cooc;
     my %prob;
     my %jprob;
@@ -411,9 +417,17 @@ sub compute_pairwise_cooccurrence
         my @fvalues = keys(%{$cooc{$f}});
         foreach my $fv (@fvalues)
         {
-            my $pfv = $data->{fvprob}{$f}{$fv};
             foreach my $g (keys(%{$cooc{$f}{$fv}}))
             {
+                # Probability of f=fv given that g is not empty. We will need
+                # the entropy of this distribution to compute mutual information
+                # of f and g.
+                my $pfv = $fgvcount{$g}{$f}{$fv} / $fgcount{$f}{$g};
+                $fgvprob{$g}{$f}{$fv} = $pfv;
+                if($pfv > 0)
+                {
+                    $fgventropy{$g}{$f} -= $pfv * log($pfv);
+                }
                 my @gvalues = keys(%{$cooc{$f}{$fv}{$g}});
                 foreach my $gv (@gvalues)
                 {
@@ -436,9 +450,11 @@ sub compute_pairwise_cooccurrence
     {
         foreach my $g (keys(%{$centropy{$f}}))
         {
+            # $fgventropy{$f}{$g} is H(g|f is not empty)
             # $centropy{$f}{$g} is H(g|f), i.e., entropy of g given f.
-            # Mutual information of $f and $g:
-            $information{$f}{$g} = $data->{fentropy}{$g} - $centropy{$f}{$g};
+            # Mutual information of $f and $g in the domain where both are not empty
+            # (we do not want to recognize the empty value as something that can be predicted):
+            $information{$f}{$g} = $fgventropy{$f}{$g} - $centropy{$f}{$g};
             ###!!! Sanity check.
             if($information{$f}{$g} < 0)
             {
@@ -455,6 +471,9 @@ sub compute_pairwise_cooccurrence
         }
     }
     $data->{fgcount} = \%fgcount;
+    $data->{fgvcount} = \%fgvcount;
+    $data->{fgvprob} = \%fgvprob;
+    $data->{fgventropy} = \%fgventropy;
     $data->{cooc} = \%cooc;
     $data->{cprob} = \%prob;
     $data->{jprob} = \%jprob;
