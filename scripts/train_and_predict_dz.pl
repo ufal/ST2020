@@ -17,9 +17,11 @@ binmode(STDERR, ':utf8');
 use Getopt::Long;
 
 my $debug = 0; # print all predictions with explanation to STDERR
+my $print_hi = 0; # print entropy of each feature and mutual information of each pair of features
 GetOptions
 (
-    'debug' => \$debug
+    'debug'    => \$debug,
+    'print_hi' => \$print_hi
 );
 
 #==============================================================================
@@ -60,30 +62,9 @@ print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
 compute_pairwise_cooccurrence(\%traindata);
-if($debug)
+if($print_hi)
 {
-    print STDERR ("Computing entropy of each feature...\n");
-    my @features_by_entropy = sort {$traindata{fentropy}{$a} <=> $traindata{fentropy}{$b}} (@{$traindata{features}});
-    foreach my $feature (@features_by_entropy)
-    {
-        print STDERR ("  $traindata{fentropy}{$feature} = H($feature)\n");
-    }
-    print STDERR ("Computing conditional entropy and mutual information of each pair of features...\n");
-    my @feature_pairs;
-    foreach my $f (keys(%{$traindata{centropy}}))
-    {
-        next if($f =~ m/^(index|wals_code|name)$/);
-        foreach my $g (keys(%{$traindata{centropy}{$f}}))
-        {
-            next if($g =~ m/^(index|wals_code|name)$/ || $g le $f);
-            push(@feature_pairs, [$f, $g]);
-        }
-    }
-    my @feature_pairs_by_information = sort {$traindata{information}{$b->[0]}{$b->[1]} <=> $traindata{information}{$a->[0]}{$a->[1]}} (@feature_pairs);
-    foreach my $fg (@feature_pairs_by_information)
-    {
-        print STDERR ("  $traindata{information}{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
-    }
+    print_hi(\%traindata);
 }
 print STDERR ("Reading the development data...\n");
 my %devdata = read_csv("$data_folder/dev_x.csv");
@@ -98,62 +79,12 @@ my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
 hash_features(\%devdata, 0);
 hash_features(\%devgdata, 0);
-my @features = @{$devdata{features}};
-my $nnan = 0;
-my $nqm = 0;
-my $nreg = 0;
-foreach my $f (@features)
-{
-    my @values = keys(%{$devdata{fvcount}{$f}});
-    foreach my $v (@values)
-    {
-        if($v eq 'nan')
-        {
-            $nnan += $devdata{fvcount}{$f}{$v};
-        }
-        elsif($v eq '?')
-        {
-            $nqm += $devdata{fvcount}{$f}{$v};
-        }
-        else
-        {
-            $nreg += $devdata{fvcount}{$f}{$v};
-        }
-    }
-}
-print STDERR ("Found $nnan nan values.\n");
-print STDERR ("Found $nqm ? values to be predicted.\n");
-print STDERR ("Found $nreg regular non-empty values.\n");
-my @languages = @{$devdata{lcodes}};
-my $nl = $devdata{nl};
-my $sumqm = 0;
-my $sumreg = 0;
-my $minreg;
-my $minreg_qm;
-foreach my $l (@languages)
-{
-    my @features = keys(%{$devdata{lh}{$l}});
-    my $nqm = scalar(grep {$devdata{lh}{$l}{$_} eq '?'} (@features));
-    my $nreg = scalar(grep {$devdata{lh}{$l}{$_} !~ m/^nan|\?$/} (@features));
-    $sumqm += $nqm;
-    $sumreg += $nreg;
-    if(!defined($minreg) || $nreg<$minreg)
-    {
-        $minreg = $nreg;
-        $minreg_qm = $nqm;
-    }
-}
-my $avgqm = $sumqm/$nl;
-my $avgreg = $sumreg/$nl;
-print STDERR ("On average, a language has $avgreg non-empty features and $avgqm features to predict.\n");
-print STDERR ("Minimum knowledge is $minreg non-empty features; in that case, $minreg_qm features are to be predicted.\n");
-print STDERR ("Note that the non-empty features always include 8 non-typologic features: ord, code, name, latitude, longitude, genus, family, countrycodes.\n");
+print_qm_analysis(\%devdata);
 # Predict the masked features.
-###!!! This is the first shot...
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
-write_csv($devdata{features}, $devdata{lh});
+write_csv(\%devdata);
 
 
 
@@ -530,9 +461,9 @@ sub compute_pairwise_cooccurrence
 #------------------------------------------------------------------------------
 sub write_csv
 {
-    my $headers = shift; # array ref
-    my $lh = shift; # hash ref
-    my @headers = map {escape_commas($_)} (@{$headers});
+    my $data = shift; # hash ref
+    my $lh = $data->{lh}; # hash ref
+    my @headers = map {escape_commas($_)} (@{$data->{features}});
     print(join(',', @headers), "\n");
     my @languages = sort {$lh->{$a}{index} <=> $lh->{$b}{index}} (keys(%{$lh}));
     foreach my $l (@languages)
@@ -708,4 +639,100 @@ sub restore_commas
     my $rcomma = shift; # the replacement
     $string =~ s/$rcomma/,/g;
     return $string;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Prints entropy of each feature and mutual information of each pair of
+# features to STDERR.
+#------------------------------------------------------------------------------
+sub print_hi
+{
+    my $data = shift;
+    print STDERR ("Entropy of each feature:\n");
+    my @features_by_entropy = sort {$data->{fentropy}{$a} <=> $data->{fentropy}{$b}} (@{$data->{features}});
+    foreach my $feature (@features_by_entropy)
+    {
+        print STDERR ("  $data->{fentropy}{$feature} = H($feature)\n");
+    }
+    print STDERR ("Mutual information of each pair of features:\n");
+    my @feature_pairs;
+    foreach my $f (keys(%{$data->{centropy}}))
+    {
+        next if($f =~ m/^(index|wals_code|name)$/);
+        foreach my $g (keys(%{$data->{centropy}{$f}}))
+        {
+            next if($g =~ m/^(index|wals_code|name)$/ || $g le $f);
+            push(@feature_pairs, [$f, $g]);
+        }
+    }
+    my @feature_pairs_by_information = sort {$data->{information}{$b->[0]}{$b->[1]} <=> $data->{information}{$a->[0]}{$a->[1]}} (@feature_pairs);
+    foreach my $fg (@feature_pairs_by_information)
+    {
+        print STDERR ("  $data->{information}{$fg->[0]}{$fg->[1]} = I( $fg->[0] , $fg->[1] )\n");
+    }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Analyzes the question marks in data: how much do we know and how much do we
+# have to predict? Prints the findings to STDERR.
+#------------------------------------------------------------------------------
+sub print_qm_analysis
+{
+    my $data = shift;
+    my @features = @{$data->{features}};
+    my $nnan = 0;
+    my $nqm = 0;
+    my $nreg = 0;
+    foreach my $f (@features)
+    {
+        my @values = keys(%{$data->{fvcount}{$f}});
+        foreach my $v (@values)
+        {
+            if($v eq 'nan')
+            {
+                $nnan += $data->{fvcount}{$f}{$v};
+            }
+            elsif($v eq '?')
+            {
+                $nqm += $data->{fvcount}{$f}{$v};
+            }
+            else
+            {
+                $nreg += $data->{fvcount}{$f}{$v};
+            }
+        }
+    }
+    print STDERR ("Found $nnan nan values.\n");
+    print STDERR ("Found $nqm ? values to be predicted.\n");
+    print STDERR ("Found $nreg regular non-empty values.\n");
+    my @languages = @{$data->{lcodes}};
+    my $nl = $data->{nl};
+    my $sumqm = 0;
+    my $sumreg = 0;
+    my $minreg;
+    my $minreg_qm;
+    my $minreg_langname;
+    foreach my $l (@languages)
+    {
+        my @features = keys(%{$data->{lh}{$l}});
+        my $nqm = scalar(grep {$data->{lh}{$l}{$_} eq '?'} (@features));
+        my $nreg = scalar(grep {$data->{lh}{$l}{$_} !~ m/^nan|\?$/} (@features));
+        $sumqm += $nqm;
+        $sumreg += $nreg;
+        if(!defined($minreg) || $nreg<$minreg)
+        {
+            $minreg = $nreg;
+            $minreg_qm = $nqm;
+            $minreg_langname = $data->{lh}{name};
+        }
+    }
+    my $avgqm = $sumqm/$nl;
+    my $avgreg = $sumreg/$nl;
+    print STDERR ("On average, a language has $avgreg non-empty features and $avgqm features to predict.\n");
+    print STDERR ("Minimum knowledge is $minreg non-empty features (language $minreg_langname); in that case, $minreg_qm features are to be predicted.\n");
+    print STDERR ("Note that the non-empty features always include 8 non-typologic features: ord, code, name, latitude, longitude, genus, family, countrycodes.\n");
 }
