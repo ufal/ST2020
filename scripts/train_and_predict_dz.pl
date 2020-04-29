@@ -101,14 +101,19 @@ sub predict_masked_features
     my $golddata = shift; # hash ref
     my $n_predicted = 0;
     my $n_predicted_correctly = 0;
-    foreach my $language (@{$blinddata->{lcodes}})
+    # Always process the languages in the same order so that diagnostic outputs can be compared.
+    my @lcodes = sort(@{$blinddata->{lcodes}});
+    foreach my $language (@lcodes)
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
         my $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
         print STDERR ("Language $lhl->{wals_code} ($lhl->{name}):\n") if($debug);
         my @features = keys(%{$lhl});
-        my @rfeatures = grep {$lhl->{$_} !~ m/^nan|\?$/} (@features);
-        my @qfeatures = grep {$lhl->{$_} eq '?'} (@features);
+        # Always process the features in the same order. Not only because of diagnostic outputs
+        # but also to get the same results in cases where two features both seem to be of same
+        # value when predicting a particular third feature.
+        my @rfeatures = sort(grep {$lhl->{$_} !~ m/^nan|\?$/} (@features));
+        my @qfeatures = sort(grep {$lhl->{$_} eq '?'} (@features));
         my $nrf = scalar(@rfeatures);
         my $nqf = scalar(@qfeatures);
         print STDERR ("  $nrf features known, $nqf features to be predicted.\n") if($debug);

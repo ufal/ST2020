@@ -5,6 +5,7 @@ Conditional probability that feature f = fv given that g = gv
 Only the strongest signal (source feature) is taken, all other source features are ignored.
 
 perl scripts/train_and_predict_dz.pl > outputs/cond_prob_info.csv
+( perl scripts/train_and_predict_dz.pl --debug > outputs/cond_prob_info.csv ) |& tee outputs/cond_prob_info.debug
 
 There is some disagreement in the evaluation. As I look at the gold standard
 immediately after each prediction in order to analyze errors, I also compute
