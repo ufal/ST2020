@@ -174,10 +174,9 @@ sub predict_masked_features
                             my %rfeatures;
                             foreach my $cooc (@model)
                             {
-                                my $plogc = $cooc->{p}*log($cooc->{c});
                                 if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
                                 {
-                                    $rfeatures{$cooc->{rf}} = $plogc;
+                                    $rfeatures{$cooc->{rf}} = $cooc->{plogcinf};
                                 }
                             }
                             my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
