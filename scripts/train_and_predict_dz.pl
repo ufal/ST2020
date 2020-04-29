@@ -504,6 +504,10 @@ sub modify_features
     {
         last if($data->{features}[$icc] eq 'countrycodes');
     }
+    if($icc != 7)
+    {
+        die("icc should be 7 but is $icc");
+    }
     foreach my $language (@{$data->{table}})
     {
         if($language->[$icc] eq 'US')
