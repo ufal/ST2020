@@ -461,7 +461,7 @@ sub compute_pairwise_cooccurrence
                 print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
                 print STDERR ("\tf = $f\n");
                 print STDERR ("\tg = $g\n");
-                print STDERR ("\tH(g) = $data->{fentropy}{$g}\n");
+                print STDERR ("\tH(g) = $fgventropy{$f}{$g} (only in languages where f is not empty)\n");
                 print STDERR ("\tH(g|f) = $centropy{$f}{$g}\n");
                 print STDERR ("\t\t$data->{fcount}{$f} = number of nonempty occurrences of f\n");
                 print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
