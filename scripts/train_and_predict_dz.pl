@@ -59,6 +59,8 @@ my %traindata = read_csv("$data_folder/train_y.csv");
 print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
+# Modify features to improve prediction.
+modify_features(\%traindata);
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
 compute_pairwise_cooccurrence(\%traindata);
@@ -77,6 +79,8 @@ my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
+# Modify features to improve prediction.
+modify_features(\%devdata);
 hash_features(\%devdata, 0);
 hash_features(\%devgdata, 0);
 print_qm_analysis(\%devdata);
@@ -475,6 +479,38 @@ sub compute_pairwise_cooccurrence
     $data->{jprob} = \%jprob;
     $data->{centropy} = \%centropy;
     $data->{information} = \%information;
+}
+
+
+
+#==============================================================================
+# Modifications of input features.
+#==============================================================================
+
+
+
+#------------------------------------------------------------------------------
+# Modifies input features in a way that might hopefully be more useful for
+# predictions. Call this function immediately after reading input, before
+# hashing the features.
+#------------------------------------------------------------------------------
+sub modify_features
+{
+    my $data = shift;
+    # Countrycodes == US is unreliable. It occurs with many languages, including e.g. African.
+    # Replace it by 'nan'.
+    my $icc;
+    for($icc = 0; $icc++; $icc <= $#{$data->{features}})
+    {
+        last if($data->{features}[$icc] eq 'countrycodes');
+    }
+    foreach my $language (@{$data->{table}})
+    {
+        if($language->[$icc] eq 'US')
+        {
+            $language->[$icc] = 'nan';
+        }
+    }
 }
 
 
