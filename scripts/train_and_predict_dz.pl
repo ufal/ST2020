@@ -151,10 +151,7 @@ print STDERR ("Note that the non-empty features always include 8 non-typologic f
 # Predict the masked features.
 ###!!! This is the first shot...
 print STDERR ("Predicting the masked features...\n");
-foreach my $l (@languages)
-{
-    predict_masked_features(\%traindata, $devdata{lh}{$l}, $devgdata{lh}{$l});
-}
+predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
 write_csv($devdata{features}, $devdata{lh});
 
@@ -169,80 +166,92 @@ write_csv($devdata{features}, $devdata{lh});
 sub predict_masked_features
 {
     my $traindata = shift; # hash ref
-    my $lhl = shift; # hash ref: feature-value hash of one language
-    my $goldlhl = shift; # hash ref: gold standard version of $lhl, used for debugging and analysis
-    print STDERR ("Language $lhl->{wals_code} ($lhl->{name}):\n") if($debug);
-    my @features = keys(%{$lhl});
-    my @rfeatures = grep {$lhl->{$_} !~ m/^nan|\?$/} (@features);
-    my @qfeatures = grep {$lhl->{$_} eq '?'} (@features);
-    my $nrf = scalar(@rfeatures);
-    my $nqf = scalar(@qfeatures);
-    print STDERR ("  $nrf features known, $nqf features to be predicted.\n") if($debug);
-    foreach my $qf (@qfeatures)
+    my $blinddata = shift; # hash ref
+    my $golddata = shift; # hash ref
+    my $n_predicted = 0;
+    my $n_predicted_correctly = 0;
+    foreach my $language (@{$blinddata->{lcodes}})
     {
-        print STDERR ("  Predicting $qf:\n") if($debug);
-        my @model;
-        foreach my $rf (@rfeatures)
+        my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
+        my $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
+        print STDERR ("Language $lhl->{wals_code} ($lhl->{name}):\n") if($debug);
+        my @features = keys(%{$lhl});
+        my @rfeatures = grep {$lhl->{$_} !~ m/^nan|\?$/} (@features);
+        my @qfeatures = grep {$lhl->{$_} eq '?'} (@features);
+        my $nrf = scalar(@rfeatures);
+        my $nqf = scalar(@qfeatures);
+        print STDERR ("  $nrf features known, $nqf features to be predicted.\n") if($debug);
+        foreach my $qf (@qfeatures)
         {
-            if(exists($traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}))
+            $n_predicted++;
+            print STDERR ("  Predicting $qf:\n") if($debug);
+            my @model;
+            foreach my $rf (@rfeatures)
             {
-                my @qvalues = keys(%{$traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}});
-                foreach my $qv (@qvalues)
+                if(exists($traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}))
                 {
-                    my %record =
-                    (
-                        'p' => $traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}{$qv},
-                        'c' => $traindata->{cooc}{$rf}{$lhl->{$rf}}{$qf}{$qv},
-                        'v' => $qv,
-                        'rf' => $rf,
-                        'rv' => $lhl->{$rf}
-                    );
-                    $record{plogc} = $record{p} * log($record{c});
-                    $record{plogcinf} = $record{plogc} * $traindata->{information}{$rf}{$qf};
-                    push(@model, \%record);
+                    my @qvalues = keys(%{$traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}});
+                    foreach my $qv (@qvalues)
+                    {
+                        my %record =
+                        (
+                            'p' => $traindata->{cprob}{$rf}{$lhl->{$rf}}{$qf}{$qv},
+                            'c' => $traindata->{cooc}{$rf}{$lhl->{$rf}}{$qf}{$qv},
+                            'v' => $qv,
+                            'rf' => $rf,
+                            'rv' => $lhl->{$rf}
+                        );
+                        $record{plogc} = $record{p} * log($record{c});
+                        $record{plogcinf} = $record{plogc} * $traindata->{information}{$rf}{$qf};
+                        push(@model, \%record);
+                    }
+                }
+                else
+                {
+                    #print STDERR ("    No cooccurrence with $rf == $lhl->{$rf}.\n");
                 }
             }
-            else
+            print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
+            if(scalar(@model)>0)
             {
-                #print STDERR ("    No cooccurrence with $rf == $lhl->{$rf}.\n");
-            }
-        }
-        print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
-        if(scalar(@model)>0)
-        {
-            # Save the winning prediction in the language-feature hash.
-            #$lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
-            $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) = 69.86%
-            #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
-            if(defined($goldlhl))
-            {
-                if($lhl->{$qf} ne $goldlhl->{$qf})
+                # Save the winning prediction in the language-feature hash.
+                #$lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
+                $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) = 69.86%
+                #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
+                if(defined($goldlhl))
                 {
-                    print STDERR ("Language $lhl->{name} wrong prediction $qf == $lhl->{$qf}\n");
-                    print STDERR ("  should be $goldlhl->{$qf}\n");
-                    if($debug)
+                    if($lhl->{$qf} eq $goldlhl->{$qf})
                     {
-                        # Sort source features: the one with strongest possible prediction first.
-                        my %rfeatures;
-                        foreach my $cooc (@model)
+                        $n_predicted_correctly++;
+                    }
+                    else
+                    {
+                        print STDERR ("Language $lhl->{name} wrong prediction $qf == $lhl->{$qf}\n");
+                        print STDERR ("  should be $goldlhl->{$qf}\n");
+                        if($debug)
                         {
-                            my $plogc = $cooc->{p}*log($cooc->{c});
-                            if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
-                            {
-                                $rfeatures{$cooc->{rf}} = $plogc;
-                            }
-                        }
-                        my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
-                        @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
-                        foreach my $rfeature (@rfeatures)
-                        {
-                            my $rvalue = $lhl->{$rfeature};
-                            # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
+                            # Sort source features: the one with strongest possible prediction first.
+                            my %rfeatures;
                             foreach my $cooc (@model)
                             {
-                                if($cooc->{rf} eq $rfeature)
+                                my $plogc = $cooc->{p}*log($cooc->{c});
+                                if(!defined($rfeatures{$cooc->{rf}}) || $plogc > $rfeatures{$cooc->{rf}})
                                 {
-                                    print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$cooc->{plogc}, plogcinf=$cooc->{plogcinf}).\n");
+                                    $rfeatures{$cooc->{rf}} = $plogc;
+                                }
+                            }
+                            my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
+                            @model = sort {$b->{p}*log($b->{c}) <=> $a->{p}*log($a->{c})} (@model);
+                            foreach my $rfeature (@rfeatures)
+                            {
+                                my $rvalue = $lhl->{$rfeature};
+                                # Show all cooccurrences with this rfeature, including the other possible target values, with probabilities.
+                                foreach my $cooc (@model)
+                                {
+                                    if($cooc->{rf} eq $rfeature)
+                                    {
+                                        print STDERR ("    Cooccurrence with $rfeature == $rvalue => $cooc->{v} (p=$cooc->{p}, c=$cooc->{c}, plogc=$cooc->{plogc}, plogcinf=$cooc->{plogcinf}).\n");
+                                    }
                                 }
                             }
                         }
@@ -251,6 +260,9 @@ sub predict_masked_features
             }
         }
     }
+    print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
+    printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted) unless($n_predicted==0);
+    print STDERR ("\n");
 }
 
 
