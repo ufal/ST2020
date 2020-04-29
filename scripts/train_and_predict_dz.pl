@@ -500,6 +500,7 @@ sub modify_features
     my $icc = 7; die if($data->{features}[$icc] ne 'countrycodes');
     my $ilat = 3; die if($data->{features}[$ilat] ne 'latitude');
     my $ilon = 4; die if($data->{features}[$ilon] ne 'longitude');
+    my $ilatlon = scalar(@{$data->{features}}); # we will add this as a new feature
     foreach my $language (@{$data->{table}})
     {
         # Countrycodes == US is unreliable. It occurs with many languages, including e.g. African.
@@ -574,6 +575,7 @@ sub modify_features
         {
             $language->[$ilon] = 145;
         }
+        $language->[$ilatlon] = $language->[$ilat].';'.$language->[$ilon];
     }
 }
 
