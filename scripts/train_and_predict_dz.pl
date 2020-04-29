@@ -500,7 +500,7 @@ sub modify_features
     # Countrycodes == US is unreliable. It occurs with many languages, including e.g. African.
     # Replace it by 'nan'.
     my $icc;
-    for($icc = 0; $icc++; $icc <= $#{$data->{features}})
+    for($icc = 0; $icc <= $#{$data->{features}}; $icc++)
     {
         last if($data->{features}[$icc] eq 'countrycodes');
     }
