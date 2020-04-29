@@ -430,6 +430,12 @@ sub compute_pairwise_cooccurrence
             {
                 $information{$f}{$g} = 0;
             }
+            # In an attempt to stabilize the results of two consecutive runs
+            # (where one of the differences I have observed is a slight difference
+            # in mutual information between the same two features), reduce the
+            # precision of mutual information. (The numbers I see typically have
+            # about 14 decimal digits, let's now limit it to 10.)
+            $information{$f}{$g} = $information{$g}{$f} = sprintf("%.10f", $information{$f}{$g});
             if($information{$f}{$g} < 0)
             {
                 print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
