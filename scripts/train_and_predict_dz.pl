@@ -60,27 +60,22 @@ print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
 compute_pairwise_cooccurrence(\%traindata);
-# Compute entropy of each feature.
-print STDERR ("Computing entropy of each feature...\n");
 if($debug)
 {
+    print STDERR ("Computing entropy of each feature...\n");
     my @features_by_entropy = sort {$traindata{fentropy}{$a} <=> $traindata{fentropy}{$b}} (@{$traindata{features}});
     foreach my $feature (@features_by_entropy)
     {
         print STDERR ("  $traindata{fentropy}{$feature} = H($feature)\n");
     }
-}
-# Compute conditional entropy of each pair of features.
-print STDERR ("Computing conditional entropy of each pair of features...\n");
-if($debug)
-{
+    print STDERR ("Computing conditional entropy and mutual information of each pair of features...\n");
     my @feature_pairs;
     foreach my $f (keys(%{$traindata{centropy}}))
     {
         next if($f =~ m/^(index|wals_code|name)$/);
         foreach my $g (keys(%{$traindata{centropy}{$f}}))
         {
-            next if($g =~ m/^(index|wals_code|name)$/ || $g eq $f);
+            next if($g =~ m/^(index|wals_code|name)$/ || $g le $f);
             push(@feature_pairs, [$f, $g]);
         }
     }
