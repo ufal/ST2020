@@ -212,7 +212,7 @@ sub predict_masked_features
         {
             # Save the winning prediction in the language-feature hash.
             #$lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
-            $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) =
+            $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) = 69.86%
             #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
             if(defined($goldlhl))
             {

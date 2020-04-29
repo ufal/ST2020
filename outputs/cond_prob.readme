@@ -1,5 +1,6 @@
 
 Conditional probability that feature f = fv given that g = gv.
+  multiplied by the log count of cooccurrence
 Only the strongest signal (source feature) is taken, all other source features are ignored.
 
 perl scripts/train_and_predict_dz.pl --debug > outputs/cond_prob.csv
