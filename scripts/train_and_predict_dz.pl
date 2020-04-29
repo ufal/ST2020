@@ -497,22 +497,82 @@ sub compute_pairwise_cooccurrence
 sub modify_features
 {
     my $data = shift;
-    # Countrycodes == US is unreliable. It occurs with many languages, including e.g. African.
-    # Replace it by 'nan'.
-    my $icc;
-    for($icc = 0; $icc <= $#{$data->{features}}; $icc++)
-    {
-        last if($data->{features}[$icc] eq 'countrycodes');
-    }
-    if($icc != 7)
-    {
-        die("icc should be 7 but is $icc");
-    }
+    my $icc = 7; die if($data->{features}[$icc] ne 'countrycodes');
+    my $ilat = 3; die if($data->{features}[$ilat] ne 'latitude');
+    my $ilon = 4; die if($data->{features}[$ilon] ne 'longitude');
     foreach my $language (@{$data->{table}})
     {
+        # Countrycodes == US is unreliable. It occurs with many languages, including e.g. African.
+        # Replace it by 'nan'.
         if($language->[$icc] eq 'US')
         {
             $language->[$icc] = 'nan';
+        }
+        # Group latitudes into zones.
+        if($language->[$ilat] >= 60) # 60-90
+        {
+            $language->[$ilat] = 65;
+        }
+        elsif($language->[$ilat] >= 35) # 35-60
+        {
+            $language->[$ilat] = 45;
+        }
+        elsif($language->[$ilat] >= 10) # 10-35
+        {
+            $language->[$ilat] = 25;
+        }
+        elsif($language->[$ilat] >= -10) # -10-10
+        {
+            $language->[$ilat] = 0;
+        }
+        else # -90--10
+        {
+            $language->[$ilat] = -35;
+        }
+        # Group longitudes
+        if($language->[$ilon] >= 160 || $language->[$ilon] <= -140) # 160--140
+        {
+            $language->[$ilon] = -180;
+        }
+        elsif($language->[$ilon] <= -115)
+        {
+            $language->[$ilon] = -115;
+        }
+        elsif($language->[$ilon] <= -95)
+        {
+            $language->[$ilon] = -105;
+        }
+        elsif($language->[$ilon] <= -60)
+        {
+            $language->[$ilon] = -75;
+        }
+        elsif($language->[$ilon] <= -25)
+        {
+            $language->[$ilon] = -40;
+        }
+        elsif($language->[$ilon] <= 35)
+        {
+            $language->[$ilon] = 0;
+        }
+        elsif($language->[$ilon] <= 70)
+        {
+            $language->[$ilon] = 55;
+        }
+        elsif($language->[$ilon] <= 95)
+        {
+            $language->[$ilon] = 85;
+        }
+        elsif($language->[$ilon] <= 118)
+        {
+            $language->[$ilon] = 100;
+        }
+        elsif($language->[$ilon] <= 130)
+        {
+            $language->[$ilon] = 125;
+        }
+        else
+        {
+            $language->[$ilon] = 145;
         }
     }
 }
