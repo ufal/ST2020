@@ -41,6 +41,7 @@ GetOptions
 #     {fentropy} .. hash {f} => entropy of distribution of non-empty values of f
 #   Filled by compute_pairwise_cooccurrence()
 #     {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
+#     {fgvcount} .. hash {f}{g}{gv} => count of g=gv in languages where f is not empty
 #     {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #     {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #     {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
@@ -369,6 +370,7 @@ sub hash_features
 # Computes conditional probability P(g=gv|f=fv).
 # Filled by compute_pairwise_cooccurrence()
 #   {fgcount} ... hash {f}{g} => count of languages where both f and g are not empty
+#   {fgvcount} .. hash {f}{g}{gv} => count of g=gv in languages where f is not empty
 #   {cooc} ...... hash {f}{fv}{g}{gv} => count of languages where f=fv and g=gv
 #   {cprob} ..... hash {f}{fv}{g}{gv} => conditional probability(g=gv|f=fv)
 #   {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
@@ -379,6 +381,7 @@ sub compute_pairwise_cooccurrence
 {
     my $data = shift; # hash ref
     my %fgcount;
+    my %fgvcount;
     my %cooc;
     my %prob;
     my %jprob;
@@ -396,6 +399,7 @@ sub compute_pairwise_cooccurrence
                 next if(!exists($data->{lhclean}{$l}{$g}));
                 my $gv = $data->{lhclean}{$l}{$g};
                 $fgcount{$f}{$g}++;
+                $fgvcount{$f}{$g}{$gv}++;
                 $cooc{$f}{$fv}{$g}{$gv}++;
             }
         }
@@ -411,16 +415,10 @@ sub compute_pairwise_cooccurrence
             foreach my $g (keys(%{$cooc{$f}{$fv}}))
             {
                 my @gvalues = keys(%{$cooc{$f}{$fv}{$g}});
-                # What is the total number of cases when $f=$fv cooccurred with a nonempty value of $g?
-                my $nffvg = 0;
-                foreach my $gv (@gvalues)
-                {
-                    $nffvg += $cooc{$f}{$fv}{$g}{$gv};
-                }
                 foreach my $gv (@gvalues)
                 {
                     # Conditional probability of $g=$gv given $f=$fv.
-                    $prob{$f}{$fv}{$g}{$gv} = $cooc{$f}{$fv}{$g}{$gv} / $nffvg;
+                    $prob{$f}{$fv}{$g}{$gv} = $cooc{$f}{$fv}{$g}{$gv} / $fgvcount{$g}{$f}{$fv};
                     # Joint probability of $f=$fv and $g=$gv.
                     my $pfvgv = $cooc{$f}{$fv}{$g}{$gv} / $fgcount{$f}{$g};
                     # Conditional entropy of $g given $f.
