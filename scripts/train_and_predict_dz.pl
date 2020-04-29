@@ -458,15 +458,24 @@ sub compute_pairwise_cooccurrence
             ###!!! Sanity check.
             if($information{$f}{$g} < 0)
             {
-                print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
-                print STDERR ("\tf = $f\n");
-                print STDERR ("\tg = $g\n");
-                print STDERR ("\tH(g) = $fgventropy{$f}{$g} (only in languages where f is not empty)\n");
-                print STDERR ("\tH(g|f) = $centropy{$f}{$g}\n");
-                print STDERR ("\t\t$data->{fcount}{$f} = number of nonempty occurrences of f\n");
-                print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
-                print STDERR ("\t\t$fgcount{$f}{$g} = number of nonempty cooccurrences of f and g\n");
-                die;
+                # Due to imprecise computation with extremely small numbers, sometimes we get very slightly below zero.
+                # Let's tolerate it.
+                if($information{$f}{$g} > -1e-15)
+                {
+                    $information{$f}{$g} = 0;
+                }
+                else
+                {
+                    print STDERR ("Something is wrong. Mutual information must not be negative but it is I = $information{$f}{$g}\n");
+                    print STDERR ("\tf = $f\n");
+                    print STDERR ("\tg = $g\n");
+                    print STDERR ("\tH(g) = $fgventropy{$f}{$g} (only in languages where f is not empty)\n");
+                    print STDERR ("\tH(g|f) = $centropy{$f}{$g}\n");
+                    print STDERR ("\t\t$data->{fcount}{$f} = number of nonempty occurrences of f\n");
+                    print STDERR ("\t\t$data->{fcount}{$g} = number of nonempty occurrences of g\n");
+                    print STDERR ("\t\t$fgcount{$f}{$g} = number of nonempty cooccurrences of f and g\n");
+                    die;
+                }
             }
         }
     }
