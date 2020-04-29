@@ -147,6 +147,7 @@ sub predict_masked_features
                         );
                         $record{plogc} = $record{p} * log($record{c});
                         $record{plogcinf} = $record{plogc} * $traindata->{information}{$rf}{$qf};
+                        $record{information} = $traindata->{information}{$rf}{$qf};
                         push(@model, \%record);
                     }
                 }
@@ -160,8 +161,9 @@ sub predict_masked_features
             {
                 # Save the winning prediction in the language-feature hash.
                 #$lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
-                $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) = 69.86%
+#                $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) = 69.86%
                 #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
+                $lhl->{$qf} = model_information_vote(@model);
                 if(defined($goldlhl))
                 {
                     if($lhl->{$qf} eq $goldlhl->{$qf})
@@ -274,6 +276,39 @@ sub model_weighted_vote
     foreach my $item (@model)
     {
         $votes{$item->{v}} += $item->{score};
+    }
+    my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
+    my $prediction = $options[0];
+    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($debug);
+    return $prediction;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Listen to source features with maximal mutual information.
+#------------------------------------------------------------------------------
+sub model_information_vote
+{
+    my @model = @_;
+    foreach my $item (@model)
+    {
+        $item->{score} = $item->{information};
+    }
+    @model = sort
+    {
+        my $r = $b->{score} <=> $a->{score};
+        unless($r)
+        {
+            $r = $b->{p} <=> $a->{p};
+        }
+        $r
+    }
+    (@model);
+    my %votes;
+    foreach my $item (@model)
+    {
+        $votes{$item->{v}} += $item->{p} * $item->{information};
     }
     my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
     my $prediction = $options[0];
