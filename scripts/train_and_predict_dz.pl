@@ -312,7 +312,7 @@ sub hash_features
     {
         $fentropy{$f} = 0;
         next if($fcount{$f}==0);
-        foreach my $fv (keys(%{$fvcount{$f}}))
+        foreach my $fv (sort(keys(%{$fvcount{$f}})))
         {
             my $p = $fvcount{$f}{$fv} / $fcount{$f};
             if($p < 0 || $p > 1)
@@ -381,10 +381,10 @@ sub compute_pairwise_cooccurrence
     # conditional probabilities, joint probabilities, and conditional entropy.
     foreach my $f (@{$data->{features}})
     {
-        my @fvalues = keys(%{$cooc{$f}});
+        my @fvalues = sort(keys(%{$cooc{$f}}));
         foreach my $fv (@fvalues)
         {
-            foreach my $g (keys(%{$cooc{$f}{$fv}}))
+            foreach my $g (sort(keys(%{$cooc{$f}{$fv}})))
             {
                 # Probability of f=fv given that g is not empty. We will need
                 # the entropy of this distribution to compute mutual information
@@ -395,7 +395,7 @@ sub compute_pairwise_cooccurrence
                 {
                     $fgventropy{$g}{$f} -= $pfv * log($pfv);
                 }
-                my @gvalues = keys(%{$cooc{$f}{$fv}{$g}});
+                my @gvalues = sort(keys(%{$cooc{$f}{$fv}{$g}}));
                 foreach my $gv (@gvalues)
                 {
                     # Conditional probability of $g=$gv given $f=$fv.
@@ -413,9 +413,9 @@ sub compute_pairwise_cooccurrence
         }
     }
     # Once we have conditional entropies we can compute mutual information.
-    foreach my $f (keys(%centropy))
+    foreach my $f (sort(keys(%centropy)))
     {
-        foreach my $g (keys(%{$centropy{$f}}))
+        foreach my $g (sort(keys(%{$centropy{$f}})))
         {
             # $fgventropy{$f}{$g} is H(g|f is not empty)
             # $centropy{$f}{$g} is H(g|f), i.e., entropy of g given f.
