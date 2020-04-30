@@ -226,7 +226,7 @@ sub predict_masked_features
                                 }
                             }
                             my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
-                            @model = sort {$b->{score} <=> $a->{score}} (@model);
+                            @model = sort {my $r = $b->{score} <=> $a->{score}; $r = $a cmp $b unless($r); $r} (@model);
                             foreach my $rfeature (@rfeatures)
                             {
                                 print STDERR ("    Mutual information with $rfeature == $traindata->{information}{$rfeature}{$qf}\n");
