@@ -16,26 +16,27 @@ binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
 use Getopt::Long;
 
-my $debug = 0; # print all predictions with explanation to STDERR
-my $print_hi = 0; # print entropy of each feature and mutual information of each pair of features
+my %config;
+$config{debug} = 0; # print all predictions with explanation to STDERR
+$config{print_hi} = 0; # print entropy of each feature and mutual information of each pair of features
 # Possible scores:
 #   c ... how many times we observed that target feature = x and source feature = y in the same language
 #   p ... conditional probability that target feature = x given that source feature = y
 #   plogc ... p × log(c) ... we want high probability but we also want it to be based on a sufficiently large count
 #   information ... mutual information between source and target features
 #   plogcinf ... plogc × mutual information between source and target features
-my $score = 'plogcinf'; # what number should be used to score predictions
+$config{score} = 'plogcinf'; # what number should be used to score predictions
 # Possible models:
 #   strongest ... take the prediction with the highest score, ignore the others
 #   vote ... each prediction is counted as a vote weighted by its score; the prediction with most votes wins
 #   infovote ... take three source features with highest mutual information with the target feature; let their best predictions vote, ignore the rest
-my $model = 'strongest'; # what model should be used to convert the scores into one winning prediction
+$config{model} = 'strongest'; # what model should be used to convert the scores into one winning prediction
 GetOptions
 (
-    'debug'    => \$debug,
-    'print_hi' => \$print_hi,
-    'score=s'  => \$score,
-    'model=s'  => \$model
+    'debug'    => \$config{debug},
+    'print_hi' => \$config{print_hi},
+    'score=s'  => \$config{score},
+    'model=s'  => \$config{model}
 );
 
 #==============================================================================
@@ -79,7 +80,7 @@ print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
 compute_pairwise_cooccurrence(\%traindata);
-if($print_hi)
+if($config{print_hi})
 {
     print_hi(\%traindata);
 }
@@ -128,7 +129,7 @@ sub predict_masked_features
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
         my $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
-        if($debug)
+        if($config{debug})
         {
             print STDERR ("----------------------------------------------------------------------\n");
             print STDERR ("Language $lhl->{wals_code} ($lhl->{name}, $lhl->{family}/$lhl->{genus}, $lhl->{countrycodes}):\n");
@@ -141,11 +142,11 @@ sub predict_masked_features
         my @qfeatures = sort(grep {$lhl->{$_} eq '?'} (@features));
         my $nrf = scalar(@rfeatures);
         my $nqf = scalar(@qfeatures);
-        print STDERR ("  $nrf features known, $nqf features to be predicted.\n") if($debug);
+        print STDERR ("  $nrf features known, $nqf features to be predicted.\n") if($config{debug});
         foreach my $qf (@qfeatures)
         {
             $n_predicted++;
-            print STDERR ("  Predicting $qf:\n") if($debug);
+            print STDERR ("  Predicting $qf:\n") if($config{debug});
             my @model;
             foreach my $rf (@rfeatures)
             {
@@ -165,14 +166,14 @@ sub predict_masked_features
                         $record{plogc} = $record{p} * log($record{c});
                         $record{plogcinf} = $record{plogc} * $traindata->{information}{$rf}{$qf};
                         $record{information} = $traindata->{information}{$rf}{$qf};
-                        # The global parameter $score identifies the number that should be used to score predictions.
-                        if(exists($record{$score}))
+                        # The global parameter $config{score} identifies the number that should be used to score predictions.
+                        if(exists($record{$config{score}}))
                         {
-                            $record{score} = $record{$score};
+                            $record{score} = $record{$config{score}};
                         }
                         else
                         {
-                            die("Unknown scoring function '$score'");
+                            die("Unknown scoring function '$config{score}'");
                         }
                         push(@model, \%record);
                     }
@@ -182,26 +183,26 @@ sub predict_masked_features
                     #print STDERR ("    No cooccurrence with $rf == $lhl->{$rf}.\n");
                 }
             }
-            print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($debug);
+            print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($config{debug});
             if(scalar(@model)>0)
             {
                 # Save the winning prediction in the language-feature hash.
-                # The global parameter $model tells us how to use the scores to obtain the winner.
-                if($model eq 'strongest')
+                # The global parameter $config{model} tells us how to use the scores to obtain the winner.
+                if($config{model} eq 'strongest')
                 {
                     $lhl->{$qf} = model_take_strongest(@model);
                 }
-                elsif($model eq 'vote')
+                elsif($config{model} eq 'vote')
                 {
                     $lhl->{$qf} = model_weighted_vote(@model);
                 }
-                elsif($model eq 'infovote')
+                elsif($config{model} eq 'infovote')
                 {
                     $lhl->{$qf} = model_information_vote(@model);
                 }
                 else
                 {
-                    die("Unknown model type '$model'");
+                    die("Unknown model type '$config{model}'");
                 }
                 if(defined($goldlhl))
                 {
@@ -214,7 +215,7 @@ sub predict_masked_features
                         print STDERR ("Language $lhl->{name} wrong prediction $qf\n");
                         print STDERR ("  predicted == $lhl->{$qf}\n");
                         print STDERR ("  should be == $goldlhl->{$qf}\n");
-                        if($debug)
+                        if($config{debug})
                         {
                             # Sort source features: the one with strongest possible prediction first.
                             my %rfeatures;
@@ -288,7 +289,7 @@ sub model_take_strongest
 {
     my @model = sort_model(@_);
     my $prediction = $model[0]{v};
-    print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
+    print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($config{debug});
     return $prediction;
 }
 
@@ -308,7 +309,7 @@ sub model_weighted_vote
     }
     my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
     my $prediction = $options[0];
-    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($debug);
+    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($config{debug});
     return $prediction;
 }
 
@@ -323,7 +324,7 @@ sub model_information_vote
     # Extract source feature names and sort them by mutual information.
     my %rfeatures; map {$rfeatures{$_->{rf}} = $_->{information}} (@model);
     my @rfeatures = sort {my $r = $rfeatures{$b} <=> $rfeatures{$a}; $r = $a cmp $b unless($r); $r} (keys(%rfeatures));
-    # Extract the best prediction (given the current $score) for each source feature.
+    # Extract the best prediction (given the current $config{score}) for each source feature.
     my %predictions;
     my %scores;
     foreach my $item (@model) # model is already sorted
@@ -348,7 +349,7 @@ sub model_information_vote
     }
     my @options = sort {my $r = $votes{$b} <=> $votes{$a}; $r = $a cmp $b unless($r); $r} (keys(%votes));
     my $prediction = $options[0];
-    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($debug);
+    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($config{debug});
     return $prediction;
 }
 
