@@ -226,7 +226,7 @@ sub predict_masked_features
                                 }
                             }
                             my @rfeatures = sort {$rfeatures{$b} <=> $rfeatures{$a}} (keys(%rfeatures));
-                            @model = sort {my $r = $b->{score} <=> $a->{score}; $r = $a cmp $b unless($r); $r} (@model);
+                            @model = sort_model(@model);
                             foreach my $rfeature (@rfeatures)
                             {
                                 print STDERR ("    Mutual information with $rfeature == $traindata->{information}{$rfeature}{$qf}\n");
@@ -254,12 +254,39 @@ sub predict_masked_features
 
 
 #------------------------------------------------------------------------------
+# Sorts cooccurrence items in model. Tries to make the order stable across runs
+# i.e., not dependent on hash key ordering.
+#------------------------------------------------------------------------------
+sub sort_model
+{
+    return sort
+    {
+        # The main sorting is by score, descending order.
+        my $result = $b->{score} <=> $a->{score};
+        # The rest is just to ensure always the same order in case of ties.
+        unless($result)
+        {
+            # By source feature name.
+            $result = $a->{rf} cmp $b->{rf};
+            unless($result)
+            {
+                # By target value.
+                $result = $a->{v} cmp $b->{v};
+            }
+        }
+        $result
+    }
+    (@_);
+}
+
+
+
+#------------------------------------------------------------------------------
 # Strongest signal: Take the prediction with the highest score, ignore others.
 #------------------------------------------------------------------------------
 sub model_take_strongest
 {
-    my @model = @_;
-    @model = sort {my $r = $b->{score} <=> $a->{score}; $r = $a cmp $b unless($r); $r} (@model);
+    my @model = sort_model(@_);
     my $prediction = $model[0]{v};
     print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
     return $prediction;
@@ -292,14 +319,14 @@ sub model_weighted_vote
 #------------------------------------------------------------------------------
 sub model_information_vote
 {
-    my @model = @_;
+    my @model = sort_model(@_);
     # Extract source feature names and sort them by mutual information.
     my %rfeatures; map {$rfeatures{$_->{rf}} = $_->{information}} (@model);
     my @rfeatures = sort {my $r = $rfeatures{$b} <=> $rfeatures{$a}; $r = $a cmp $b unless($r); $r} (keys(%rfeatures));
     # Extract the best prediction (given the current $score) for each source feature.
     my %predictions;
     my %scores;
-    foreach my $item (sort {$b->{score} <=> $a->{score}} (@model))
+    foreach my $item (@model) # model is already sorted
     {
         if(!exists($predictions{$item->{rf}}))
         {
