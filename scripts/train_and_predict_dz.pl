@@ -259,7 +259,7 @@ sub predict_masked_features
 sub model_take_strongest
 {
     my @model = @_;
-    @model = sort {$b->{score} <=> $a->{score}} (@model);
+    @model = sort {my $r = $b->{score} <=> $a->{score}; $r = $a cmp $b unless($r); $r} (@model);
     my $prediction = $model[0]{v};
     print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
     return $prediction;
