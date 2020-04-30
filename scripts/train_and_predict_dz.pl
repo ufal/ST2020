@@ -594,10 +594,10 @@ sub modify_features
         # including e.g. African. Replace it by 'nan'.
         foreach my $lcode (@{$data->{lcodes}})
         {
-            if($data->{lh}{lcode}{countrycodes} eq 'US')
+            if($data->{lh}{$lcode}{countrycodes} eq 'US')
             {
-                $restore{lcode}{countrycodes} = 'US';
-                $data->{lh}{lcode}{countrycodes} = 'nan';
+                $restore{$lcode}{countrycodes} = 'US';
+                $data->{lh}{$lcode}{countrycodes} = 'nan';
             }
         }
     }
@@ -703,8 +703,8 @@ sub write_csv
     my $data = shift; # hash ref
     my @headers = map {escape_commas($_)} (@{$data->{features}});
     print(join(',', @headers), "\n");
-    my @languages = sort {$lh->{$a}{index} <=> $lh->{$b}{index}} (keys(%{$lh}));
-    foreach my $l (@languages)
+    my @lcodes = sort {$data->{lh}{$a}{index} <=> $data->{lh}{$b}{index}} (@{$data->{lcodes}});
+    foreach my $l (@lcodes)
     {
         my @values = map
         {
