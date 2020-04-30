@@ -7,16 +7,12 @@ Only the strongest signal (source feature) is taken, all other source features a
 ( perl scripts/train_and_predict_dz.pl --score plogcinf --model strongest --debug > outputs/cond_prob_info.csv ) |& tee outputs/cond_prob_info.debug
 Correctly predicted 1135 features out of 1596 total predictions, accuracy = 71.12%
 python3 scripts/evaluate_from_csv.py --input_file data/dev_x.csv --output_file outputs/cond_prob_info.csv --golden_file data/dev_y.csv
-Accuracy is 70.05%
+Accuracy is 71.12%
 
-There is some disagreement in the evaluation. As I look at the gold standard
-immediately after each prediction in order to analyze errors, I also compute
-accuracy internally and gives higher numbers than our external evaluation
-script.
-
-Also, I am struggling to make the prediction deterministic. So far it still oscilates between several possible outcomes:
-correct 1136 out of 1596, accuracy 71.18% (external evaluation 70.11%)
-correct 1135 out of 1596, accuracy 71.12% (external evaluation 70.05%)
-correct 1134 out of 1596, accuracy 71.05% (external evaluation 69.99%)
-correct 1132 out of 1596, accuracy 70.93% (external evaluation 69.86%)
+I am struggling to make the prediction stable and deterministic.
+So far it still oscilates between several possible outcomes (it must have to do with random ordering of same-value predictions):
+correct 1136 out of 1596, accuracy 71.18%
+correct 1135 out of 1596, accuracy 71.12%
+correct 1134 out of 1596, accuracy 71.05%
+correct 1132 out of 1596, accuracy 70.93%
 

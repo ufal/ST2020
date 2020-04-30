@@ -6,5 +6,5 @@ Only the strongest signal (source feature) is taken, all other source features a
 ( perl scripts/train_and_predict_dz.pl --score plogc --model strongest --debug > outputs/cond_prob.csv ) |& tee outputs/cond_prob.debug
 Correctly predicted 1043 features out of 1596 total predictions, accuracy = 65.35%
 python3 scripts/evaluate_from_csv.py --input_file data/dev_x.csv --output_file outputs/cond_prob.csv --golden_file data/dev_y.csv
-Accuracy is 64.47%
+Accuracy is 65.35%
 
