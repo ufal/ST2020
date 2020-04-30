@@ -74,7 +74,8 @@ print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Modify features to improve prediction.
-modify_features(\%traindata);
+###!!! WE MUST REWRITE THIS SO THAT THE MODIFIED FEATURES DON'T MAKE IT TO THE OUTPUT!
+###!!!modify_features(\%traindata);
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
 compute_pairwise_cooccurrence(\%traindata);
