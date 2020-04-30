@@ -95,7 +95,9 @@ my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, c
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
 # Modify features to improve prediction.
-modify_features(\%devdata);
+###!!! WE MUST REWRITE THIS SO THAT THE MODIFIED FEATURES DON'T MAKE IT TO THE OUTPUT!
+###!!!modify_features(\%traindata);
+#modify_features(\%devdata);
 hash_features(\%devdata, 0);
 hash_features(\%devgdata, 0);
 print_qm_analysis(\%devdata);
