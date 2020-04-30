@@ -721,6 +721,7 @@ sub read_csv
     my $nf;
     my $iline = 0;
     my @data; # the table, without the header line
+    my $rcomma = chr(12289); # IDEOGRAPHIC COMMA
     while(<>)
     {
         $iline++;
