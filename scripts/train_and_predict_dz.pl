@@ -18,10 +18,24 @@ use Getopt::Long;
 
 my $debug = 0; # print all predictions with explanation to STDERR
 my $print_hi = 0; # print entropy of each feature and mutual information of each pair of features
+# Possible scores:
+#   c ... how many times we observed that target feature = x and source feature = y in the same language
+#   p ... conditional probability that target feature = x given that source feature = y
+#   plogc ... p × log(c) ... we want high probability but we also want it to be based on a sufficiently large count
+#   information ... mutual information between source and target features
+#   plogcinf ... plogc × mutual information between source and target features
+my $score = 'plogcinf'; # what number should be used to score predictions
+# Possible models:
+#   strongest ... take the prediction with the highest score, ignore the others
+#   vote ... each prediction is counted as a vote weighted by its score; the prediction with most votes wins
+#   infovote ... take three source features with highest mutual information with the target feature; let their best predictions vote, ignore the rest
+my $model = 'strongest'; # what model should be used to convert the scores into one winning prediction
 GetOptions
 (
     'debug'    => \$debug,
-    'print_hi' => \$print_hi
+    'print_hi' => \$print_hi,
+    'score=s'  => \$score,
+    'model=s'  => \$model
 );
 
 #==============================================================================
@@ -148,6 +162,15 @@ sub predict_masked_features
                         $record{plogc} = $record{p} * log($record{c});
                         $record{plogcinf} = $record{plogc} * $traindata->{information}{$rf}{$qf};
                         $record{information} = $traindata->{information}{$rf}{$qf};
+                        # The global parameter $score identifies the number that should be used to score predictions.
+                        if(exists($record{$score}))
+                        {
+                            $record{score} = $record{$score};
+                        }
+                        else
+                        {
+                            die("Unknown scoring function '$score'");
+                        }
                         push(@model, \%record);
                     }
                 }
@@ -160,10 +183,23 @@ sub predict_masked_features
             if(scalar(@model)>0)
             {
                 # Save the winning prediction in the language-feature hash.
-                #$lhl->{$qf} = model_take_strongest(@model); # accuracy(dev) = 64.47%
-#                $lhl->{$qf} = model_take_strongest_information(@model); # accuracy(dev) = 69.86%
-                #$lhl->{$qf} = model_weighted_vote(@model); # accuracy(dev) = 60.28%
-                $lhl->{$qf} = model_information_vote(@model);
+                # The global parameter $model tells us how to use the scores to obtain the winner.
+                if($model eq 'strongest')
+                {
+                    $lhl->{$qf} = model_take_strongest(@model);
+                }
+                elsif($model eq 'vote')
+                {
+                    $lhl->{$qf} = model_weighted_vote(@model);
+                }
+                elsif($model eq 'infovote')
+                {
+                    $lhl->{$qf} = model_information_vote(@model);
+                }
+                else
+                {
+                    die("Unknown model type '$model'");
+                }
                 if(defined($goldlhl))
                 {
                     if($lhl->{$qf} eq $goldlhl->{$qf})
@@ -215,42 +251,11 @@ sub predict_masked_features
 
 
 #------------------------------------------------------------------------------
-# Strongest signal: high probability and enough instances the probability is
-# based on. We take the prediction suggested by the strongest signal and ignore
-# the other suggestions.
+# Strongest signal: Take the prediction with the highest score, ignore others.
 #------------------------------------------------------------------------------
 sub model_take_strongest
 {
     my @model = @_;
-    # Our score is conditional probability multiplied by log joint count.
-    # We want a high probability but we also want it to be based on a sufficiently large count.
-    foreach my $item (@model)
-    {
-        $item->{score} = $item->{plogc};
-    }
-    @model = sort {$b->{score} <=> $a->{score}} (@model);
-    my $prediction = $model[0]{v};
-    print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
-    return $prediction;
-}
-
-
-
-#------------------------------------------------------------------------------
-# Strongest signal: high probability and enough instances the probability is
-# based on. We take the prediction suggested by the strongest signal and ignore
-# the other suggestions.
-# Here the signal is: cond prob * log count * mutual information
-#------------------------------------------------------------------------------
-sub model_take_strongest_information
-{
-    my @model = @_;
-    # Our score is conditional probability multiplied by log joint count and the mutual information of the two features.
-    # We want a high probability but we also want it to be based on a sufficiently large count.
-    foreach my $item (@model)
-    {
-        $item->{score} = $item->{plogcinf};
-    }
     @model = sort {$b->{score} <=> $a->{score}} (@model);
     my $prediction = $model[0]{v};
     print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($debug);
@@ -261,17 +266,11 @@ sub model_take_strongest_information
 
 #------------------------------------------------------------------------------
 # We let the individual signals based on available features vote. The votes are
-# weighted by the strength of the signal (probability × log count).
+# weighted by the strength of the signal (score).
 #------------------------------------------------------------------------------
 sub model_weighted_vote
 {
     my @model = @_;
-    # Our score is conditional probability multiplied by log joint count.
-    # We want a high probability but we also want it to be based on a sufficiently large count.
-    foreach my $item (@model)
-    {
-        $item->{score} = $item->{plogc};
-    }
     my %votes;
     foreach my $item (@model)
     {
@@ -291,34 +290,33 @@ sub model_weighted_vote
 sub model_information_vote
 {
     my @model = @_;
-    foreach my $item (@model)
+    # Extract source feature names and sort them by mutual information.
+    my %rfeatures; map {$rfeatures{$_->{rf}} = $_->{information}} (@model);
+    my @rfeatures = sort {my $r = $rfeatures{$b} <=> $rfeatures{$a}; $r = $a cmp $b unless($r); $r} (keys(%rfeatures));
+    # Extract the best prediction (given the current $score) for each source feature.
+    my %predictions;
+    my %scores;
+    foreach my $item (sort {$b->{score} <=> $a->{score}} (@model))
     {
-        $item->{score} = $item->{information};
-    }
-    @model = sort
-    {
-        my $r = $b->{score} <=> $a->{score};
-        unless($r)
+        if(!exists($predictions{$item->{rf}}))
         {
-            $r = $b->{p} <=> $a->{p};
+            $predictions{$item->{rf}} = $item->{v};
+            $scores{$item->{rf}} = $item->{score};
         }
-        $r
     }
-    (@model);
+    # Keep the three most informed source features (or a few more if they have the same information value).
+    if(scalar(@rfeatures) > 3)
+    {
+        my $threshold = $rfeatures{$rfeatures[2]};
+        @rfeatures = grep {$rfeatures{$_} >= $threshold} (@rfeatures);
+    }
+    # Let the surviving features vote about the outcome. The vote will be weighted by the score of the prediction.
     my %votes;
-    my $nfeatures = 3;
-    my $last_feature = '';
-    foreach my $item (@model)
+    foreach my $rf (@rfeatures)
     {
-        if($item->{rf} ne $last_feature)
-        {
-            $last_feature = $item->{rf};
-            $nfeatures--;
-        }
-        last if($nfeatures <= 0);
-        $votes{$item->{v}} += $item->{p} * $item->{information};
+        $votes{$predictions{$rf}} += $scores{$rf};
     }
-    my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
+    my @options = sort {my $r = $votes{$b} <=> $votes{$a}; $r = $a cmp $b unless($r); $r} (keys(%votes));
     my $prediction = $options[0];
     print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($debug);
     return $prediction;
