@@ -10,7 +10,13 @@ def evaluate(inp, output, golden_output):
     should_predict = (inp == '?')
     total = np.sum(should_predict)
     predicted_right = np.sum(output[should_predict] == golden_output[should_predict])
-    print('correctly predicted', predicted_right, 'out of', total)
+    # Debugging of errors:
+    #it = np.nditer(inp, flags=['multi_index', 'refs_ok'])
+    #while not it.finished:
+    #    if inp[it.multi_index] == '?' and output[it.multi_index] != golden_output[it.multi_index]:
+    #        print('prediction', output[it.multi_index], '     !=     gold', golden_output[it.multi_index])
+    #    it.iternext()
+    #print('correctly predicted', predicted_right, 'out of', total)
     return predicted_right / total 
 
 
