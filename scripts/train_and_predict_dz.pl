@@ -31,12 +31,18 @@ $config{score} = 'plogcinf'; # what number should be used to score predictions
 #   vote ... each prediction is counted as a vote weighted by its score; the prediction with most votes wins
 #   infovote ... take three source features with highest mutual information with the target feature; let their best predictions vote, ignore the rest
 $config{model} = 'strongest'; # what model should be used to convert the scores into one winning prediction
+# The feature countrycodes is unreliable. It says US (United States) for a heterogenous
+# group of languages, many of them from other continents (e.g., Africa).
+# --countrycodes nous ... whenever countrycodes=US, replace it by nan
+# We could also remove countrycodes completely but we have not tried this yet.
+$config{countrycodes} = '';
 GetOptions
 (
     'debug'    => \$config{debug},
     'print_hi' => \$config{print_hi},
     'score=s'  => \$config{score},
-    'model=s'  => \$config{model}
+    'model=s'  => \$config{model},
+    'countrycodes=s' => \$config{countrycodes}
 );
 
 #==============================================================================
@@ -50,6 +56,7 @@ GetOptions
 #   Filled by hash_features()
 #     {lcodes} .... list of wals codes of known languages (index to lh)
 #     {lh} ........ data from {table} indexed by {language}{feature}
+#     {restore} ... like {lh} but only original values where we modified them
 #     {lhclean} ... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
 #     {fcount} .... hash {f} => count of languages where f is not empty
@@ -74,9 +81,6 @@ my %traindata = read_csv("$data_folder/train_y.csv");
 print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Hashing the features and their cooccurrences...\n");
-# Modify features to improve prediction.
-###!!! WE MUST REWRITE THIS SO THAT THE MODIFIED FEATURES DON'T MAKE IT TO THE OUTPUT!
-###!!!modify_features(\%traindata);
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
 compute_pairwise_cooccurrence(\%traindata);
@@ -95,10 +99,6 @@ my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
-# Modify features to improve prediction.
-###!!! WE MUST REWRITE THIS SO THAT THE MODIFIED FEATURES DON'T MAKE IT TO THE OUTPUT!
-###!!!modify_features(\%traindata);
-#modify_features(\%devdata);
 hash_features(\%devdata, 0);
 hash_features(\%devgdata, 0);
 print_qm_analysis(\%devdata);
@@ -359,6 +359,7 @@ sub model_information_vote
 # Converts the input table to hashes.
 #   {lcodes} ...... list of wals codes of known languages (index to lh)
 #   {lh} .......... data from {table} indexed by {language}{feature}
+#   {restore} ..... like {lh} but only original values where we modified them
 #   {lhclean} ..... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
 #   {fcount} ...... hash {f} => count of languages where f is not empty
@@ -377,25 +378,39 @@ sub hash_features
     my %fvcount;
     my %fvprob;
     my %fentropy;
-    foreach my $language (@{$data->{table}})
+    # Create the initial language-feature-value hash but do not infer anything
+    # further yet. We may want to modify some features before we proceed.
+    foreach my $line (@{$data->{table}})
     {
-        my $lcode = $language->[1];
+        my $lcode = $line->[1];
         push(@lcodes, $lcode);
-        # Remember observed features and values.
         for(my $i = 0; $i <= $#{$data->{features}}; $i++)
         {
             my $feature = $data->{features}[$i];
             # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
-            $language->[$i] = 'nan' if(!defined($language->[$i]) || $language->[$i] eq '' || $language->[$i] eq 'nan');
+            $line->[$i] = 'nan' if(!defined($line->[$i]) || $line->[$i] eq '' || $line->[$i] eq 'nan');
             # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
             # If desired, we can convert question marks to 'nan' here.
-            $language->[$i] = 'nan' if($language->[$i] eq '?' && $qm_is_nan);
-            $lh{$lcode}{$feature} = $language->[$i];
-            unless($language->[$i] eq 'nan' || $language->[$i] eq '?')
+            $line->[$i] = 'nan' if($line->[$i] eq '?' && $qm_is_nan);
+            $lh{$lcode}{$feature} = $line->[$i];
+        }
+    }
+    $data->{lcodes} = \@lcodes;
+    $data->{lh} = \%lh;
+    # Modify features to improve prediction.
+    modify_features($data);
+    # Now go on and fill the other hashes that depend solely on one language-feature-value triple.
+    foreach my $lcode (@lcodes)
+    {
+        # Remember observed features and values.
+        foreach my $feature (@{$data->{features}})
+        {
+            my $value = $lh{$lcode}{$feature};
+            unless($value eq 'nan' || $value eq '?')
             {
-                $lhclean{$lcode}{$feature} = $language->[$i];
+                $lhclean{$lcode}{$feature} = $value;
                 $fcount{$feature}++;
-                $fvcount{$feature}{$language->[$i]}++;
+                $fvcount{$feature}{$value}++;
             }
         }
     }
@@ -415,8 +430,6 @@ sub hash_features
             $fentropy{$f} -= $p * log($p);
         }
     }
-    $data->{lcodes} = \@lcodes;
-    $data->{lh} = \%lh;
     $data->{lhclean} = \%lhclean;
     $data->{fcount} = \%fcount;
     $data->{fvcount} = \%fvcount;
@@ -563,92 +576,112 @@ sub compute_pairwise_cooccurrence
 
 #------------------------------------------------------------------------------
 # Modifies input features in a way that might hopefully be more useful for
-# predictions. Call this function immediately after reading input, before
-# hashing the features.
+# predictions. The global configuration hash controls what features will be
+# modified and how. This function should be called after the first lh hash has
+# been created for the data, so that we can operate on the hash rather than the
+# initial table, but before any further information is inferred from the hash.
 #------------------------------------------------------------------------------
 sub modify_features
 {
     my $data = shift;
-    my $icc = 7; die if($data->{features}[$icc] ne 'countrycodes');
-    my $ilat = 3; die if($data->{features}[$ilat] ne 'latitude');
-    my $ilon = 4; die if($data->{features}[$ilon] ne 'longitude');
-    my $ilatlon = scalar(@{$data->{features}}); # we will add this as a new feature
-    push(@{$data->{features}}, 'latlon');
-    foreach my $language (@{$data->{table}})
+    # Remember how to restore original values before modification. We may want
+    # to do it before we write the data to a CSV file.
+    my %restore;
+    $data->{restore} = \%restore;
+    if($config{countrycodes} eq 'nous')
     {
-        # Countrycodes == US is unreliable. It occurs with many languages, including e.g. African.
-        # Replace it by 'nan'.
-        if($language->[$icc] eq 'US')
+        # Countrycodes == US is unreliable. It occurs with many languages,
+        # including e.g. African. Replace it by 'nan'.
+        foreach my $lcode (@{$data->{lcodes}})
         {
-            $language->[$icc] = 'nan';
+            if($data->{lh}{lcode}{countrycodes} eq 'US')
+            {
+                $restore{lcode}{countrycodes} = 'US';
+                $data->{lh}{lcode}{countrycodes} = 'nan';
+            }
         }
-        # Group latitudes into zones.
-        if($language->[$ilat] >= 60) # 60-90
+    }
+    elsif($config{countrycodes} ne '')
+    {
+        die("Unknown parameter countrycodes='$config{countrycodes}'");
+    }
+    if(0)
+    {
+        my $icc = 7; die if($data->{features}[$icc] ne 'countrycodes');
+        my $ilat = 3; die if($data->{features}[$ilat] ne 'latitude');
+        my $ilon = 4; die if($data->{features}[$ilon] ne 'longitude');
+        my $ilatlon = scalar(@{$data->{features}}); # we will add this as a new feature
+        push(@{$data->{features}}, 'latlon');
+        foreach my $language (@{$data->{table}})
         {
-            $language->[$ilat] = 65;
+            # Group latitudes into zones.
+            if($language->[$ilat] >= 60) # 60-90
+            {
+                $language->[$ilat] = 65;
+            }
+            elsif($language->[$ilat] >= 35) # 35-60
+            {
+                $language->[$ilat] = 45;
+            }
+            elsif($language->[$ilat] >= 10) # 10-35
+            {
+                $language->[$ilat] = 25;
+            }
+            elsif($language->[$ilat] >= -10) # -10-10
+            {
+                $language->[$ilat] = 0;
+            }
+            else # -90--10
+            {
+                $language->[$ilat] = -35;
+            }
+            # Group longitudes
+            if($language->[$ilon] >= 160 || $language->[$ilon] <= -140) # 160--140
+            {
+                $language->[$ilon] = -180;
+            }
+            elsif($language->[$ilon] <= -115)
+            {
+                $language->[$ilon] = -115;
+            }
+            elsif($language->[$ilon] <= -95)
+            {
+                $language->[$ilon] = -105;
+            }
+            elsif($language->[$ilon] <= -60)
+            {
+                $language->[$ilon] = -75;
+            }
+            elsif($language->[$ilon] <= -25)
+            {
+                $language->[$ilon] = -40;
+            }
+            elsif($language->[$ilon] <= 35)
+            {
+                $language->[$ilon] = 0;
+            }
+            elsif($language->[$ilon] <= 70)
+            {
+                $language->[$ilon] = 55;
+            }
+            elsif($language->[$ilon] <= 95)
+            {
+                $language->[$ilon] = 85;
+            }
+            elsif($language->[$ilon] <= 118)
+            {
+                $language->[$ilon] = 100;
+            }
+            elsif($language->[$ilon] <= 130)
+            {
+                $language->[$ilon] = 125;
+            }
+            else
+            {
+                $language->[$ilon] = 145;
+            }
+            $language->[$ilatlon] = $language->[$ilat].';'.$language->[$ilon];
         }
-        elsif($language->[$ilat] >= 35) # 35-60
-        {
-            $language->[$ilat] = 45;
-        }
-        elsif($language->[$ilat] >= 10) # 10-35
-        {
-            $language->[$ilat] = 25;
-        }
-        elsif($language->[$ilat] >= -10) # -10-10
-        {
-            $language->[$ilat] = 0;
-        }
-        else # -90--10
-        {
-            $language->[$ilat] = -35;
-        }
-        # Group longitudes
-        if($language->[$ilon] >= 160 || $language->[$ilon] <= -140) # 160--140
-        {
-            $language->[$ilon] = -180;
-        }
-        elsif($language->[$ilon] <= -115)
-        {
-            $language->[$ilon] = -115;
-        }
-        elsif($language->[$ilon] <= -95)
-        {
-            $language->[$ilon] = -105;
-        }
-        elsif($language->[$ilon] <= -60)
-        {
-            $language->[$ilon] = -75;
-        }
-        elsif($language->[$ilon] <= -25)
-        {
-            $language->[$ilon] = -40;
-        }
-        elsif($language->[$ilon] <= 35)
-        {
-            $language->[$ilon] = 0;
-        }
-        elsif($language->[$ilon] <= 70)
-        {
-            $language->[$ilon] = 55;
-        }
-        elsif($language->[$ilon] <= 95)
-        {
-            $language->[$ilon] = 85;
-        }
-        elsif($language->[$ilon] <= 118)
-        {
-            $language->[$ilon] = 100;
-        }
-        elsif($language->[$ilon] <= 130)
-        {
-            $language->[$ilon] = 125;
-        }
-        else
-        {
-            $language->[$ilon] = 145;
-        }
-        $language->[$ilatlon] = $language->[$ilat].';'.$language->[$ilon];
     }
 }
 
@@ -668,13 +701,19 @@ sub modify_features
 sub write_csv
 {
     my $data = shift; # hash ref
-    my $lh = $data->{lh}; # hash ref
     my @headers = map {escape_commas($_)} (@{$data->{features}});
     print(join(',', @headers), "\n");
     my @languages = sort {$lh->{$a}{index} <=> $lh->{$b}{index}} (keys(%{$lh}));
     foreach my $l (@languages)
     {
-        my @values = map {escape_commas($lh->{$l}{$_})} (@{$data->{features}});
+        my @values = map
+        {
+            # If we modified some values of some input features, restore the
+            # original values now.
+            my $v = exists($data->{restore}{$l}{$_}) ? $data->{restore}{$l}{$_} : $data->{lh}{$l}{$_};
+            escape_commas($v);
+        }
+        (@{$data->{features}});
         print(join(',', @values), "\n");
     }
 }
