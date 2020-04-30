@@ -10,6 +10,7 @@ def evaluate(inp, output, golden_output):
     should_predict = (inp == '?')
     total = np.sum(should_predict)
     predicted_right = np.sum(output[should_predict] == golden_output[should_predict])
+    print('correctly predicted', predicted_right, 'out of', total)
     return predicted_right / total 
 
 
