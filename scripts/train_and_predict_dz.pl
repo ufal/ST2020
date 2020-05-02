@@ -17,7 +17,11 @@ binmode(STDERR, ':utf8');
 use Getopt::Long;
 
 my %config;
-$config{debug} = 0; # print all predictions with explanation to STDERR
+# Possible debug levels:
+#   0 ... print only progress information and accuracy to STDERR
+#   1 ... print all predictions and whether they are correct
+#   2 ... print also other options so we can see why a wrong prediction was made
+$config{debug} = 0;
 $config{print_hi} = 0; # print entropy of each feature and mutual information of each pair of features
 # Possible scores:
 #   c ... how many times we observed that target feature = x and source feature = y in the same language
@@ -38,7 +42,7 @@ $config{model} = 'strongest'; # what model should be used to convert the scores 
 $config{countrycodes} = '';
 GetOptions
 (
-    'debug'    => \$config{debug},
+    'debug=i'  => \$config{debug},
     'print_hi' => \$config{print_hi},
     'score=s'  => \$config{score},
     'model=s'  => \$config{model},
@@ -183,7 +187,7 @@ sub predict_masked_features
                     #print STDERR ("    No cooccurrence with $rf == $lhl->{$rf}.\n");
                 }
             }
-            print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($config{debug});
+            print STDERR ("    Found ", scalar(@model), " conditional probabilities.\n") if($config{debug} >= 2);
             if(scalar(@model)>0)
             {
                 # Save the winning prediction in the language-feature hash.
@@ -209,13 +213,21 @@ sub predict_masked_features
                     if($lhl->{$qf} eq $goldlhl->{$qf})
                     {
                         $n_predicted_correctly++;
+                        if($config{debug} >= 1)
+                        {
+                            print STDERR ("Language $lhl->{name} feature $qf:\n");
+                            print STDERR ("  correctly predicted == $lhl->{$qf}\n");
+                        }
                     }
                     else
                     {
-                        print STDERR ("Language $lhl->{name} wrong prediction $qf\n");
-                        print STDERR ("  predicted == $lhl->{$qf}\n");
-                        print STDERR ("  should be == $goldlhl->{$qf}\n");
-                        if($config{debug})
+                        if($config{debug} >= 1)
+                        {
+                            print STDERR ("Language $lhl->{name} feature $qf:\n");
+                            print STDERR ("  wrongly predicted   == $lhl->{$qf}\n");
+                            print STDERR ("  should be           == $goldlhl->{$qf}\n");
+                        }
+                        if($config{debug} >= 2)
                         {
                             # Sort source features: the one with strongest possible prediction first.
                             my %rfeatures;
@@ -289,7 +301,6 @@ sub model_take_strongest
 {
     my @model = sort_model(@_);
     my $prediction = $model[0]{v};
-    print STDERR ("    score=$model[0]{score} => winner: $prediction (source: $model[0]{rf} == $model[0]{rv})\n") if($config{debug});
     return $prediction;
 }
 
@@ -309,7 +320,6 @@ sub model_weighted_vote
     }
     my @options = sort {$votes{$b} <=> $votes{$a}} (keys(%votes));
     my $prediction = $options[0];
-    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($config{debug});
     return $prediction;
 }
 
@@ -349,7 +359,6 @@ sub model_information_vote
     }
     my @options = sort {my $r = $votes{$b} <=> $votes{$a}; $r = $a cmp $b unless($r); $r} (keys(%votes));
     my $prediction = $options[0];
-    print STDERR ("    $votes{$options[0]}\t$options[0]\n") if($config{debug});
     return $prediction;
 }
 
