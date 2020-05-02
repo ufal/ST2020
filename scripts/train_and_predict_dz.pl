@@ -150,7 +150,6 @@ sub predict_masked_features
         foreach my $qf (@qfeatures)
         {
             $n_predicted++;
-            print STDERR ("  Predicting $qf:\n") if($config{debug});
             my @model;
             foreach my $rf (@rfeatures)
             {
@@ -254,6 +253,14 @@ sub predict_masked_features
                                 }
                             }
                         }
+                    }
+                }
+                else # no gold standard data available
+                {
+                    if($config{debug} >= 1)
+                    {
+                        print STDERR ("Language $lhl->{name} feature $qf:\n");
+                        print STDERR ("  predicted == $lhl->{$qf}\n");
                     }
                 }
             }
