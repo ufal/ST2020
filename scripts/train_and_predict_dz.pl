@@ -40,13 +40,18 @@ $config{model} = 'strongest'; # what model should be used to convert the scores 
 # --countrycodes nous ... whenever countrycodes=US, replace it by nan
 # We could also remove countrycodes completely but we have not tried this yet.
 $config{countrycodes} = '';
+# The features latitude and longitude are hardly useful for inference directly.
+# However, grouping languages in geographical zones may help.
+# --latlon zones ... both latitude and longitude grouped into wide zones around the globe
+$config{latlon} = '';
 GetOptions
 (
     'debug=i'  => \$config{debug},
     'print_hi' => \$config{print_hi},
     'score=s'  => \$config{score},
     'model=s'  => \$config{model},
-    'countrycodes=s' => \$config{countrycodes}
+    'countrycodes=s' => \$config{countrycodes},
+    'latlon=s' => \$config{latlon}
 );
 
 #==============================================================================
@@ -604,10 +609,10 @@ sub modify_features
     # to do it before we write the data to a CSV file.
     my %restore;
     $data->{restore} = \%restore;
+    # Countrycodes == US is unreliable. It occurs with many languages,
+    # including e.g. African. Replace it by 'nan'.
     if($config{countrycodes} eq 'nous')
     {
-        # Countrycodes == US is unreliable. It occurs with many languages,
-        # including e.g. African. Replace it by 'nan'.
         foreach my $lcode (@{$data->{lcodes}})
         {
             if($data->{lh}{$lcode}{countrycodes} eq 'US')
@@ -621,81 +626,70 @@ sub modify_features
     {
         die("Unknown parameter countrycodes='$config{countrycodes}'");
     }
+    # Latitude and longitude is hardly useful for inference as a single pair
+    # of coordinates. However, we can define zones in which we hope languages
+    # will share some features.
+    if($config{latlon} eq 'zones')
+    {
+        my @lat =
+        (
+            90, # North Pole
+            60, # 60-90 North (Scandinavia, Northern Russia (excl Kamchatka), most of Alaska (excl Aleutes), Yukon, Northwest Terr, Nunavut, Greenland)
+            35, # 35-60 North (Europe and Northernmost Maghreb, Caucasus, Central Asia, Northern China, Korea, most of Japan, most of USA and Canada)
+            10, # 10-35 North (Sahara and Sahel, North Ethiopia, Middle East, Most of India and Indochina, Northern Philippines, Southern USA, Mexico, Nicaragua, Caribbean)
+            -10, # 10 South - 10 North (Gulf of Guinea, Congo, Tanzania, Sri Lanka, Indonesia, Papua New Guinea, North Peru and Brazil)
+            -90 # 10-90 South (South Africa from Angola, Zambia and Mosambique, Madagascar, Australia, New Zealand, South America from Southern Peru, Bolivia and Southern half of Brazil)
+        );
+        my @lon =
+        (
+            160,
+            -140, # 160 East - 140 West (New Zealand, Solomon Islands, East Kamchatka, Chukotka, Alaska, Hawaii)
+            -115, # 115-140 West (Yukon, British Columbia, West Coast of US)
+            -95,  # 95-115 West (Northwest Territories, Western Nunavut, Central Canada, Central USA (incl most of Kansas, Texas), Mexico except Yucatan)
+            -60,  # 60-95 West (East Canada except Newfoundland, Eastern USA, Caribbean, Amazonia and Andes, most of Bolivia, most of Argentina)
+            -25,  # 25-60 West (most of Greenland, Guyana, Eastern Brazil, Paraguay, Uruguay, Northeastern Argentina)
+            35,   # 25 West - 35 East (Europe Iceland to almost Moscow, Crimea, Western Turkey, Southwestern Israel, Africa except East Coast from Sudan down)
+            70,   # 35-70 East (rest of European Russia, West Kazakhstan and Uzbekistan, middle East and most Afghanistan, Western Pakistan, East Coast of Africa, Madagascar)
+            95,   # 70-95 East (Western Siberia, Xinjiang, Tibet, India, Bangladesh, Western Myanmar, Sri Lanka)
+            118,  # 95-118 East (Eastern Siberia, Mongolia, Central and Southeastern China, Indochina, most of Indonesia (incl Kalimantan, Java, Bali), West Coast of Australia)
+            130,  # 118-130 East (West border of Yakutia, Amur Region, Eastern China, Korea, Taiwan, Philippines, Sulawesi, Western Australia)
+            160   # 130-160 East (Yakutia, Southwestern Kamchatka, Japan, Papua New Guinea, Central and Eastern Australia)
+        );
+        foreach my $lcode (@{$data->{lcodes}})
+        {
+            for(my $i = 0; $i < $#lat; $i++)
+            {
+                if($data->{lh}{$lcode}{latitude} >= $lat[$i+1])
+                {
+                    $restore{$lcode}{latitude} = $data->{lh}{$lcode}{latitude};
+                    $data->{lh}{$lcode}{latitude} = $lat[$i+1].'–'.$lat[$i];
+                    last;
+                }
+            }
+            for(my $i = 0; $i < $#lon; $i++)
+            {
+                if($lon[$i] > $lon[$i+1] && ($data->{lh}{$lcode}{longitude} > $lon[$i] || $data->{lh}{$lcode}{longitude} <= $lon[$i+1]) ||
+                   $lon[$i] < $lon[$i+1] && $data->{lh}{$lcode}{longitude} <= $lon[$i+1])
+                {
+                    $restore{$lcode}{longitude} = $data->{lh}{$lcode}{longitude};
+                    $data->{lh}{$lcode}{longitude} = $lon[$i].'–'.$lon[$i+1];
+                    last;
+                }
+            }
+        }
+    }
+    elsif($config{latlon} ne '')
+    {
+        die("Unknown parameter latlon='$config{latlon}'");
+    }
     if(0)
     {
-        my $icc = 7; die if($data->{features}[$icc] ne 'countrycodes');
         my $ilat = 3; die if($data->{features}[$ilat] ne 'latitude');
         my $ilon = 4; die if($data->{features}[$ilon] ne 'longitude');
         my $ilatlon = scalar(@{$data->{features}}); # we will add this as a new feature
         push(@{$data->{features}}, 'latlon');
         foreach my $language (@{$data->{table}})
         {
-            # Group latitudes into zones.
-            if($language->[$ilat] >= 60) # 60-90
-            {
-                $language->[$ilat] = 65;
-            }
-            elsif($language->[$ilat] >= 35) # 35-60
-            {
-                $language->[$ilat] = 45;
-            }
-            elsif($language->[$ilat] >= 10) # 10-35
-            {
-                $language->[$ilat] = 25;
-            }
-            elsif($language->[$ilat] >= -10) # -10-10
-            {
-                $language->[$ilat] = 0;
-            }
-            else # -90--10
-            {
-                $language->[$ilat] = -35;
-            }
-            # Group longitudes
-            if($language->[$ilon] >= 160 || $language->[$ilon] <= -140) # 160--140
-            {
-                $language->[$ilon] = -180;
-            }
-            elsif($language->[$ilon] <= -115)
-            {
-                $language->[$ilon] = -115;
-            }
-            elsif($language->[$ilon] <= -95)
-            {
-                $language->[$ilon] = -105;
-            }
-            elsif($language->[$ilon] <= -60)
-            {
-                $language->[$ilon] = -75;
-            }
-            elsif($language->[$ilon] <= -25)
-            {
-                $language->[$ilon] = -40;
-            }
-            elsif($language->[$ilon] <= 35)
-            {
-                $language->[$ilon] = 0;
-            }
-            elsif($language->[$ilon] <= 70)
-            {
-                $language->[$ilon] = 55;
-            }
-            elsif($language->[$ilon] <= 95)
-            {
-                $language->[$ilon] = 85;
-            }
-            elsif($language->[$ilon] <= 118)
-            {
-                $language->[$ilon] = 100;
-            }
-            elsif($language->[$ilon] <= 130)
-            {
-                $language->[$ilon] = 125;
-            }
-            else
-            {
-                $language->[$ilon] = 145;
-            }
             $language->[$ilatlon] = $language->[$ilat].';'.$language->[$ilon];
         }
     }
