@@ -5,7 +5,7 @@ Conditional probability that feature f = fv given that g = gv
 Only the strongest signal (source feature) is taken, all other source features are ignored.
 Unreliable countrycodes=US is replaced by countrycodes=nan.
 
-( perl scripts/train_and_predict_dz.pl --score plogcinf --model strongest --countrycodes nous --debug > outputs/cond_prob_info_nous.csv ) |& tee outputs/cond_prob_info_nous.debug
+( perl scripts/train_and_predict_dz.pl --score plogcinf --model strongest --countrycodes nous --debug 1 > outputs/cond_prob_info_nous.csv ) |& tee outputs/cond_prob_info_nous.debug
 Correctly predicted 1149 features out of 1596 total predictions, accuracy = 71.99%
 python3 scripts/evaluate_from_csv.py --input_file data/dev_x.csv --output_file outputs/cond_prob_info_nous.csv --golden_file data/dev_y.csv
 Accuracy is 71.99%
