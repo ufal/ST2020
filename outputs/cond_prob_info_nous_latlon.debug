@@ -177,8 +177,7 @@ Language Amele feature Nominal_and_Verbal_Conjunction:
   wrongly predicted   == 1 Identity
   should be           == 2 Differentiation
 Language Amele feature Noun_Phrase_Conjunction:
-  wrongly predicted   == 1 'And' different from 'with'
-  should be           == 2 'And' identical to 'with'
+  correctly predicted == 2 'And' identical to 'with'
 Language Amele feature Number_of_Genders:
   correctly predicted == 1 None
 Language Amele feature Obligatory_Possessive_Inflection:
@@ -224,7 +223,7 @@ Language Amele feature Position_of_Pronominal_Possessive_Affixes:
 Language Amele feature Position_of_Tense-Aspect_Affixes:
   correctly predicted == 2 Tense-aspect suffixes
 Language Amele feature Predicative_Possession:
-  wrongly predicted   == 5 'Have'
+  wrongly predicted   == 3 Topic
   should be           == 4 Conjunctional
 Language Amele feature Presence_of_Uncommon_Consonants:
   wrongly predicted   == 1 None
@@ -266,7 +265,8 @@ Language Amele feature The_Perfect:
 Language Amele feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
   correctly predicted == 17 OptDoubleNeg
 Language Amele feature The_Velar_Nasal:
-  correctly predicted == 3 No velar nasal
+  wrongly predicted   == 1 Initial velar nasal
+  should be           == 3 No velar nasal
 Language Amele feature Third_Person_Pronouns_and_Demonstratives:
   correctly predicted == 1 Unrelated
 Language Amele feature Tone:
@@ -282,7 +282,7 @@ Language Amele feature Voicing_and_Gaps_in_Plosive_Systems:
   wrongly predicted   == 1 Other
   should be           == 3 Missing /p/
 Language Amele feature Voicing_in_Plosives_and_Fricatives:
-  wrongly predicted   == 4 In both plosives and fricatives
+  wrongly predicted   == 1 No voicing contrast
   should be           == 2 In plosives alone
 Language Amele feature Weight-Sensitive_Stress:
   wrongly predicted   == 3 Right-edge: Ultimate or penultimate
@@ -322,8 +322,7 @@ Language Anywa feature Order_of_Adjective_and_Noun:
 Language Anywa feature Order_of_Genitive_and_Noun:
   correctly predicted == 2 Noun-Genitive
 Language Anywa feature Order_of_Numeral_and_Noun:
-  wrongly predicted   == 1 Numeral-Noun
-  should be           == 2 Noun-Numeral
+  correctly predicted == 2 Noun-Numeral
 Language Anywa feature Order_of_Object_and_Verb:
   wrongly predicted   == 2 VO
   should be           == 3 No dominant order
@@ -344,7 +343,7 @@ Language Anywa feature Position_of_negative_words_relative_to_beginning_and_end_
 Language Anywa feature Postverbal_Negative_Morphemes:
   correctly predicted == 4 None
 Language Anywa feature Purpose_Clauses:
-  wrongly predicted   == 1 Balanced
+  wrongly predicted   == 3 Deranked
   should be           == 2 Balanced/deranked
 Language Anywa feature Reason_Clauses:
   correctly predicted == 1 Balanced
@@ -404,7 +403,8 @@ Language Athpare feature The_Prohibitive:
 Language bar (Bari, Eastern Sudanic/Nilotic, nan):
   39 features known, 21 features to be predicted.
 Language Bari feature Alignment_of_Verbal_Person_Marking:
-  correctly predicted == 1 Neutral
+  wrongly predicted   == 2 Accusative
+  should be           == 1 Neutral
 Language Bari feature Definite_Articles:
   wrongly predicted   == 1 Definite word distinct from demonstrative
   should be           == 5 No definite or indefinite article
@@ -482,7 +482,7 @@ Language Belhare feature Obligatory_Possessive_Inflection:
   wrongly predicted   == 2 Absent
   should be           == 1 Exists
 Language Belhare feature Occurrence_of_Nominal_Plurality:
-  wrongly predicted   == 2 Only human nouns, optional
+  wrongly predicted   == 6 All nouns, always obligatory
   should be           == 5 All nouns, optional in inanimates
 Language Belhare feature Optional_Double_Negation:
   wrongly predicted   == 2 (Neg)VNeg
@@ -596,7 +596,8 @@ Language Waimaha feature Voicing_in_Plosives_and_Fricatives:
   wrongly predicted   == 1 No voicing contrast
   should be           == 2 In plosives alone
 Language Waimaha feature Vowel_Quality_Inventories:
-  correctly predicted == 2 Average (5-6)
+  wrongly predicted   == 1 Small (2-4)
+  should be           == 2 Average (5-6)
 ----------------------------------------------------------------------
 Language bon (Bongu, Trans-New Guinea/Madang, nan):
   14 features known, 7 features to be predicted.
@@ -653,7 +654,7 @@ Language Barasano feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
   wrongly predicted   == 3 No inclusive/exclusive
   should be           == 1 No person marking
 Language Barasano feature Inflectional_Synthesis_of_the_Verb:
-  wrongly predicted   == 2 2-3 categories per word
+  wrongly predicted   == 5 8-9 categories per word
   should be           == 3 4-5 categories per word
 Language Barasano feature M-T_Pronouns:
   correctly predicted == 1 No M-T pronouns
@@ -689,7 +690,8 @@ Language Barasano feature Order_of_Adverbial_Subordinator_and_Clause:
   wrongly predicted   == 2 Final subordinator word
   should be           == 4 Subordinating suffix
 Language Barasano feature Order_of_Demonstrative_and_Noun:
-  correctly predicted == 1 Demonstrative-Noun
+  wrongly predicted   == 2 Noun-Demonstrative
+  should be           == 1 Demonstrative-Noun
 Language Barasano feature Order_of_Genitive_and_Noun:
   correctly predicted == 1 Genitive-Noun
 Language Barasano feature Order_of_Object,_Oblique,_and_Verb:
@@ -718,8 +720,7 @@ Language Barasano feature Polar_Questions:
 Language Barasano feature Politeness_Distinctions_in_Pronouns:
   correctly predicted == 1 No politeness distinction
 Language Barasano feature Position_of_Interrogative_Phrases_in_Content_Questions:
-  wrongly predicted   == 2 Not initial interrogative phrase
-  should be           == 1 Initial interrogative phrase
+  correctly predicted == 1 Initial interrogative phrase
 Language Barasano feature Position_of_Polar_Question_Particles:
   wrongly predicted   == 2 Final
   should be           == 6 No question particle
@@ -787,8 +788,7 @@ Language Cakchiquel feature Ordinal_Numerals:
   wrongly predicted   == 7 First, second, three-th
   should be           == 6 First, two-th, three-th
 Language Cakchiquel feature Position_of_Interrogative_Phrases_in_Content_Questions:
-  wrongly predicted   == 2 Not initial interrogative phrase
-  should be           == 1 Initial interrogative phrase
+  correctly predicted == 1 Initial interrogative phrase
 Language Cakchiquel feature Postnominal_relative_clauses:
   correctly predicted == 1 Noun-Relative clause (NRel) dominant
 Language Cakchiquel feature Postverbal_Negative_Morphemes:
@@ -829,8 +829,7 @@ Language Chuj feature Position_of_Interrogative_Phrases_in_Content_Questions:
 Language Chuj feature Position_of_Negative_Word_With_Respect_to_Subject,_Object,_and_Verb:
   correctly predicted == 19 OptDoubleNeg
 Language Chuj feature Position_of_Pronominal_Possessive_Affixes:
-  wrongly predicted   == 2 Possessive suffixes
-  should be           == 1 Possessive prefixes
+  correctly predicted == 1 Possessive prefixes
 Language Chuj feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
   correctly predicted == 3 Immed preverbal
 Language Chuj feature Postnominal_relative_clauses:
@@ -881,7 +880,8 @@ Language cmy (Chontal Maya, Mayan/Mayan, nan):
 Language Chontal Maya feature Coding_of_Nominal_Plurality:
   correctly predicted == 2 Plural suffix
 Language Chontal Maya feature Definite_Articles:
-  correctly predicted == 1 Definite word distinct from demonstrative
+  wrongly predicted   == 5 No definite or indefinite article
+  should be           == 1 Definite word distinct from demonstrative
 Language Chontal Maya feature Expression_of_Pronominal_Subjects:
   correctly predicted == 2 Subject affixes on verb
 Language Chontal Maya feature Finger_and_Hand:
@@ -913,7 +913,8 @@ Language Chontal Maya feature Position_of_Case_Affixes:
 Language Chontal Maya feature Position_of_Polar_Question_Particles:
   correctly predicted == 6 No question particle
 Language Chontal Maya feature Position_of_Pronominal_Possessive_Affixes:
-  correctly predicted == 2 Possessive suffixes
+  wrongly predicted   == 1 Possessive prefixes
+  should be           == 2 Possessive suffixes
 Language Chontal Maya feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
   correctly predicted == 3 Immed preverbal
 Language Chontal Maya feature Postnominal_relative_clauses:
@@ -934,7 +935,8 @@ Language Chontal Maya feature The_Velar_Nasal:
 Language coi (Chortí, Mayan/Mayan, nan):
   8 features known, 3 features to be predicted.
 Language Chortí feature Ordinal_Numerals:
-  correctly predicted == 7 First, second, three-th
+  wrongly predicted   == 6 First, two-th, three-th
+  should be           == 7 First, second, three-th
 Language Chortí feature The_Morphological_Imperative:
   correctly predicted == 1 Second singular and second plural
 Language Chortí feature The_Prohibitive:
@@ -994,10 +996,10 @@ Language Carapana feature Coding_of_Nominal_Plurality:
 Language Carapana feature Finger_and_Hand:
   correctly predicted == 2 Different
 Language Carapana feature Order_of_Adjective_and_Noun:
-  wrongly predicted   == 1 Adjective-Noun
-  should be           == 2 Noun-Adjective
+  correctly predicted == 2 Noun-Adjective
 Language Carapana feature Order_of_Demonstrative_and_Noun:
-  correctly predicted == 1 Demonstrative-Noun
+  wrongly predicted   == 2 Noun-Demonstrative
+  should be           == 1 Demonstrative-Noun
 Language Carapana feature Order_of_Numeral_and_Noun:
   correctly predicted == 1 Numeral-Noun
 Language Carapana feature Position_of_Tense-Aspect_Affixes:
@@ -1025,7 +1027,7 @@ Language Tiwa (Northern) feature Languages_with_two_Dominant_Orders_of_Subject,_
 Language Tiwa (Northern) feature Minor_morphological_means_of_signaling_negation:
   correctly predicted == 4 None
 Language Tiwa (Northern) feature Multiple_Negative_Constructions_in_SOV_Languages:
-  wrongly predicted   == 6 SO[Neg-V]/SO[V-Neg]
+  wrongly predicted   == 3 NegSOV/SNegOV/SONegV
   should be           == 14 SO[Neg-V]/S[Neg-V]O
 Language Tiwa (Northern) feature NegSOV_Order:
   correctly predicted == 4 No NegSOV
@@ -1036,8 +1038,7 @@ Language Tiwa (Northern) feature Order_of_Object,_Oblique,_and_Verb:
 Language Tiwa (Northern) feature Order_of_Subject_and_Verb:
   correctly predicted == 1 SV
 Language Tiwa (Northern) feature Position_of_Case_Affixes:
-  wrongly predicted   == 9 No case affixes or adpositional clitics
-  should be           == 1 Case suffixes
+  correctly predicted == 1 Case suffixes
 Language Tiwa (Northern) feature Position_of_Tense-Aspect_Affixes:
   correctly predicted == 2 Tense-aspect suffixes
 Language Tiwa (Northern) feature Presence_of_Uncommon_Consonants:
@@ -1920,7 +1921,7 @@ Language uzb (Uzbek, Altaic/Turkic, AF UZ):
 Language Uzbek feature Coding_of_Nominal_Plurality:
   correctly predicted == 2 Plural suffix
 Language Uzbek feature Comitatives_and_Instrumentals:
-  wrongly predicted   == 1 Identity
+  wrongly predicted   == 2 Differentiation
   should be           == 3 Mixed
 Language Uzbek feature Comparative_Constructions:
   correctly predicted == 1 Locational
@@ -1931,8 +1932,7 @@ Language Uzbek feature Epistemic_Possibility:
 Language Uzbek feature Expression_of_Pronominal_Subjects:
   correctly predicted == 2 Subject affixes on verb
 Language Uzbek feature Hand_and_Arm:
-  wrongly predicted   == 2 Different
-  should be           == 1 Identical
+  correctly predicted == 1 Identical
 Language Uzbek feature Indefinite_Pronouns:
   correctly predicted == 1 Interrogative-based
 Language Uzbek feature NegSOV_Order:
@@ -2151,13 +2151,15 @@ Language Vietnamese feature Consonant-Vowel_Ratio:
 Language Vietnamese feature Consonant_Inventories:
   correctly predicted == 3 Average
 Language Vietnamese feature Definite_Articles:
-  correctly predicted == 1 Definite word distinct from demonstrative
+  wrongly predicted   == 5 No definite or indefinite article
+  should be           == 1 Definite word distinct from demonstrative
 Language Vietnamese feature Distance_Contrasts_in_Demonstratives:
   correctly predicted == 2 Two-way contrast
 Language Vietnamese feature Distributive_Numerals:
   correctly predicted == 1 No distributive numerals
 Language Vietnamese feature Epistemic_Possibility:
-  correctly predicted == 1 Verbal constructions
+  wrongly predicted   == 3 Other
+  should be           == 1 Verbal constructions
 Language Vietnamese feature Exponence_of_Selected_Inflectional_Formatives:
   correctly predicted == 5 No case
 Language Vietnamese feature Exponence_of_Tense-Aspect-Mood_Inflection:
@@ -2337,7 +2339,7 @@ Language Vinmavis feature SVONeg_Order:
 Language vot (Votic, Uralic/Finnic, RU):
   19 features known, 6 features to be predicted.
 Language Votic feature Epistemic_Possibility:
-  wrongly predicted   == 3 Other
+  wrongly predicted   == 1 Verbal constructions
   should be           == 2 Affixes on verbs
 Language Votic feature Fixed_Stress_Locations:
   correctly predicted == 2 Initial
@@ -2510,8 +2512,7 @@ Language Wappo feature Possessive_Classification:
 Language Wappo feature Postverbal_Negative_Morphemes:
   correctly predicted == 2 [V-Neg]
 Language Wappo feature Predicative_Possession:
-  wrongly predicted   == 3 Topic
-  should be           == 5 'Have'
+  correctly predicted == 5 'Have'
 Language Wappo feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
   correctly predicted == 2 Strongly suffixing
 Language Wappo feature Reduplication:
@@ -2527,7 +2528,8 @@ Language Wappo feature The_Velar_Nasal:
 Language Wappo feature Verbal_Person_Marking:
   correctly predicted == 1 No person marking
 Language Wappo feature Vowel_Quality_Inventories:
-  correctly predicted == 2 Average (5-6)
+  wrongly predicted   == 1 Small (2-4)
+  should be           == 2 Average (5-6)
 ----------------------------------------------------------------------
 Language war (Wari', Chapacura-Wanham/Chapacura-Wanham, BR):
   80 features known, 62 features to be predicted.
@@ -2701,7 +2703,7 @@ Language Washo feature Order_of_Person_Markers_on_the_Verb:
   wrongly predicted   == 2 A precedes P
   should be           == 3 P precedes A
 Language Washo feature Person_Marking_on_Adpositions:
-  wrongly predicted   == 2 No person marking
+  wrongly predicted   == 1 No adpositions
   should be           == 3 Pronouns only
 Language Washo feature Polar_Questions:
   correctly predicted == 1 Question particle
@@ -2857,7 +2859,8 @@ Language Wichí feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
   wrongly predicted   == 3 No inclusive/exclusive
   should be           == 2 'We' the same as 'I'
 Language Wichí feature Inflectional_Synthesis_of_the_Verb:
-  correctly predicted == 2 2-3 categories per word
+  wrongly predicted   == 5 8-9 categories per word
+  should be           == 2 2-3 categories per word
 Language Wichí feature Locus_of_Marking_in_the_Clause:
   correctly predicted == 3 Double marking
 Language Wichí feature M-T_Pronouns:
@@ -2930,8 +2933,7 @@ Language Wichí feature Plurality_in_Independent_Personal_Pronouns:
 Language Wichí feature Polar_Questions:
   correctly predicted == 1 Question particle
 Language Wichí feature Position_of_Interrogative_Phrases_in_Content_Questions:
-  wrongly predicted   == 2 Not initial interrogative phrase
-  should be           == 1 Initial interrogative phrase
+  correctly predicted == 1 Initial interrogative phrase
 Language Wichí feature Position_of_Polar_Question_Particles:
   wrongly predicted   == 6 No question particle
   should be           == 1 Initial
@@ -3099,8 +3101,7 @@ Language Welsh feature Postverbal_Negative_Morphemes:
 Language Welsh feature Predicative_Adjectives:
   correctly predicted == 2 Nonverbal encoding
 Language Welsh feature Predicative_Possession:
-  wrongly predicted   == 5 'Have'
-  should be           == 1 Locational
+  correctly predicted == 1 Locational
 Language Welsh feature Preverbal_Negative_Morphemes:
   correctly predicted == 1 NegV
 Language Welsh feature Pronominal_and_Adnominal_Demonstratives:
@@ -3165,7 +3166,8 @@ Language Wichita feature Consonant-Vowel_Ratio:
   wrongly predicted   == 5 High
   should be           == 3 Average
 Language Wichita feature Consonant_Inventories:
-  correctly predicted == 3 Average
+  wrongly predicted   == 1 Small
+  should be           == 3 Average
 Language Wichita feature Fixed_Stress_Locations:
   correctly predicted == 1 No fixed stress
 Language Wichita feature Front_Rounded_Vowels:
@@ -3181,7 +3183,7 @@ Language Wichita feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
 Language Wichita feature Indefinite_Pronouns:
   correctly predicted == 1 Interrogative-based
 Language Wichita feature Inflectional_Synthesis_of_the_Verb:
-  wrongly predicted   == 4 6-7 categories per word
+  wrongly predicted   == 5 8-9 categories per word
   should be           == 7 12-13 categories per word
 Language Wichita feature Locus_of_Marking:_Whole-language_Typology:
   correctly predicted == 1 Head-marking
@@ -3312,7 +3314,7 @@ Language Wikchamni feature Relationship_between_the_Order_of_Object_and_Verb_and
 Language Wikchamni feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   correctly predicted == 5 Other
 Language Wikchamni feature The_Velar_Nasal:
-  wrongly predicted   == 2 No initial velar nasal
+  wrongly predicted   == 3 No velar nasal
   should be           == 1 Initial velar nasal
 Language Wikchamni feature Third_Person_Pronouns_and_Demonstratives:
   correctly predicted == 1 Unrelated
@@ -3902,5 +3904,5 @@ Language Wapishana feature Voicing_in_Plosives_and_Fricatives:
 Language Wapishana feature Vowel_Quality_Inventories:
   wrongly predicted   == 2 Average (5-6)
   should be           == 1 Small (2-4)
-Correctly predicted 1149 features out of 1596 total predictions, accuracy = 71.99%
+Correctly predicted 1147 features out of 1596 total predictions, accuracy = 71.87%
 Writing the completed file...
