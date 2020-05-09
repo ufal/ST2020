@@ -66,6 +66,9 @@ for _ in range(N):
         sampledline = dictline.copy()
         correct = 0
         total = 0
+        feats_filled = [feat if feat for feat in feats_use]
+        change_count = random.randoint(0, len(feats_filled))
+        feats_change = random.sample(feats_filled, change_count)
         for feat in feats_use:
             true_value = dictline[feat]
             if true_value:
@@ -74,12 +77,24 @@ for _ in range(N):
                 # them? Or for each, first throw a dice to decide whether to
                 # change it?
                 # TODO !!!!!! ??????
-                # if randon.choice((True,False)):
-                sampled_value = random.choice(feat_values_tuples[feat])
-                sampledline[feat] = sampled_value
-                total += 1
-                if sampled_value == true_value:
-                    correct += 1
+                # Probably I want uniform ditribution of the proportion of
+                # correct values.
+                # It is probably not hard to distinguish really bad lines, as
+                # the baselines are around 50%, so we need to focus on the
+                # quite good and really good lines and learn to distinguish
+                # those well.
+                # (But we also need to see some bad lines to know what they
+                # look like.)
+                # We could generate ALL options but that would lead to too
+                # large training data (and too slow training), and also such
+                # distro would have way too many bad lines (we probably don!t
+                # need so many).
+                if random.choice((True,False)):
+                    sampled_value = random.choice(feat_values_tuples[feat])
+                    sampledline[feat] = sampled_value
+                    total += 1
+                    if sampled_value == true_value:
+                        correct += 1
         sampledline[ACC] = correct/total
         output.append(sampledline)
         
