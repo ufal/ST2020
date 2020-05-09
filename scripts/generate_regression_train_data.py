@@ -65,10 +65,10 @@ for _ in range(N):
     for dictline in gold_data:
         sampledline = dictline.copy()
         incorrect_count = 0
-        feats_filled = [feat if feat for feat in feats_use]
+        feats_filled = [feat for feat in feats_use if feat]
         total_count = len(feats_filled)
         # How many feature values to change
-        change_count = random.randoint(0, total_count)
+        change_count = random.randint(0, total_count)
         # Which features to change
         feats_change = random.sample(feats_filled, change_count)
         for feat in feats_change:
@@ -95,7 +95,7 @@ for _ in range(N):
 random.shuffle(output)
 
 with open('../data/train_regression.csv', 'w') as out:
-    outwriter = csv.DictWriter(out, feats_extended)
+    outwriter = csv.DictWriter(out, feats_extended, lineterminator='\n')
     outwriter.writeheader()
     for dictline in output:
         outwriter.writerow(dictline)
