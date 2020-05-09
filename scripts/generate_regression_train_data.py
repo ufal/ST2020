@@ -64,38 +64,30 @@ for dictline in gold_data:
 for _ in range(N):
     for dictline in gold_data:
         sampledline = dictline.copy()
-        correct = 0
-        total = 0
+        incorrect_count = 0
         feats_filled = [feat if feat for feat in feats_use]
-        change_count = random.randoint(0, len(feats_filled))
+        total_count = len(feats_filled)
+        # How many feature values to change
+        change_count = random.randoint(0, total_count)
+        # Which features to change
         feats_change = random.sample(feats_filled, change_count)
-        for feat in feats_use:
+        for feat in feats_change:
+            # Change the feature
             true_value = dictline[feat]
-            if true_value:
-                # TODO need to often change only a few values -- first sample
-                # the number of values to change, then change only some of
-                # them? Or for each, first throw a dice to decide whether to
-                # change it?
-                # TODO !!!!!! ??????
-                # Probably I want uniform ditribution of the proportion of
-                # correct values.
-                # It is probably not hard to distinguish really bad lines, as
-                # the baselines are around 50%, so we need to focus on the
-                # quite good and really good lines and learn to distinguish
-                # those well.
-                # (But we also need to see some bad lines to know what they
-                # look like.)
-                # We could generate ALL options but that would lead to too
-                # large training data (and too slow training), and also such
-                # distro would have way too many bad lines (we probably don!t
-                # need so many).
-                if random.choice((True,False)):
-                    sampled_value = random.choice(feat_values_tuples[feat])
-                    sampledline[feat] = sampled_value
-                    total += 1
-                    if sampled_value == true_value:
-                        correct += 1
-        sampledline[ACC] = correct/total
+            sampled_value = random.choice(feat_values_tuples[feat])
+            if sampled_value != true_value:
+                incorrect_count += 1
+                sampledline[feat] = sampled_value
+        # NOTE: An incorrect line for one language may be a correct line for a
+        # different language (even one from the same family or even genus).
+        # I ignore that at the moment, hoping that the same line will simply
+        # appear multiple times in the training data with different scores.
+        # Some accuracies are thus underestimates (and symmetrically some high
+        # accuracy lines would be low accuracy lines for another language, so
+        # these are overestimates).
+        # Alternatively, we might go through whole train to find the highest
+        # accuracy for the changed line and use that as the gold accuracy?
+        sampledline[ACC] = 1 - incorrect_count/total_count
         output.append(sampledline)
         
 # produce output
