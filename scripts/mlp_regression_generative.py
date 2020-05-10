@@ -23,8 +23,8 @@ feats_remove = {'','wals_code','name','latitude','longitude','countrycodes', 'AC
 # load training data 
 train_data = list()
 train_labels = list()
-#with open('../data/train_regression.csv') as train:
-with open('../data/train_regression_10000.csv') as train:
+with open('../data/train_regression.csv') as train:
+#with open('../data/train_regression_10000.csv') as train:
     d2 = csv.DictReader(train)
     for dictline in d2:
         train_line = list()
