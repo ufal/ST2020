@@ -1,0 +1,2 @@
+Model which use transformer model with masked input and tries to predict masked features. It is usally not able to train any important information and only learns the easiest features resulting in accuracy at maximum of 20 %.
+Since the accuracy is so low, I didn't include it.
