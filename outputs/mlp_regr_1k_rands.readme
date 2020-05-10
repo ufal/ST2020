@@ -1,0 +1,13 @@
+
+Train a MLP regressor to predict WALS line accuracy.
+
+For each ? in test data, randomly choose one of the possible values.
+Do this 1000 times for each dev line, thus having 1000 candidates for the line.
+Run the regressor prediction on the lines and choose the highest scoring line.
+
+Accuracy is 16%.
+
+TODO investigate
+
+
+

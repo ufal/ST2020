@@ -35,10 +35,32 @@ with open('../models/mlpr.model', 'rb') as f:
 
 feat_all_values = one_hotter.categories_
 
-# for each ? values, expand to all possible values for the feat
-# include all info
+# How many random options to generate
+N=10000
+
+# TODO this VASTLY subexplores the space; it is reasonable to first take random
+# options, and then to take a hillclimbing approach to improving the best
+# option
+
+# TODO measure search error versus prediction error to find best params
+
 def generate_options(line):
-    return generate_options_recursively(line, 0)
+    options = list()
+    for _ in range(N):
+        options.append(generate_random_option(line))
+    return options
+
+import random
+
+# randomly fill each '?'
+def generate_random_option(line):
+    new_line = line.copy()
+    for position in range(len(line)):
+        feat = feats_all[position]
+        if line[feat] == '?':
+            all_values = feat_all_values[position-len(feats_remove)]  # the removed feats are not encoded
+            line[feat] = random.choice(all_values)
+    return new_line
 
 def generate_options_recursively(line, position):
     # First generate the continuation (head recursion)
@@ -87,15 +109,17 @@ def find_max(options, predictions):
 
 # apply
 output = list()
+preds_sum = 0
 for line in test_data:
     logging.info('Predicting values for {}'.format(line['name']))
     all_options = generate_options(line)
-    logging.info('Generated {} options'.format(len(all_options)))
+    #logging.info('Generated {} options'.format(len(all_options)))
     all_options_onehot = onehot(all_options, one_hotter)
     predictions = regressor.predict(all_options_onehot)
     best_option, best_prediction = find_max(all_options, predictions)
     logging.info('Selected option with predicted accuracy {}'.format(
                 best_prediction))
+    preds_sum += best_prediction
     output.append(best_option)
 
 with open('output', 'w') as out:
@@ -104,3 +128,5 @@ with open('output', 'w') as out:
     for line in output:
         outwriter.writerow(line)
 
+logging.info('Average predicted accuracy {}'.format(
+                (preds_sum/len(test_data))))
