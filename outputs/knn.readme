@@ -1,0 +1,2 @@
+Using typical KNN based on hamming distance. Choosing different fallbacks (Most common, most common in genus, most common in family.) when no value is found in neighbours. It seems that it doesn't depend much on the fallback.
+Maximum accuracy is 62.28 %.
