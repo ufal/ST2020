@@ -42,7 +42,7 @@ with open('../models/'+M+'.model', 'rb') as f:
 feat_all_values = one_hotter.categories_
 
 # How many random options to generate
-N=1000
+N=10000
 
 # TODO this VASTLY subexplores the space; it is reasonable to first take random
 # options, and then to take a hillclimbing approach to improving the best

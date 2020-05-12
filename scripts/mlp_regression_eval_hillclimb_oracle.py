@@ -14,6 +14,7 @@ logging.basicConfig(
     format='%(asctime)s %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
     level=logging.INFO)
+    #level=logging.DEBUG)
 
 feats_remove = {'','wals_code','name','latitude','longitude','countrycodes'}
 feats_fixed = {'family', 'genus'}
@@ -32,6 +33,7 @@ with open('../data/dev_y.csv') as test:
     for dictline in d2:
         gold_data.append(dictline)
 
+
 # load models
 
 #M='mlpr'
@@ -46,7 +48,7 @@ with open('../models/'+M+'.model', 'rb') as f:
 feat_all_values = one_hotter.categories_
 
 # How many random options to generate
-N=10000
+N=1000
 
 # TODO this VASTLY subexplores the space; it is reasonable to first take random
 # options, and then to take a hillclimbing approach to improving the best
@@ -54,7 +56,20 @@ N=10000
 
 # TODO measure search error versus prediction error to find best params
 
-def generate_options(line):
+def generate_options(line, best_option):
+    options = list()
+    for position in range(len(line)):
+        feat = feats_all[position]
+        logging.debug('{} {} {}'.format(position, feat, line[feat]))
+        if line[feat] == '?':
+            all_values = feat_all_values[position-len(feats_remove)]  # the removed feats are not encoded
+            for value in all_values:
+                option = best_option.copy()
+                option[feat] = value
+                options.append(option)
+    return options
+
+def generate_random_options(line):
     options = list()
     for _ in range(N):
         options.append(generate_random_option(line))
@@ -71,27 +86,6 @@ def generate_random_option(line):
             all_values = feat_all_values[position-len(feats_remove)]  # the removed feats are not encoded
             new_line[feat] = random.choice(all_values)
     return new_line
-
-def generate_options_recursively(line, position):
-    # First generate the continuation (head recursion)
-    if position < len(line)-1:
-        further_options = generate_options_recursively(line, position+1)
-    else:
-        further_options = [[]]
-    
-    output = list()
-    feat = feats_all[position]
-    if line[feat] == '?':
-        all_values = feat_all_values[position-len(feats_remove)]  # the removed feats are not encoded
-        for value in all_values:
-            for further in further_options:
-                option = [value, *further]
-                output.append(option)
-    else:
-        for further in further_options:
-            option = [line[feat], *further]
-            output.append(option)
-    return output
 
 # convert to onehotter input format and convert ot onehot
 def onehot(options, one_hotter):
@@ -120,20 +114,49 @@ def find_max(options, predictions):
 # apply
 output = list()
 preds_sum = 0
-for line, goldline in zip(test_data, gold_data):
+for line, gold_line in zip(test_data, gold_data):
     logging.info('Predicting values for {}'.format(line['name']))
-    all_options = generate_options(line)
-    all_options.append(goldline)
+    
+    # randomly try some options
+    # find best random option to start with
+    all_options = generate_random_options(line)
     #logging.info('Generated {} options'.format(len(all_options)))
     all_options_onehot = onehot(all_options, one_hotter)
     predictions = regressor.predict(all_options_onehot)
     best_option, best_prediction = find_max(all_options, predictions)
+
+    last_best_prediction = -1
+    while best_prediction > last_best_prediction:
+        # remeber current best
+        logging.info('Found option with predicted accuracy {}'.format(
+                best_prediction))
+        last_best_prediction = best_prediction
+        # take best option and change individual values
+        new_options = generate_options(line, best_option)
+        logging.info('Exploring {} options'.format(
+                len(new_options)))
+        # score them
+        new_options_onehot = onehot(new_options, one_hotter)
+        predictions = regressor.predict(new_options_onehot)
+        # take best
+        best_option, best_prediction = find_max(
+                new_options, predictions)
+
+    oracle_options = [best_option, gold_line]
+    oracle_options_onehot = onehot(oracle_options, one_hotter)
+    predictions = regressor.predict(oracle_options_onehot)
+    logging.info('best {}, oracle {}, search error {}'.format(
+        predictions[0], predictions[1], (predictions[1] > predictions[0])))
+    best_option, best_prediction = find_max(
+                oracle_options, predictions)
+
+
     logging.info('Selected option with predicted accuracy {}'.format(
                 best_prediction))
     preds_sum += best_prediction
     output.append(best_option)
 
-with open('output_oracle', 'w') as out:
+with open('output_hillclimb_oracle', 'w') as out:
     outwriter = csv.DictWriter(out, feats_all)
     outwriter.writeheader()
     for line in output:
