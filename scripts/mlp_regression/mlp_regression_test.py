@@ -22,7 +22,7 @@ feats_remove = {'','wals_code','name','latitude','longitude','countrycodes', 'AC
 languages = list()
 test_data = list()
 test_labels = list()
-with open('../data/train_regression_tail.csv') as test:
+with open('../../data/train_regression_tail.csv') as test:
     d2 = csv.DictReader(test)
     for dictline in d2:
         test_line = list()
