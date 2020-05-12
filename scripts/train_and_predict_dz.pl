@@ -685,8 +685,11 @@ sub modify_features
             {
                 my $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
                 $data->{lh}{$lcode}{latlon} = $zone2d;
-                push(@{$data->{features}}, 'latlon');
             }
+        }
+        if($config{latlon2d})
+        {
+            push(@{$data->{features}}, 'latlon');
         }
     }
     elsif($config{latlon} ne '')
