@@ -29,10 +29,14 @@ with open('../data/dev_y.csv') as test:
 
 
 # load models
+
+#M='mlpr'
+M='mlpr_full'
+
 import pickle
-with open('../models/mlpr.onehot_encoder', 'rb') as f:
+with open('../models/'+M+'.onehot_encoder', 'rb') as f:
     one_hotter = pickle.load(f)
-with open('../models/mlpr.model', 'rb') as f:
+with open('../models/'+M+'.model', 'rb') as f:
     regressor = pickle.load(f)
 
 feat_all_values = one_hotter.categories_
