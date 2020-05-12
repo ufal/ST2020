@@ -685,6 +685,7 @@ sub modify_features
             {
                 my $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
                 $data->{lh}{$lcode}{latlon} = $zone2d;
+                push(@{$data->{features}}, 'latlon');
             }
         }
     }
@@ -710,7 +711,7 @@ sub modify_features
 sub write_csv
 {
     my $data = shift; # hash ref
-    my @headers = map {escape_commas($_)} (@{$data->{features}});
+    my @headers = map {escape_commas($_)} (@{$data->{infeatures}});
     print(join(',', @headers), "\n");
     my @lcodes = sort {$data->{lh}{$a}{index} <=> $data->{lh}{$b}{index}} (@{$data->{lcodes}});
     foreach my $l (@lcodes)
@@ -722,7 +723,7 @@ sub write_csv
             my $v = exists($data->{restore}{$l}{$_}) ? $data->{restore}{$l}{$_} : $data->{lh}{$l}{$_};
             escape_commas($v);
         }
-        (@{$data->{features}});
+        (@{$data->{infeatures}});
         print(join(',', @values), "\n");
     }
 }
@@ -824,12 +825,16 @@ sub read_csv
     {
         $headers[0] = 'index';
     }
+    # We may want to add new combined features but we will not want to output them;
+    # therefore we must save the original list of features.
+    my @infeatures = @headers;
     my %data =
     (
-        'features' => \@headers,
-        'table'    => \@data,
-        'nf'       => scalar(@headers),
-        'nl'       => scalar(@data)
+        'infeatures' => \@infeatures,
+        'features'   => \@headers,
+        'table'      => \@data,
+        'nf'         => scalar(@headers),
+        'nl'         => scalar(@data)
     );
     return %data;
 }
