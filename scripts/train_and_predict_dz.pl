@@ -55,7 +55,7 @@ GetOptions
 );
 
 #==============================================================================
-# The main data structure for a seat of language descriptions read from CSV:
+# The main data structure for a set of language descriptions read from CSV:
 # %data:
 #   Filled by read_csv(): -----------------------------------------------------
 #     {features} .. names of features = headers of columns in the table
@@ -676,22 +676,19 @@ sub modify_features
                     last;
                 }
             }
+            # In addition to grouping coordinates to zones, we may add a new feature
+            # which combines the latitude and longitude zones into 2D areas.
+            ###!!! We should define a new commandline option for this. But it should only work together with --latlon=zones.
+            if(0)
+            {
+                my $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
+                $data->{lh}{$lcode}{latlon} = $zone2d;
+            }
         }
     }
     elsif($config{latlon} ne '')
     {
         die("Unknown parameter latlon='$config{latlon}'");
-    }
-    if(0)
-    {
-        my $ilat = 3; die if($data->{features}[$ilat] ne 'latitude');
-        my $ilon = 4; die if($data->{features}[$ilon] ne 'longitude');
-        my $ilatlon = scalar(@{$data->{features}}); # we will add this as a new feature
-        push(@{$data->{features}}, 'latlon');
-        foreach my $language (@{$data->{table}})
-        {
-            $language->[$ilatlon] = $language->[$ilat].';'.$language->[$ilon];
-        }
     }
 }
 
