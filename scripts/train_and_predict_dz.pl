@@ -44,6 +44,8 @@ $config{countrycodes} = '';
 # However, grouping languages in geographical zones may help.
 # --latlon zones ... both latitude and longitude grouped into wide zones around the globe
 $config{latlon} = '';
+# --latlon2d ... combine latitude and longitude into a 2D area (this only works with --latlon zones)
+$config{latlon2d} = 0;
 GetOptions
 (
     'debug=i'  => \$config{debug},
@@ -51,7 +53,8 @@ GetOptions
     'score=s'  => \$config{score},
     'model=s'  => \$config{model},
     'countrycodes=s' => \$config{countrycodes},
-    'latlon=s' => \$config{latlon}
+    'latlon=s' => \$config{latlon},
+    'latlon2d' => \$config{latlon2d}
 );
 
 #==============================================================================
@@ -678,8 +681,7 @@ sub modify_features
             }
             # In addition to grouping coordinates to zones, we may add a new feature
             # which combines the latitude and longitude zones into 2D areas.
-            ###!!! We should define a new commandline option for this. But it should only work together with --latlon=zones.
-            if(0)
+            if($config{latlon2d})
             {
                 my $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
                 $data->{lh}{$lcode}{latlon} = $zone2d;
