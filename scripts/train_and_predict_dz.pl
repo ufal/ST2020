@@ -730,7 +730,12 @@ sub modify_features
         # which is not feasible. Therefore, we will only look at feature pairs that have been
         # observed enough times.
         ###!!! We want to do this cut for training data but not for blind test data!
-        my @features2d = sort(grep {$features2d{$_}>2} (keys(%features2d)));
+        ###!!! Hack: If the total number is over 18000, we will assume that we are working with training data.
+        my @features2d = sort(keys(%features2d));
+        if(scalar(@features2d)>18000)
+        {
+            @features2d = grep {$features2d{$_}>5} (@features2d);
+        }
         push(@{$data->{features}}, @features2d);
         my $n = scalar(@{$data->{features}});
         print STDERR ("We have $n features after expansion.\n");
