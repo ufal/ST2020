@@ -1,0 +1,12 @@
+
+Conditional probability that feature f = fv given that g = gv
+  multiplied by the log count of cooccurrence
+  multiplied by the mutual information of features f and g
+Only the strongest signal (source feature) is taken, all other source features are ignored.
+Unreliable countrycodes=US is replaced by countrycodes=nan.
+Latitude and longitude grouped into wide zones; added a combined latlon feature.
+Selected (high-frequency) other feature pairs also added as combined features.
+
+( perl scripts/train_and_predict_dz.pl --score plogcinf --model strongest --countrycodes nous --latlon zones --latlon2d --feats2d --debug 1 > outputs/cond_prob_info_nous_latlon2d_feats2d.csv ) |& tee outputs/cond_prob_info_nous_latlon2d_feats2d.debug
+Correctly predicted 1149 features out of 1596 total predictions, accuracy = 71.99%
+
