@@ -726,6 +726,8 @@ sub modify_features
         }
         my @features2d = sort(keys(%features2d));
         push(@{$data->{features}}, @features2d);
+        my $n = scalar(@{$data->{features}});
+        print STDERR ("We have $n features after expansion.\n");
     }
 }
 
