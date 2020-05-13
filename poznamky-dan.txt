@@ -13,8 +13,17 @@ rysy (countryCZ = yes).
 Clustering jazyků podle vzdálenosti od jednoho z předem připravených bodů (např. Evropa, Kavkaz).
 Nebo k-means, ale místo náhodného rozmístění počátečních centroidů asi zase zvolit body ručně.
 
+Zakomponovat druh rysu, aby lexikální rys jako Hand_and_Arm nezávisel třeba na morfologii.
+
 Měli bychom otestovat, zda se na pořadí metod něco změní, když dostaneme na vstupu výrazně více nebo výrazně
-méně vyplněných rysů.
+méně vyplněných rysů. (Organizátoři řekli, že těch rysů dostaneme "a handful". Nic přesnějšího nevíme.)
+
+Ještě se znova podívat na to, proč nefunguje hlasování více rysů.
+
+Pozor, někdy se rozhodnu pro zdrojový rys, ale jeho 1. i 2. odpověď se téměř neliší ve skóre! To bych se pak měl zeptat třetího.
+
+Self training: vybrat takový otazník, kde si jsme nejvíce jisti predikcí, pak ho vzít jako součást
+znalosti a zkusit, jestli nedokážu předpovědět něco dalšího?
 
 
 
@@ -22,6 +31,8 @@ Další neuspořádané poznámky
 
 * Hamming distance mezi jazyky
 * Kilometrová vzdálenost jazyků https://en.wikipedia.org/wiki/Geographical_distance
+* Hal Daumé III (2009), Bayesovské sítě, prý mají někde ke stažení implementaci a přehled implikací mezi rysy, které objevili.
+* Zvýšit váhu implikací z rodiny a rodu (pokud existují, třeba je přičíst ke všem ostatním predikcím?)
 
 * RR 12.5.2020: regrese neuronkou. Dostane řádek z WALSu. Má říct, nakolik je to správně. Nefunguje to.
 * MV 12.5.2020: maskovanej vstup jako v transformerech. Nic moc, ještě si s tím hraje.
