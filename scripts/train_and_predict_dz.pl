@@ -734,7 +734,7 @@ sub modify_features
         my @features2d = sort(keys(%features2d));
         if(scalar(@features2d)>18000)
         {
-            @features2d = grep {$features2d{$_}>500} (@features2d);
+            @features2d = grep {$features2d{$_}>600} (@features2d);
         }
         push(@{$data->{features}}, @features2d);
         my $n = scalar(@{$data->{features}});
