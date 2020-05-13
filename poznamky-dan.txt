@@ -1,0 +1,31 @@
+Repozitář github.com/ufal/ST2020 (založil Ruda).
+
+TO DO:
+
+Vylepšit analýzu chyb. Pokud nějaký rys předpovím špatně, byla vůbec šance předpovědět ho dobře, tj., stalo se
+v trénovacích datech alespoň jednou, že něco, co teď mám na vstupu, se vyskytlo spolu se správnou odpovědí?
+Soustředit se na případy, kde nějakou šanci máme. A spočítat, jaké procento případů je takových, že máme šanci;
+tohle bude horní mez úspěšnosti, které můžeme dosáhnout.
+
+Countrycodes by možná byly užitečnější, kdybych rozsekal případy, kdy jeden jazyk má několik zemí, na binární
+rysy (countryCZ = yes).
+
+Clustering jazyků podle vzdálenosti od jednoho z předem připravených bodů (např. Evropa, Kavkaz).
+Nebo k-means, ale místo náhodného rozmístění počátečních centroidů asi zase zvolit body ručně.
+
+Měli bychom otestovat, zda se na pořadí metod něco změní, když dostaneme na vstupu výrazně více nebo výrazně
+méně vyplněných rysů.
+
+
+
+Další neuspořádané poznámky
+
+* Hamming distance mezi jazyky
+* Kilometrová vzdálenost jazyků https://en.wikipedia.org/wiki/Geographical_distance
+
+* RR 12.5.2020: regrese neuronkou. Dostane řádek z WALSu. Má říct, nakolik je to správně. Nefunguje to.
+* MV 12.5.2020: maskovanej vstup jako v transformerech. Nic moc, ještě si s tím hraje.
+* MV zatím nejlepší (73,8 %): lang id + feature value ... ptá se neuronky, zda je to dobře.
+  language embedding, používá i dev data (bez těch chybějících hodnot)
+  viz lang_embedding.readme
+  Embeddingy jazyků lépe modelují podobnost jazyků než Hamming distance.
