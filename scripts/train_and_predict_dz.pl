@@ -46,6 +46,12 @@ $config{countrycodes} = '';
 $config{latlon} = '';
 # --latlon2d ... combine latitude and longitude into a 2D area (this only works with --latlon zones)
 $config{latlon2d} = 0;
+# Similarly to the combination of latitude and longitude above, other features
+# may also be stronger in combination than in isolation. We can create a new
+# feature for each pair of non-empty features. This will be done after latlon2d,
+# so latlon can enter pairs as a single feature.
+# --feats2d ... switch on pairs of features
+$config{feats2d} = 0;
 GetOptions
 (
     'debug=i'  => \$config{debug},
@@ -54,7 +60,8 @@ GetOptions
     'model=s'  => \$config{model},
     'countrycodes=s' => \$config{countrycodes},
     'latlon=s' => \$config{latlon},
-    'latlon2d' => \$config{latlon2d}
+    'latlon2d' => \$config{latlon2d},
+    'feats2d'  => \$config{feats2d}
 );
 
 #==============================================================================
@@ -695,6 +702,30 @@ sub modify_features
     elsif($config{latlon} ne '')
     {
         die("Unknown parameter latlon='$config{latlon}'");
+    }
+    # Create a combined feature from each pair of non-empty features.
+    if($config{feats2d})
+    {
+        my %features2d;
+        foreach my $lcode (@{$data->{lcodes}})
+        {
+            my @nefeatures = grep {exists($data->{lh}{$lcode}{$_}) && $data->{lh}{$lcode}{$_} ne '' && $data->{lh}{$lcode}{$_} !~ m/^nan|\?$/} (@{$data->{features}});
+            foreach my $f (@nefeatures)
+            {
+                foreach my $g (@nefeatures)
+                {
+                    if($f lt $g)
+                    {
+                        my $fg = $f.';'.$g;
+                        my $fgv = $data->{lh}{$lcode}{$f}.';'.$data->{lh}{$lcode}{$g};
+                        $features2d{$fg}++;
+                        $data->{lh}{$lcode}{$fg} = $fgv;
+                    }
+                }
+            }
+        }
+        my @features2d = sort(keys(%features2d));
+        push(@{$data->{features}}, @features2d);
     }
 }
 
