@@ -21,7 +21,7 @@ feats_fixed = {'family', 'genus'}
 
 # load test data 
 test_data = list()
-with open('../data/dev_y.csv') as test:
+with open('../../data/dev_y.csv') as test:
     d2 = csv.DictReader(test)
     for dictline in d2:
         test_data.append(dictline)

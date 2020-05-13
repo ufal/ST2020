@@ -9,7 +9,7 @@ import csv
 import random
 
 # how many times to sample a feature vector for each language
-N=100
+N=100000
 
 # label for the accuracy field
 ACC='ACCURACY'
@@ -24,7 +24,7 @@ logging.basicConfig(
 # feat -> count
 gold_data = list()
 feat_values = defaultdict(set)
-with open('../data/train_y.csv') as train:
+with open('../../data/train_y.csv') as train:
     d2 = csv.DictReader(train)
     for dictline in d2:
         gold_data.append(dictline)
@@ -61,7 +61,8 @@ for dictline in gold_data:
     output.append(dictline)
 
 # repeatedly sample and score random data
-for _ in range(N):
+for i in range(N):
+    logging.info('Pass {} of {}'.format(i, N))
     for dictline in gold_data:
         sampledline = dictline.copy()
         incorrect_count = 0
@@ -92,11 +93,14 @@ for _ in range(N):
         
 # produce output
 
+logging.info('Shuffle')
 random.shuffle(output)
 
-with open('../data/train_regression.csv', 'w') as out:
+logging.info('Output')
+with open('../../data/train_regression_'+str(N)+'.csv', 'w') as out:
     outwriter = csv.DictWriter(out, feats_extended, lineterminator='\n')
     outwriter.writeheader()
     for dictline in output:
         outwriter.writerow(dictline)
 
+logging.info('Done')

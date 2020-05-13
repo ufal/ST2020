@@ -21,14 +21,14 @@ feats_fixed = {'family', 'genus'}
 
 # load test data 
 test_data = list()
-with open('../data/dev_x.csv') as test:
+with open('../../data/dev_x.csv') as test:
     d2 = csv.DictReader(test)
     for dictline in d2:
         test_data.append(dictline)
     feats_all = d2.fieldnames
 
 gold_data = list()
-with open('../data/dev_y.csv') as test:
+with open('../../data/dev_y.csv') as test:
     d2 = csv.DictReader(test)
     for dictline in d2:
         gold_data.append(dictline)
