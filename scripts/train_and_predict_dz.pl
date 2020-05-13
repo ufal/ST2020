@@ -724,7 +724,13 @@ sub modify_features
                 }
             }
         }
-        my @features2d = sort(keys(%features2d));
+        # We are facing combinatorial explosion. In WALS, one language may have up to 193 features.
+        # Non-empty combinations shoot us to 18691 features. But then we will look of co-occurrences
+        # of pairs of features, i.e., square the number again, that's ~ 350 million co-occurrences,
+        # which is not feasible. Therefore, we will only look at feature pairs that have been
+        # observed more than once.
+        ###!!! We want to do this cut for training data but not for blind test data!
+        my @features2d = sort(grep {$features2d{$_}>1} (keys(%features2d)));
         push(@{$data->{features}}, @features2d);
         my $n = scalar(@{$data->{features}});
         print STDERR ("We have $n features after expansion.\n");
