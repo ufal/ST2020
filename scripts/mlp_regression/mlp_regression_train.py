@@ -21,10 +21,12 @@ logging.basicConfig(
 feats_remove = {'','wals_code','name','latitude','longitude','countrycodes', 'ACCURACY'}
 
 # load training data 
+M='100000'
+
 train_data = list()
 train_labels = list()
-with open('../../data/train_regression.csv') as train:
-#with open('../../data/train_regression_10000.csv') as train:
+#with open('../../data/train_regression.csv') as train:
+with open('../../data/train_regression_'+M+'.csv') as train:
     d2 = csv.DictReader(train)
     for dictline in d2:
         train_line = list()
@@ -50,9 +52,9 @@ regressor.fit(train_data_onehot, train_labels)
 
 # save trained model
 import pickle
-with open('../models/mlpr.onehot_encoder', 'wb') as f:
+with open('../../models/mlpr_'+M+'.onehot_encoder', 'wb') as f:
     pickle.dump(one_hotter, f)
-with open('../models/mlpr.model', 'wb') as f:
+with open('../../models/mlpr_'+M+'.model', 'wb') as f:
     pickle.dump(regressor, f)
 
 

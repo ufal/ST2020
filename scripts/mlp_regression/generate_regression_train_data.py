@@ -53,12 +53,15 @@ feats_extended = feats_all.copy()
 feats_extended.append(ACC)
 
 # construct output
-output = list()
+logging.info('Output')
+out = open('../../data/train_regression_'+str(N)+'.csv', 'w')
+outwriter = csv.DictWriter(out, feats_extended, lineterminator='\n')
+outwriter.writeheader()
 
 # put there the gold data
 for dictline in gold_data:
     dictline[ACC] = 1.0
-    output.append(dictline)
+    outwriter.writerow(dictline)
 
 # repeatedly sample and score random data
 for i in range(N):
@@ -89,18 +92,7 @@ for i in range(N):
         # Alternatively, we might go through whole train to find the highest
         # accuracy for the changed line and use that as the gold accuracy?
         sampledline[ACC] = 1 - incorrect_count/total_count
-        output.append(sampledline)
+        outwriter.writerow(sampledline)
         
-# produce output
-
-logging.info('Shuffle')
-random.shuffle(output)
-
-logging.info('Output')
-with open('../../data/train_regression_'+str(N)+'.csv', 'w') as out:
-    outwriter = csv.DictWriter(out, feats_extended, lineterminator='\n')
-    outwriter.writeheader()
-    for dictline in output:
-        outwriter.writerow(dictline)
-
+out.close()
 logging.info('Done')

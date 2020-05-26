@@ -35,9 +35,9 @@ with open('../../data/train_regression_tail.csv') as test:
 
 # load models
 import pickle
-with open('../models/mlpr.onehot_encoder', 'rb') as f:
+with open('../../models/mlpr.onehot_encoder', 'rb') as f:
     one_hotter = pickle.load(f)
-with open('../models/mlpr.model', 'rb') as f:
+with open('../../models/mlpr.model', 'rb') as f:
     regressor = pickle.load(f)
 
 # apply
