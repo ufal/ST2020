@@ -326,9 +326,11 @@ sub is_gold_value_predictable
     my $model = shift; # array reference; the model for the queried feature
     my $goldv = shift; # gold-standard value of the queried feature
     # For each real feature, check the score of the gold-standard value.
+    my %rfeatures;
     my %goldv_scores_for_rfs;
     foreach my $item (@{$model})
     {
+        $rfeatures{$item->{rf}}++;
         if($item->{v} eq $goldv && $item->{c} > 0)
         {
             $goldv_scores_for_rfs{$item->{rf}} = $item->{score};
@@ -336,23 +338,26 @@ sub is_gold_value_predictable
     }
     # Now for each real feature check whether it scores higher something else.
     # If not, it is a useful predictor.
-    my %rfeatures;
     my %notgood;
     foreach my $item (@{$model})
     {
-        $rfeatures{$item->{rf}}++;
         if($item->{v} ne $goldv && exists($goldv_scores_for_rfs{$item->{rf}}) && $item->{score} > $goldv_scores_for_rfs{$item->{rf}})
         {
             $notgood{$item->{rf}}++;
         }
     }
+    # Number of available source features:
     my $nrf = scalar(keys(%rfeatures));
+    # Number of source features which have been observed with the correct target value:
+    my $nrf1 = scalar(keys(%goldv_scores_for_rfs));
+    # Number of source features with which the correct target value has been observed but does not have the best score among possible target values:
     my $nng = scalar(keys(%notgood));
-    my $nok = $nrf - $nng;
+    # Number of source features with which the correct target value has the best score among possible target values:
+    my $nok = $nrf1 - $nng;
     if($nok > 0)
     {
         print STDERR ("    The correct value '$goldv' has a better score than the wrong values with the following $nok features (out of total $nrf known features):\n");
-        foreach my $rf (keys(%rfeatures))
+        foreach my $rf (keys(%goldv_scores_for_rfs))
         {
             if(!exists($notgood{$rf}))
             {
@@ -360,7 +365,7 @@ sub is_gold_value_predictable
             }
         }
     }
-    return $nrf > $nng;
+    return $nok;
 }
 
 
