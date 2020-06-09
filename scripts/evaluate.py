@@ -19,6 +19,20 @@ def evaluate(inp, output, golden_output):
     #print('correctly predicted', predicted_right, 'out of', total)
     return predicted_right / total 
 
+def compare(inp, output1, output2, golden_output):
+    should_predict = (inp == '?')
+    total = np.sum(should_predict)
+    predicted_right_1 = np.sum(output1[should_predict] == golden_output[should_predict])
+    predicted_right_2 = np.sum(output2[should_predict] == golden_output[should_predict])
+    predicted_right_any = 0
+    print (should_predict)
+    for i in range(len(should_predict)):
+        for j in range(len(should_predict[i])):
+            if should_predict[i,j]:
+                if output1[i,j] == golden_output[i,j] or output2[i,j] == golden_output[i,j]:
+                    predicted_right_any += 1
+    
+    return (predicted_right_1 / total, predicted_right_2 / total, predicted_right_any / total)
 
 if __name__ == "__main__":
     import pandas as pd
