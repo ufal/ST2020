@@ -350,12 +350,12 @@ sub is_gold_value_predictable
     my $nng = scalar(keys(%notgood));
     if($nrf > $nng)
     {
-        print STDERR ("The correct value '$goldv' has a better score than the wrong values with the following known features:\n");
+        print STDERR ("    The correct value '$goldv' has a better score than the wrong values with the following known features:\n");
         foreach my $rf (keys(%rfeatures))
         {
             if(!exists($notgood{$rf}))
             {
-                print STDERR ("  $rf\n");
+                print STDERR ("      $rf\n");
             }
         }
     }
