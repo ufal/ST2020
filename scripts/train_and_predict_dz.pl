@@ -247,6 +247,10 @@ sub predict_masked_features
                             {
                                 print STDERR ("The gold-standard value is not reachable given the available features!\n");
                             }
+                            if(!is_gold_value_predictable(\@model, $goldlhl->{$qf}))
+                            {
+                                print STDERR ("The gold-standard value is not predictable (there is always another value with a higher score).\n");
+                            }
                             # Sort source features: the one with strongest possible prediction first.
                             my %rfeatures;
                             foreach my $item (@model)
@@ -309,6 +313,42 @@ sub is_gold_value_reachable
         }
     }
     return 0;
+}
+
+
+
+#------------------------------------------------------------------------------
+# A more demanding option: the gold-standard value must have the best score
+# with at least one other feature.
+#------------------------------------------------------------------------------
+sub is_gold_value_predictable
+{
+    my $model = shift; # array reference; the model for the queried feature
+    my $goldv = shift; # gold-standard value of the queried feature
+    # For each real feature, check the score of the gold-standard value.
+    my %goldv_scores_for_rfs;
+    foreach my $item (@{$model})
+    {
+        if($item->{v} eq $goldv && $item->{c} > 0)
+        {
+            $goldv_scores_for_rfs{$item->{rf}} = $item->{score};
+        }
+    }
+    # Now for each real feature check whether it scores higher something else.
+    # If not, it is a useful predictor.
+    my %rfeatures;
+    my %notgood;
+    foreach my $item (@{$model})
+    {
+        $rfeatures{$item->{rf}}++;
+        if($item->{v} ne $goldv && exists($goldv_scores_for_rfs{$item->{rf}}) && $item->{score} > $goldv_scores_for_rfs{$item->{rf}})
+        {
+            $notgood{$item->{rf}}++;
+        }
+    }
+    my $nrf = scalar(keys(%rfeatures));
+    my $nng = scalar(keys(%notgood));
+    return $nrf > $nng;
 }
 
 
