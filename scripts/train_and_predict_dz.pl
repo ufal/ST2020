@@ -243,6 +243,10 @@ sub predict_masked_features
                         }
                         if($config{debug} >= 2)
                         {
+                            if(!is_gold_value_reachable(\@model, $goldlhl->{$qf}))
+                            {
+                                print STDERR ("The gold-standard value is not reachable given the available features!\n");
+                            }
                             # Sort source features: the one with strongest possible prediction first.
                             my %rfeatures;
                             foreach my $item (@model)
@@ -284,6 +288,27 @@ sub predict_masked_features
     print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
     printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
     print STDERR ("\n");
+}
+
+
+
+#------------------------------------------------------------------------------
+# Takes a model and a gold-standard target feature-value pair. Looks for source
+# feature-value pairs that have been observed together with the target pair and
+# can thus provide signals for the correct prediction.
+#------------------------------------------------------------------------------
+sub is_gold_value_reachable
+{
+    my $model = shift; # array reference; the model for the queried feature
+    my $goldv = shift; # gold-standard value of the queried feature
+    foreach my $item (@{$model})
+    {
+        if($item->{v} eq $goldv && $item->{c} > 0)
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 
