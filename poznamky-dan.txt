@@ -25,6 +25,18 @@ Pozor, někdy se rozhodnu pro zdrojový rys, ale jeho 1. i 2. odpověď se tém�
 Self training: vybrat takový otazník, kde si jsme nejvíce jisti predikcí, pak ho vzít jako součást
 znalosti a zkusit, jestli nedokážu předpovědět něco dalšího?
 
+10.6.:
+
+Pouze 13 hodnot (z 1596 v dev datech) nemáme z čeho předpovědět. Teoreticky tedy můžeme dosáhnout úspěšnosti 99 %.
+Ale: dalších 81 hodnot taky nemůžeme předpovědět, protože ve všech případech je pravděpodobnější něco jiného. To by byl strop 94 %.
+
+Asi by pomohlo jemnější rozčlenění Země, u chybných předpovědí často vidím latlon jako viníka (i když jinde zase pomohl).
+
+Co určitě zkusit: Martin (pokus s názvem lang_embedding) předpovídá X, pro mě je to další vstupní údaj.
+Zjistit, jak moc se lišíme (Ruda tuším spočítal, že kdyby Orákulum vybíralo ze mne a z Martina, přelezli bychom 80 %).
+Pozor, v Martinově výstupu jsou momentálně posunuté úvodní sloupce.
+Taky bych mohl využít své skóre. Když jsem si hodně jistej (skóre větší než práh), mám častěji pravdu?
+
 
 
 Další neuspořádané poznámky
