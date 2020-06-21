@@ -189,6 +189,7 @@ sub read_csv
     my @data; # the table, without the header line
     my $rcomma = chr(12289); # IDEOGRAPHIC COMMA
     my $id = 0;
+    my %feature_names;
     while(<>)
     {
         $iline++;
@@ -239,7 +240,46 @@ sub read_csv
                 $f[$nf-1] = join('', @f[($nf-1)..($n-1)]);
                 splice(@f, $nf);
             }
+            # The original format has 8 columns, now 9 because we added the numeric index.
+            # The ninth column contains all the features. Remember their names.
+            if($original && scalar(@f)==9)
+            {
+                my @features = map {s/=.*//; $_} (split(/\|/, $f[8]));
+                foreach my $feature (@features)
+                {
+                    $feature_names{$feature}++;
+                }
+            }
             push(@data, \@f);
+        }
+    }
+    # If we read the original format, split the features so that each has its own column.
+    if($original)
+    {
+        my @fnames = sort(keys(%feature_names));
+        splice(@headers, $#headers, 1, @fnames);
+        foreach my $row (@data)
+        {
+            my @features = split(/\|/, pop(@{$row}));
+            my %features;
+            foreach my $fv (@features)
+            {
+                if($fv =~ m/^(.+?)=(.+)$/)
+                {
+                    $features{$1} = $2;
+                }
+            }
+            foreach my $f (@fnames)
+            {
+                if(defined($features{$f}))
+                {
+                    push(@{$row}, $features{$f});
+                }
+                else
+                {
+                    push(@{$row}, 'nan');
+                }
+            }
         }
     }
     if($myfiles)

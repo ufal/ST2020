@@ -126,6 +126,21 @@ print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
 write_csv(\%devdata);
+print STDERR ("Reading the blind test data...\n");
+my %testdata = read_csv("$data_folder/test_x.csv");
+print STDERR ("Found $testdata{nf} headers.\n");
+print STDERR ("Found $testdata{nl} language lines.\n");
+my $ntestlangs = $testdata{nl};
+my $ntestfeats = $testdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
+my $ntestlangfeats = $ntestlangs*$ntestfeats;
+print STDERR ("$ntestlangs languages × $ntestfeats features would be $ntestlangfeats.\n");
+hash_features(\%testdata, 0);
+print_qm_analysis(\%testdata);
+# Predict the masked features.
+print STDERR ("Predicting the masked features...\n");
+predict_masked_features(\%traindata, \%testdata);
+print STDERR ("Writing the completed file...\n");
+write_csv(\%testdata);
 
 
 
