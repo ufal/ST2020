@@ -11,15 +11,105 @@ binmode(STDERR, ':utf8');
 use Getopt::Long;
 
 my $original = 0; # original data separated by spaces and tabs, with errors; our _x and _y data (original==0) separated by commas
-my $rcomma = "\x{3001}"; # 、 to replace comma inside of quotation marks for easier processing
+my $write = 0; # we can write the fixed table in our format if desired
 GetOptions
 (
-    'original' => \$original
+    'original' => \$original,
+    'write'    => \$write
 );
 
 my %data = read_csv();
-print("Found ", scalar(@{$data{infeatures}}), " headers.\n");
-print("Found ", scalar(@{$data{table}}), " language lines.\n");
+print STDERR ("Found ", scalar(@{$data{infeatures}}), " headers.\n");
+print STDERR ("Found ", scalar(@{$data{table}}), " language lines.\n");
+hash_features(\%data, 0);
+if($write)
+{
+    write_csv(\%data);
+}
+
+
+
+#------------------------------------------------------------------------------
+# Converts the input table to hashes.
+#   {lcodes} ...... list of wals codes of known languages (index to lh)
+#   {lh} .......... data from {table} indexed by {language}{feature}
+#   {restore} ..... like {lh} but only original values where we modified them
+#   {lhclean} ..... like {lh} but contains only non-empty values (that are not
+#                   '', 'nan' or '?')
+#   {fcount} ...... hash {f} => count of languages where f is not empty
+#   {fvcount} ..... hash indexed by {feature}{value} => count of that value
+#   {fvprob} ...... hash {f}{fv} => probability that f=fv
+#   {fentropy} .... hash {f} => entropy of distribution of non-empty values of f
+#------------------------------------------------------------------------------
+sub hash_features
+{
+    my $data = shift; # hash ref
+    my $qm_is_nan = shift; # convert question marks to 'nan'?
+    my @lcodes;
+    my %lh; # hash indexed by language code
+    my %lhclean; # like %lh but only non-empty values
+    my %fcount;
+    my %fvcount;
+    my %fvprob;
+    my %fentropy;
+    # Create the initial language-feature-value hash but do not infer anything
+    # further yet. We may want to modify some features before we proceed.
+    foreach my $line (@{$data->{table}})
+    {
+        my $lcode = $line->[1];
+        push(@lcodes, $lcode);
+        for(my $i = 0; $i <= $#{$data->{features}}; $i++)
+        {
+            my $feature = $data->{features}[$i];
+            # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
+            $line->[$i] = 'nan' if(!defined($line->[$i]) || $line->[$i] eq '' || $line->[$i] eq 'nan');
+            # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
+            # If desired, we can convert question marks to 'nan' here.
+            $line->[$i] = 'nan' if($line->[$i] eq '?' && $qm_is_nan);
+            $lh{$lcode}{$feature} = $line->[$i];
+        }
+    }
+    $data->{lcodes} = \@lcodes;
+    $data->{lh} = \%lh;
+    # Modify features to improve prediction.
+    ###!!!modify_features($data);
+    # Now go on and fill the other hashes that depend solely on one language-feature-value triple.
+    foreach my $lcode (@lcodes)
+    {
+        # Remember observed features and values.
+        foreach my $feature (@{$data->{features}})
+        {
+            my $value = $lh{$lcode}{$feature};
+            unless($value eq 'nan' || $value eq '?')
+            {
+                $lhclean{$lcode}{$feature} = $value;
+                $fcount{$feature}++;
+                $fvcount{$feature}{$value}++;
+            }
+        }
+    }
+    # Compute unconditional probability of each feature value and entropy of each feature.
+    foreach my $f (@{$data->{features}})
+    {
+        $fentropy{$f} = 0;
+        next if($fcount{$f}==0);
+        foreach my $fv (sort(keys(%{$fvcount{$f}})))
+        {
+            my $p = $fvcount{$f}{$fv} / $fcount{$f};
+            if($p < 0 || $p > 1)
+            {
+                die("Something is wrong: p = $p");
+            }
+            $fvprob{$f}{$fv} = $p;
+            $fentropy{$f} -= $p * log($p);
+        }
+    }
+    $data->{lhclean} = \%lhclean;
+    $data->{fcount} = \%fcount;
+    $data->{fvcount} = \%fvcount;
+    $data->{fvprob} = \%fvprob;
+    $data->{fentropy} = \%fentropy;
+}
 
 
 
@@ -98,6 +188,7 @@ sub read_csv
     my $iline = 0;
     my @data; # the table, without the header line
     my $rcomma = chr(12289); # IDEOGRAPHIC COMMA
+    my $id = 0;
     while(<>)
     {
         $iline++;
@@ -114,6 +205,8 @@ sub read_csv
             if($original)
             {
                 @f = split(/\s+/, $_);
+                # Insert the column for the numeric id that we use in our format.
+                unshift(@f, '');
             }
             else
             {
@@ -127,6 +220,8 @@ sub read_csv
             if($original)
             {
                 @f = split(/\t/, $_);
+                # Insert the column for the numeric id that we use in our format.
+                unshift(@f, $id++);
             }
             else
             {
@@ -138,7 +233,11 @@ sub read_csv
             # However, the number of values must not be greater than the number of columns (which would happen if a value contained the separator character).
             if($n > $nf)
             {
-                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n.\n");
+                # Assume that it can be fixed by joining the last column with the extra columns.
+                my $ntojoin = $n-$nf+1;
+                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n. Joining the last $ntojoin fields.\n");
+                $f[$nf-1] = join('', @f[($nf-1)..($n-1)]);
+                splice(@f, $nf);
             }
             push(@data, \@f);
         }
