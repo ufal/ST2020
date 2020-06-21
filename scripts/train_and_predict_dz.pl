@@ -1088,32 +1088,32 @@ sub print_qm_analysis
 {
     my $data = shift;
     my @features = @{$data->{features}};
+    my @languages = @{$data->{lcodes}};
     my $nnan = 0;
     my $nqm = 0;
     my $nreg = 0;
-    foreach my $f (@features)
+    foreach my $l (@languages)
     {
-        my @values = keys(%{$data->{fvcount}{$f}});
-        foreach my $v (@values)
+        foreach my $feature (@{$data->{features}})
         {
-            if($v eq 'nan')
+            my $value = $data->{lh}{$l}{$feature};
+            if($value eq 'nan')
             {
-                $nnan += $data->{fvcount}{$f}{$v};
+                $nnan++;
             }
-            elsif($v eq '?')
+            elsif($value eq '?')
             {
-                $nqm += $data->{fvcount}{$f}{$v};
+                $nqm++;
             }
             else
             {
-                $nreg += $data->{fvcount}{$f}{$v};
+                $nreg++;
             }
         }
     }
     print STDERR ("Found $nnan nan values.\n");
     print STDERR ("Found $nqm ? values to be predicted.\n");
     print STDERR ("Found $nreg regular non-empty values.\n");
-    my @languages = @{$data->{lcodes}};
     my $nl = $data->{nl};
     my $sumqm = 0;
     my $sumreg = 0;
@@ -1131,7 +1131,7 @@ sub print_qm_analysis
         {
             $minreg = $nreg;
             $minreg_qm = $nqm;
-            $minreg_langname = $data->{lh}{name};
+            $minreg_langname = $data->{lh}{$l}{name};
         }
     }
     my $avgqm = $sumqm/$nl;
