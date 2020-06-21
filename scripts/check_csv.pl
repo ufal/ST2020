@@ -17,15 +17,62 @@ GetOptions
     'original' => \$original
 );
 
-my ($headers, $data) = read_csv();
-print("Found ", scalar(@{$headers}), " headers.\n");
-print("Found ", scalar(@{$data}), " language lines.\n");
+my %data = read_csv();
+print("Found ", scalar(@{$data{infeatures}}), " headers.\n");
+print("Found ", scalar(@{$data{table}}), " language lines.\n");
 
 
 
 #==============================================================================
 # Input and output functions.
 #==============================================================================
+
+
+
+#------------------------------------------------------------------------------
+# Takes the column headers (needed because of their order) and the current
+# language-feature hash with the newly predicted values and prints them as
+# a CSV file to STDOUT.
+#------------------------------------------------------------------------------
+sub write_csv
+{
+    my $data = shift; # hash ref
+    my @headers = map {escape_commas($_)} (@{$data->{infeatures}});
+    print(join(',', @headers), "\n");
+    my @lcodes = sort {$data->{lh}{$a}{index} <=> $data->{lh}{$b}{index}} (@{$data->{lcodes}});
+    foreach my $l (@lcodes)
+    {
+        my @values = map
+        {
+            # If we modified some values of some input features, restore the
+            # original values now.
+            my $v = exists($data->{restore}{$l}{$_}) ? $data->{restore}{$l}{$_} : $data->{lh}{$l}{$_};
+            escape_commas($v);
+        }
+        (@{$data->{infeatures}});
+        print(join(',', @values), "\n");
+    }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Takes a value of a CSV cell and makes sure that it is enclosed in quotation
+# marks if it contains a comma.
+#------------------------------------------------------------------------------
+sub escape_commas
+{
+    my $string = shift;
+    if($string =~ m/"/) # "
+    {
+        die("A CSV value must not contain a double quotation mark");
+    }
+    if($string =~ m/,/)
+    {
+        $string = '"'.$string.'"';
+    }
+    return $string;
+}
 
 
 
@@ -50,6 +97,7 @@ sub read_csv
     my $nf;
     my $iline = 0;
     my @data; # the table, without the header line
+    my $rcomma = chr(12289); # IDEOGRAPHIC COMMA
     while(<>)
     {
         $iline++;
@@ -99,7 +147,22 @@ sub read_csv
     {
         @ARGV = @oldargv;
     }
-    return (\@headers, \@data);
+    if(scalar(@headers) > 0 && $headers[0] eq '')
+    {
+        $headers[0] = 'index';
+    }
+    # We may want to add new combined features but we will not want to output them;
+    # therefore we must save the original list of features.
+    my @infeatures = @headers;
+    my %data =
+    (
+        'infeatures' => \@infeatures,
+        'features'   => \@headers,
+        'table'      => \@data,
+        'nf'         => scalar(@headers),
+        'nl'         => scalar(@data)
+    );
+    return %data;
 }
 
 
