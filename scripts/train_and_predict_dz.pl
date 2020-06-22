@@ -126,6 +126,22 @@ print STDERR ("Reading the training data...\n");
 my %traindata = Sigtypio::read_csv("$data_folder/train_y.csv");
 print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
+print STDERR ("Reading the development data...\n");
+my %devdata = Sigtypio::read_csv("$data_folder/dev_x.csv");
+# Read the gold standard development data. It will help us with debugging and error analysis.
+print STDERR ("Reading the development gold standard data...\n");
+my %devgdata = Sigtypio::read_csv("$data_folder/dev_y.csv");
+print STDERR ("Found $devdata{nf} headers.\n");
+print STDERR ("Found $devdata{nl} language lines.\n");
+print STDERR ("Reading the blind test data...\n");
+my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
+print STDERR ("Found $testdata{nf} headers.\n");
+print STDERR ("Found $testdata{nl} language lines.\n");
+print STDERR ("Comparing training and development data...\n");
+compare_data_sets(\%traindata, \%devdata);
+print STDERR ("Comparing training and test data...\n");
+compare_data_sets(\%traindata, \%testdata);
+# Everything is read. Now organize the data better.
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
 hash_features(\%traindata, 0);
@@ -134,13 +150,6 @@ if($config{print_hi})
 {
     print_hi(\%traindata);
 }
-print STDERR ("Reading the development data...\n");
-my %devdata = Sigtypio::read_csv("$data_folder/dev_x.csv");
-# Read the gold standard development data. It will help us with debugging and error analysis.
-print STDERR ("Reading the development gold standard data...\n");
-my %devgdata = Sigtypio::read_csv("$data_folder/dev_y.csv");
-print STDERR ("Found $devdata{nf} headers.\n");
-print STDERR ("Found $devdata{nl} language lines.\n");
 my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
@@ -153,10 +162,6 @@ print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
 Sigtypio::write_csv(\%devdata, "$output_folder/dz-dev.csv");
-print STDERR ("Reading the blind test data...\n");
-my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
-print STDERR ("Found $testdata{nf} headers.\n");
-print STDERR ("Found $testdata{nl} language lines.\n");
 my $ntestlangs = $testdata{nl};
 my $ntestfeats = $testdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ntestlangfeats = $ntestlangs*$ntestfeats;
@@ -880,7 +885,7 @@ sub modify_features
 
 
 #==============================================================================
-# Input and output functions.
+# Statistics and sanity checks.
 #==============================================================================
 
 
@@ -977,4 +982,40 @@ sub print_qm_analysis
     print STDERR ("On average, a language has $avgreg non-empty features and $avgqm features to predict.\n");
     print STDERR ("Minimum knowledge is $minreg non-empty features (language $minreg_langname); in that case, $minreg_qm features are to be predicted.\n");
     print STDERR ("Note that the non-empty features always include 8 non-typologic features: ord, code, name, latitude, longitude, genus, family, countrycodes.\n");
+}
+
+
+
+#------------------------------------------------------------------------------
+# Compares two data sets that have been just read (i.e., %data does not yet
+# contain hashed indexes). Looks for features that exist in one data set and
+# not in the other.
+#------------------------------------------------------------------------------
+sub compare_data_sets
+{
+    my $d1 = shift; # hash ref
+    my $d2 = shift; # hash ref
+    my $f1 = $d1->{features};
+    my $f2 = $d2->{features};
+    my %hf1;
+    foreach my $feature (@{$f1})
+    {
+        $hf1{$feature}++;
+    }
+    my %hf2;
+    foreach my $feature (@{$f2})
+    {
+        $hf2{$feature}++;
+        if(!exists($hf1{$feature}))
+        {
+            print STDERR ("Feature '$feature' exists only in the second dataset.\n");
+        }
+    }
+    foreach my $feature (@{$f1})
+    {
+        if(!exists($hf2{$feature}))
+        {
+            print STDERR ("Feature '$feature' exists only in the first dataset.\n");
+        }
+    }
 }
