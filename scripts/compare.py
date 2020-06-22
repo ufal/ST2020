@@ -57,3 +57,10 @@ for feat in total:
             better_1[feat] + better_2[feat],
             sep='\t')
 
+print('TOTAL',
+        percent(sum(correct_1.values()), sum(total.values())),
+        percent(sum(correct_2.values()), sum(total.values())),
+        percent(sum(correct_any.values()), sum(total.values())),
+        percent(sum(better_1.values()), sum(better_1.values()) + sum(better_2.values())),
+        sum(better_1.values()) + sum(better_2.values()),
+        sep='\t')
