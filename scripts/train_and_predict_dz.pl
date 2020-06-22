@@ -154,7 +154,7 @@ sub predict_masked_features
 {
     my $traindata = shift; # hash ref
     my $blinddata = shift; # hash ref
-    my $golddata = shift; # hash ref
+    my $golddata = shift; # hash ref; may be undefined for evaluation test data
     my $n_predicted = 0;
     my $n_predicted_correctly = 0;
     # Always process the languages in the same order so that diagnostic outputs can be compared.
@@ -162,7 +162,11 @@ sub predict_masked_features
     foreach my $language (@lcodes)
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
-        my $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
+        my $goldlhl;
+        if(defined($golddata))
+        {
+            $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
+        }
         if($config{debug})
         {
             print STDERR ("----------------------------------------------------------------------\n");
@@ -304,9 +308,16 @@ sub predict_masked_features
             }
         }
     }
-    print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
-    printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
-    print STDERR ("\n");
+    if(defined($golddata))
+    {
+        print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
+        printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
+        print STDERR ("\n");
+    }
+    else
+    {
+        print STDERR ("Predicted $n_predicted feature values. Accuracy is unknown because we cannot access the gold-standard data.\n");
+    }
 }
 
 
