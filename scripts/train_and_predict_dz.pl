@@ -121,6 +121,7 @@ GetOptions
 #==============================================================================
 
 my $data_folder = 'data';
+my $output_folder = 'outputs';
 print STDERR ("Reading the training data...\n");
 my %traindata = Sigtypio::read_csv("$data_folder/train_y.csv");
 print STDERR ("Found $traindata{nf} headers.\n");
@@ -151,7 +152,7 @@ print_qm_analysis(\%devdata);
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
-Sigtypio::write_csv(\%devdata);
+Sigtypio::write_csv(\%devdata, "$output_folder/dz-dev.csv");
 print STDERR ("Reading the blind test data...\n");
 my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
 print STDERR ("Found $testdata{nf} headers.\n");
@@ -166,7 +167,7 @@ print_qm_analysis(\%testdata);
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%testdata);
 print STDERR ("Writing the completed file...\n");
-Sigtypio::write_csv(\%testdata);
+Sigtypio::write_csv(\%testdata, "$output_folder/dz-test.csv");
 
 
 

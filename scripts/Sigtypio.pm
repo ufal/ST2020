@@ -1,6 +1,7 @@
 package Sigtypio;
 
 use utf8;
+use open ':utf8';
 use namespace::autoclean;
 
 use Carp;
@@ -15,8 +16,20 @@ use Carp;
 sub write_csv
 {
     my $data = shift; # hash ref
+    my $filename = shift; # optional path to the output file; if not present, we will write to STDOUT
+    if(defined($filename))
+    {
+        open(FILE, ">$filename") or confess("Cannot write '$filename': $!");
+    }
     my @headers = map {escape_commas($_)} (@{$data->{infeatures}});
-    print(join(',', @headers), "\n");
+    if(defined($filename))
+    {
+        print FILE (join(',', @headers), "\n");
+    }
+    else
+    {
+        print(join(',', @headers), "\n");
+    }
     my @lcodes = sort {$data->{lh}{$a}{index} <=> $data->{lh}{$b}{index}} (@{$data->{lcodes}});
     foreach my $l (@lcodes)
     {
@@ -28,7 +41,18 @@ sub write_csv
             escape_commas($v);
         }
         (@{$data->{infeatures}});
-        print(join(',', @values), "\n");
+        if(defined($filename))
+        {
+            print FILE (join(',', @values), "\n");
+        }
+        else
+        {
+            print(join(',', @values), "\n");
+        }
+    }
+    if(defined($filename))
+    {
+        close(FILE);
     }
 }
 
