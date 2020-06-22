@@ -280,4 +280,46 @@ sub restore_commas
 
 
 
+#------------------------------------------------------------------------------
+# Converts the input table to a hash. First part, no further sophisticated
+# indexing. The idea is that from now on, we will use {lh} instead of {table}.
+# Therefore we remove {table} at the end (nobody will update it if {lh}
+# changes). On the other hand, {features} is still useful and we keep it.
+# INPUT:
+#   {features} .... list of feature names
+#   {table} ....... table of feature values for each language
+# OUTPUT:
+#   {lcodes} ...... list of wals codes of known languages (index to lh)
+#   {lh} .......... data from {table} indexed by {language}{feature}
+#------------------------------------------------------------------------------
+sub convert_table_to_lh
+{
+    my $data = shift; # hash ref
+    my $qm_is_nan = shift; # convert question marks to 'nan'?
+    my @lcodes;
+    my %lh; # hash indexed by language code
+    # Create the initial language-feature-value hash but do not infer anything
+    # further yet. We may want to modify some features before we proceed.
+    foreach my $line (@{$data->{table}})
+    {
+        my $lcode = $line->[1];
+        push(@lcodes, $lcode);
+        for(my $i = 0; $i <= $#{$data->{features}}; $i++)
+        {
+            my $feature = $data->{features}[$i];
+            # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
+            $line->[$i] = 'nan' if(!defined($line->[$i]) || $line->[$i] eq '' || $line->[$i] eq 'nan');
+            # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
+            # If desired, we can convert question marks to 'nan' here.
+            $line->[$i] = 'nan' if($line->[$i] eq '?' && $qm_is_nan);
+            $lh{$lcode}{$feature} = $line->[$i];
+        }
+    }
+    $data->{lcodes} = \@lcodes;
+    $data->{lh} = \%lh;
+    delete($data->{table});
+}
+
+
+
 1;

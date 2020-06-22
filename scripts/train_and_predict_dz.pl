@@ -124,17 +124,21 @@ my $data_folder = 'data';
 my $output_folder = 'outputs';
 print STDERR ("Reading the training data...\n");
 my %traindata = Sigtypio::read_csv("$data_folder/train_y.csv");
+Sigtypio::convert_table_to_lh(\%traindata, 0);
 print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Reading the development data...\n");
 my %devdata = Sigtypio::read_csv("$data_folder/dev_x.csv");
+Sigtypio::convert_table_to_lh(\%devdata, 0);
 # Read the gold standard development data. It will help us with debugging and error analysis.
 print STDERR ("Reading the development gold standard data...\n");
 my %devgdata = Sigtypio::read_csv("$data_folder/dev_y.csv");
+Sigtypio::convert_table_to_lh(\%devgdata, 0);
 print STDERR ("Found $devdata{nf} headers.\n");
 print STDERR ("Found $devdata{nl} language lines.\n");
 print STDERR ("Reading the blind test data...\n");
 my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
+Sigtypio::convert_table_to_lh(\%testdata, 0);
 print STDERR ("Found $testdata{nf} headers.\n");
 print STDERR ("Found $testdata{nl} language lines.\n");
 print STDERR ("Comparing training and development data...\n");
@@ -144,7 +148,7 @@ compare_data_sets(\%traindata, \%testdata);
 # Everything is read. Now organize the data better.
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
-hash_features(\%traindata, 0);
+hash_features(\%traindata);
 compute_pairwise_cooccurrence(\%traindata);
 if($config{print_hi})
 {
@@ -154,8 +158,8 @@ my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
-hash_features(\%devdata, 0);
-hash_features(\%devgdata, 0);
+hash_features(\%devdata);
+hash_features(\%devgdata);
 print_qm_analysis(\%devdata);
 # Predict the masked features.
 print STDERR ("Predicting the masked features...\n");
@@ -166,7 +170,7 @@ my $ntestlangs = $testdata{nl};
 my $ntestfeats = $testdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ntestlangfeats = $ntestlangs*$ntestfeats;
 print STDERR ("$ntestlangs languages × $ntestfeats features would be $ntestlangfeats.\n");
-hash_features(\%testdata, 0);
+hash_features(\%testdata);
 print_qm_analysis(\%testdata);
 # Predict the masked features.
 print STDERR ("Predicting the masked features...\n");
@@ -527,9 +531,7 @@ sub model_information_vote
 
 
 #------------------------------------------------------------------------------
-# Converts the input table to hashes.
-#   {lcodes} ...... list of wals codes of known languages (index to lh)
-#   {lh} .......... data from {table} indexed by {language}{feature}
+# Reads the initial hash {lh} and indexes the data by further hashes.
 #   {restore} ..... like {lh} but only original values where we modified them
 #   {lhclean} ..... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
@@ -541,42 +543,20 @@ sub model_information_vote
 sub hash_features
 {
     my $data = shift; # hash ref
-    my $qm_is_nan = shift; # convert question marks to 'nan'?
-    my @lcodes;
-    my %lh; # hash indexed by language code
     my %lhclean; # like %lh but only non-empty values
     my %fcount;
     my %fvcount;
     my %fvprob;
     my %fentropy;
-    # Create the initial language-feature-value hash but do not infer anything
-    # further yet. We may want to modify some features before we proceed.
-    foreach my $line (@{$data->{table}})
-    {
-        my $lcode = $line->[1];
-        push(@lcodes, $lcode);
-        for(my $i = 0; $i <= $#{$data->{features}}; $i++)
-        {
-            my $feature = $data->{features}[$i];
-            # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
-            $line->[$i] = 'nan' if(!defined($line->[$i]) || $line->[$i] eq '' || $line->[$i] eq 'nan');
-            # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
-            # If desired, we can convert question marks to 'nan' here.
-            $line->[$i] = 'nan' if($line->[$i] eq '?' && $qm_is_nan);
-            $lh{$lcode}{$feature} = $line->[$i];
-        }
-    }
-    $data->{lcodes} = \@lcodes;
-    $data->{lh} = \%lh;
     # Modify features to improve prediction.
     modify_features($data);
     # Now go on and fill the other hashes that depend solely on one language-feature-value triple.
-    foreach my $lcode (@lcodes)
+    foreach my $lcode (@{$data->{lcodes}})
     {
         # Remember observed features and values.
         foreach my $feature (@{$data->{features}})
         {
-            my $value = $lh{$lcode}{$feature};
+            my $value = $data->{lh}{$lcode}{$feature};
             unless($value eq 'nan' || $value eq '?')
             {
                 $lhclean{$lcode}{$feature} = $value;
