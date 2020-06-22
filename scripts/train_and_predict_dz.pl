@@ -276,7 +276,6 @@ sub predict_masked_features
                 if($config{model} eq 'strongest')
                 {
                     ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_take_strongest(@model);
-                    print STDERR ("Score($language)($qf) = $blinddata->{scores}{$language}{$qf}\n");
                 }
                 elsif($config{model} eq 'vote')
                 {
@@ -367,8 +366,6 @@ sub predict_masked_features
     {
         print STDERR ("Predicted $n_predicted feature values. Accuracy is unknown because we cannot access the gold-standard data.\n");
     }
-    my $k = scalar(keys(%{$blinddata->{scores}}));
-    print STDERR ("DEBUG: BLINDDATA SCORES $k\n");
 }
 
 
