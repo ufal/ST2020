@@ -368,6 +368,8 @@ sub predict_masked_features
     {
         print STDERR ("Predicted $n_predicted feature values. Accuracy is unknown because we cannot access the gold-standard data.\n");
     }
+    my $k = scalar(keys(%{$blinddata->{scores}}));
+    print STDERR ("DEBUG: BLINDDATA SCORES $k\n");
 }
 
 
