@@ -277,6 +277,7 @@ sub predict_masked_features
                 if($config{model} eq 'strongest')
                 {
                     ($lhl->{$qf}, $shl->{$qf}) = model_take_strongest(@model);
+                    print STDERR ("Score = $shl->{$qf}\n");
                 }
                 elsif($config{model} eq 'vote')
                 {
