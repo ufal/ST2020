@@ -78,6 +78,8 @@ $config{latlon2d} = 0;
 # so latlon can enter pairs as a single feature.
 # --feats2d ... switch on pairs of features
 $config{feats2d} = 0;
+# Base name of the output files.
+$config{name} = 'dz';
 GetOptions
 (
     'debug=i'  => \$config{debug},
@@ -87,7 +89,8 @@ GetOptions
     'countrycodes=s' => \$config{countrycodes},
     'latlon=s' => \$config{latlon},
     'latlon2d' => \$config{latlon2d},
-    'feats2d'  => \$config{feats2d}
+    'feats2d'  => \$config{feats2d},
+    'name=s'   => \$config{name}
 );
 
 #==============================================================================
@@ -167,7 +170,7 @@ print_qm_analysis(\%devdata);
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
-Sigtypio::write_csv(\%devdata, "$output_folder/dz-dev.csv");
+Sigtypio::write_csv(\%devdata, "$output_folder/$config{name}-dev.csv");
 my $ntestlangs = $testdata{nl};
 my $ntestfeats = $testdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ntestlangfeats = $ntestlangs*$ntestfeats;
@@ -178,7 +181,7 @@ print_qm_analysis(\%testdata);
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%testdata);
 print STDERR ("Writing the completed file...\n");
-Sigtypio::write_csv(\%testdata, "$output_folder/dz-test.csv");
+Sigtypio::write_csv(\%testdata, "$output_folder/$config{name}-test.csv");
 
 
 
