@@ -916,6 +916,8 @@ sub read_csv
     my $iline = 0;
     my @data; # the table, without the header line
     my $rcomma = chr(12289); # IDEOGRAPHIC COMMA
+    my $id = 0;
+    my %feature_names;
     while(<>)
     {
         $iline++;
@@ -932,6 +934,8 @@ sub read_csv
             if($original)
             {
                 @f = split(/\s+/, $_);
+                # Insert the column for the numeric id that we use in our format.
+                unshift(@f, '');
             }
             else
             {
@@ -945,6 +949,8 @@ sub read_csv
             if($original)
             {
                 @f = split(/\t/, $_);
+                # Insert the column for the numeric id that we use in our format.
+                unshift(@f, $id++);
             }
             else
             {
@@ -956,9 +962,52 @@ sub read_csv
             # However, the number of values must not be greater than the number of columns (which would happen if a value contained the separator character).
             if($n > $nf)
             {
-                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n.\n");
+                # Assume that it can be fixed by joining the last column with the extra columns.
+                my $ntojoin = $n-$nf+1;
+                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n. Joining the last $ntojoin fields.\n");
+                $f[$nf-1] = join('', @f[($nf-1)..($n-1)]);
+                splice(@f, $nf);
+            }
+            # The original format has 8 columns, now 9 because we added the numeric index.
+            # The ninth column contains all the features. Remember their names.
+            if($original && scalar(@f)==9)
+            {
+                my @features = map {s/=.*//; $_} (split(/\|/, $f[8]));
+                foreach my $feature (@features)
+                {
+                    $feature_names{$feature}++;
+                }
             }
             push(@data, \@f);
+        }
+    }
+    # If we read the original format, split the features so that each has its own column.
+    if($original)
+    {
+        my @fnames = sort(keys(%feature_names));
+        splice(@headers, $#headers, 1, @fnames);
+        foreach my $row (@data)
+        {
+            my @features = split(/\|/, pop(@{$row}));
+            my %features;
+            foreach my $fv (@features)
+            {
+                if($fv =~ m/^(.+?)=(.+)$/)
+                {
+                    $features{$1} = $2;
+                }
+            }
+            foreach my $f (@fnames)
+            {
+                if(defined($features{$f}))
+                {
+                    push(@{$row}, $features{$f});
+                }
+                else
+                {
+                    push(@{$row}, 'nan');
+                }
+            }
         }
     }
     if($myfiles)
