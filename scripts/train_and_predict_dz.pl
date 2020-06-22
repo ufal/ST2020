@@ -998,4 +998,20 @@ sub compare_data_sets
             print STDERR ("Feature '$feature' exists only in the first dataset.\n");
         }
     }
+    # If the first set is for training and the second for dev or test, then we
+    # do not expect a language to appear in both sets.
+    my $l1 = $d1->{lcodes};
+    my $l2 = $d2->{lcodes};
+    my %hl1;
+    foreach my $lcode (@{$l1})
+    {
+        $hl1{$lcode}++;
+    }
+    foreach my $lcode (@{$l2})
+    {
+        if(exists($hl1{$lcode}))
+        {
+            print STDERR ("Language '$lcode' occurs in both sets.\n");
+        }
+    }
 }
