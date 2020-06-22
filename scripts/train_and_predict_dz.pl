@@ -210,7 +210,6 @@ sub predict_masked_features
     foreach my $language (@lcodes)
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
-        my $shl = $blinddata->{scores}{$language}; # hash ref: language => feature => score (only the predicted features)
         my $goldlhl;
         if(defined($golddata))
         {
@@ -276,8 +275,8 @@ sub predict_masked_features
                 # The global parameter $config{model} tells us how to use the scores to obtain the winner.
                 if($config{model} eq 'strongest')
                 {
-                    ($lhl->{$qf}, $shl->{$qf}) = model_take_strongest(@model);
-                    print STDERR ("Score($qf) = $shl->{$qf}\n");
+                    ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_take_strongest(@model);
+                    print STDERR ("Score($language)($qf) = $blinddata->{scores}{$language}{$qf}\n");
                 }
                 elsif($config{model} eq 'vote')
                 {
