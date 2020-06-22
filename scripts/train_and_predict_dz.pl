@@ -818,6 +818,23 @@ sub modify_features
             130,  # 118-130 East (West border of Yakutia, Amur Region, Eastern China, Korea, Taiwan, Philippines, Sulawesi, Western Australia)
             160   # 130-160 East (Yakutia, Southwestern Kamchatka, Japan, Papua New Guinea, Central and Eastern Australia)
         );
+        # For some specifically picked regions, register also directly their bounding box.
+        my @latlon =
+        (
+            # minlat, maxlat, minlon, maxlon, region
+            #[ 42,  60, -141, -114, 'pacusacan'], # Pacific USA and Canada
+            #[ 21,  42, -125,  -93, 'usamexico'], # Southwestern USA and Northern Mexico
+            [ 13,  21, -106,  -86, 'guatemala'], # Southern Mexico and Guatemala
+            #[ -7,   4,  -75,  -60, 'wamazonia'], # Western Amazonia
+            [  2,  18,  -17,   17, 'sahel'    ], # Western Sahel ###!!! First box that somewhat helps!
+            [ 34,  47,   17,   29, 'balkans'  ], # Balkans
+            #[ 41,  45,   38,   49, 'caucasus' ], # Caucasus
+            [  5,  26,   66,   91, 'india'    ], # India, Sri Lanka, Bangladesh but not Nepal and not easternmost India
+            #[  9,  37,   99,  123, 'indochina'], # Indochina, Southeastern China
+            #[-11,   0,  131,  151, 'newguinea'], # New Guinea
+            [-44, -11,  112,  154, 'australia'], # Australia
+            #[-50,  30,  163, -120, 'oceania'  ], # Oceania
+        );
         foreach my $lcode (@{$data->{lcodes}})
         {
             for(my $i = 0; $i < $#lat; $i++)
@@ -843,7 +860,30 @@ sub modify_features
             # which combines the latitude and longitude zones into 2D areas.
             if($config{latlon2d})
             {
-                my $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
+                my $zone2d;
+                # First try predefined regions. If none of them matches, use a
+                # combination of latitude zone and longitude zone.
+                # We must look at $restore{$lcode} because the coordinates in $data->{lh}{$lcode} have been zoned already!
+                foreach my $box (@latlon)
+                {
+                    if($restore{$lcode}{latitude} >= $box->[0] &&
+                       $restore{$lcode}{latitude} <= $box->[1] &&
+                       ($box->[2] <= $box->[3] &&
+                        $restore{$lcode}{longitude} >= $box->[2] &&
+                        $restore{$lcode}{longitude} <= $box->[3]) ||
+                       ($box->[2] > $box->[3] &&
+                        ($restore{$lcode}{longitude} >= $box->[2] ||
+                         $restore{$lcode}{longitude} <= $box->[3])))
+                    {
+                        $zone2d = $box->[4];
+                        #print STDERR ("A $data->{lh}{$lcode}{family} language located in $box->[4].\n");
+                        last;
+                    }
+                }
+                if(!defined($zone2d))
+                {
+                    $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
+                }
                 $data->{lh}{$lcode}{latlon} = $zone2d;
             }
         }
