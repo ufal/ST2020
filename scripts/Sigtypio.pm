@@ -59,6 +59,34 @@ sub write_csv
 
 
 #------------------------------------------------------------------------------
+# Takes the column headers (needed because of their order) and the current
+# language-feature-score hash with the scores of the newly predicted values
+# and prints the scores as a CSV file to STDOUT.
+#------------------------------------------------------------------------------
+sub write_scores
+{
+    my $data = shift; # hash ref
+    my $filename = shift;
+    open(FILE, ">$filename") or confess("Cannot write '$filename': $!");
+    my @headers = map {escape_commas($_)} (@{$data->{infeatures}});
+    print FILE (join(',', @headers), "\n");
+    my @lcodes = sort {$data->{lh}{$a}{index} <=> $data->{lh}{$b}{index}} (@{$data->{lcodes}});
+    foreach my $l (@lcodes)
+    {
+        my @values = map
+        {
+            my $v = exists($data->{scores}{$l}{$_}) ? $data->{scores}{$l}{$_} : 'inf';
+            escape_commas($v);
+        }
+        (@{$data->{infeatures}});
+        print FILE (join(',', @values), "\n");
+    }
+    close(FILE);
+}
+
+
+
+#------------------------------------------------------------------------------
 # Takes a value of a CSV cell and makes sure that it is enclosed in quotation
 # marks if it contains a comma.
 #------------------------------------------------------------------------------

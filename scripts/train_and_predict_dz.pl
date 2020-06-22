@@ -121,6 +121,8 @@ GetOptions
 #     {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
 #     {centropy} .. hash {f}{g} => conditional entropy(g|f)
 #     {information} ... hash {f}{g} => mutual information between f and g
+#   Filled by predict_masked_features()
+#     {scores} .... hash {language}{feature} => score of the predicted value in lh
 #==============================================================================
 
 my $data_folder = 'data';
@@ -171,6 +173,7 @@ print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
 Sigtypio::write_csv(\%devdata, "$output_folder/$config{name}-dev.csv");
+Sigtypio::write_scores(\%devdata, "$output_folder/$config{name}-dev-scores.csv");
 my $ntestlangs = $testdata{nl};
 my $ntestfeats = $testdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ntestlangfeats = $ntestlangs*$ntestfeats;
@@ -182,6 +185,7 @@ print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%testdata);
 print STDERR ("Writing the completed file...\n");
 Sigtypio::write_csv(\%testdata, "$output_folder/$config{name}-test.csv");
+Sigtypio::write_scores(\%testdata, "$output_folder/$config{name}-test-scores.csv");
 
 
 
@@ -198,11 +202,15 @@ sub predict_masked_features
     my $golddata = shift; # hash ref; may be undefined for evaluation test data
     my $n_predicted = 0;
     my $n_predicted_correctly = 0;
+    # We will also save the scores of the answers so that we can later assess their credibility.
+    my %scores; # $scores{$lcode}{$feature} = $score
+    $blinddata->{scores} = \%scores;
     # Always process the languages in the same order so that diagnostic outputs can be compared.
     my @lcodes = sort(@{$blinddata->{lcodes}});
     foreach my $language (@lcodes)
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
+        my $shl = $blinddata->{scores}{$language}; # hash ref: language => feature => score (only the predicted features)
         my $goldlhl;
         if(defined($golddata))
         {
@@ -268,7 +276,7 @@ sub predict_masked_features
                 # The global parameter $config{model} tells us how to use the scores to obtain the winner.
                 if($config{model} eq 'strongest')
                 {
-                    $lhl->{$qf} = model_take_strongest(@model);
+                    ($lhl->{$qf}, $shl->{$qf}) = model_take_strongest(@model);
                 }
                 elsif($config{model} eq 'vote')
                 {
@@ -472,7 +480,8 @@ sub model_take_strongest
 {
     my @model = sort_model(@_);
     my $prediction = $model[0]{v};
-    return $prediction;
+    my $score = $model[0]{score};
+    return ($prediction, $score);
 }
 
 
