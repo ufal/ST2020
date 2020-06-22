@@ -130,6 +130,7 @@ print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Reading the development data...\n");
 my %devdata = Sigtypio::read_csv("$data_folder/dev_x.csv");
 Sigtypio::convert_table_to_lh(\%devdata, 0);
+merge_data(\%traindata, \%devdata);
 # Read the gold standard development data. It will help us with debugging and error analysis.
 print STDERR ("Reading the development gold standard data...\n");
 my %devgdata = Sigtypio::read_csv("$data_folder/dev_y.csv");
@@ -139,6 +140,7 @@ print STDERR ("Found $devdata{nl} language lines.\n");
 print STDERR ("Reading the blind test data...\n");
 my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
 Sigtypio::convert_table_to_lh(\%testdata, 0);
+merge_data(\%traindata, \%testdata);
 print STDERR ("Found $testdata{nf} headers.\n");
 print STDERR ("Found $testdata{nl} language lines.\n");
 print STDERR ("Comparing training and development data...\n");
@@ -526,6 +528,37 @@ sub model_information_vote
     my @options = sort {my $r = $votes{$b} <=> $votes{$a}; $r = $a cmp $b unless($r); $r} (keys(%votes));
     my $prediction = $options[0];
     return $prediction;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Merges two datasets. Looks at {lh} and not at later more sophisticated
+# hashes, so it should be called early. Can be used to add non-blinded
+# information from the dev/test set to the training data. The first data set
+# is the target where additional information from the second data set will be
+# added.
+#------------------------------------------------------------------------------
+sub merge_data
+{
+    my $d1 = shift; # hash ref
+    my $d2 = shift; # hash ref
+    foreach my $lcode (@{$d2->{lcodes}})
+    {
+        # No language should originally be in both data sets. If it happens,
+        # ignore the language, i.e., keep its values from the target set.
+        unless(exists($d1->{lh}{$lcode}))
+        {
+            foreach my $feature (@{$d1->{features}})
+            {
+                my $value = $d2->{lh}{$lcode}{$feature};
+                # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
+                # In this function we also handle all question marks as empty values (we are copying test data but only the non-blind/input part of it).
+                $value = 'nan' if(!defined($value) || $value eq '' || $value eq 'nan' || $value eq '?');
+                $d1->{lh}{$lcode}{$feature} = $value;
+            }
+        }
+    }
 }
 
 
