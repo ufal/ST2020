@@ -277,6 +277,10 @@ sub predict_masked_features
                 {
                     ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_take_strongest(@model);
                 }
+                elsif($config{model} eq 'threshold')
+                {
+                    ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_strongest_threshold(@model);
+                }
                 elsif($config{model} eq 'vote')
                 {
                     $lhl->{$qf} = model_weighted_vote(@model);
@@ -316,7 +320,7 @@ sub predict_masked_features
                         if($config{debug} >= 2)
                         {
                             # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
-                            print STDERR ("SCORESULT WRONG $blinddata->{scores}{$language}{$qf}\n");
+                            print STDERR ("SCORESULT WRONG   $blinddata->{scores}{$language}{$qf}\n");
                             if(!is_gold_value_reachable(\@model, $goldlhl->{$qf}))
                             {
                                 print STDERR ("The gold-standard value is not reachable given the available features!\n");
@@ -487,6 +491,29 @@ sub model_take_strongest
     my @model = sort_model(@_);
     my $prediction = $model[0]{v};
     my $score = $model[0]{score};
+    return ($prediction, $score);
+}
+
+
+
+#------------------------------------------------------------------------------
+# Conditional vote. Take the strongest signal but if it is not strong enough
+# (score < threshold), organize a vote among three strongest signals.
+#------------------------------------------------------------------------------
+sub model_strongest_threshold
+{
+    my @model = sort_model(@_);
+    my $prediction = $model[0]{v};
+    my $score = $model[0]{score};
+    if($score < 2.1 && scalar(@model) >= 3 && $model[1]{v} ne $model[0]{v} && $model[2]{v} eq $model[1]{v})
+    {
+        my $score12 = $model[1]{score} + $model[2]{score};
+        if($score12 > $score)
+        {
+            $prediction = $model[1]{v};
+            $score = $score12;
+        }
+    }
     return ($prediction, $score);
 }
 
