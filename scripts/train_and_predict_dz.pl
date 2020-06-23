@@ -299,6 +299,11 @@ sub predict_masked_features
                             print STDERR ("Language $lhl->{name} feature $qf:\n");
                             print STDERR ("  correctly predicted == $lhl->{$qf}\n");
                         }
+                        if($config{debug} >= 2)
+                        {
+                            # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
+                            print STDERR ("SCORESULT CORRECT $blinddata->{scores}{$language}{$qf}\n");
+                        }
                     }
                     else
                     {
@@ -310,6 +315,8 @@ sub predict_masked_features
                         }
                         if($config{debug} >= 2)
                         {
+                            # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
+                            print STDERR ("SCORESULT WRONG $blinddata->{scores}{$language}{$qf}\n");
                             if(!is_gold_value_reachable(\@model, $goldlhl->{$qf}))
                             {
                                 print STDERR ("The gold-standard value is not reachable given the available features!\n");
