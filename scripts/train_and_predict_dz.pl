@@ -303,7 +303,7 @@ sub predict_masked_features
                             print STDERR ("Language $lhl->{name} feature $qf:\n");
                             print STDERR ("  correctly predicted == $lhl->{$qf}\n");
                         }
-                        if($config{debug} >= 2)
+                        if($config{debug} >= 3)
                         {
                             # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
                             print STDERR ("SCORESULT CORRECT $blinddata->{scores}{$language}{$qf}\n");
@@ -317,10 +317,13 @@ sub predict_masked_features
                             print STDERR ("  wrongly predicted   == $lhl->{$qf}\n");
                             print STDERR ("  should be           == $goldlhl->{$qf}\n");
                         }
-                        if($config{debug} >= 2)
+                        if($config{debug} >= 3)
                         {
                             # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
                             print STDERR ("SCORESULT WRONG   $blinddata->{scores}{$language}{$qf}\n");
+                        }
+                        if($config{debug} >= 2)
+                        {
                             if(!is_gold_value_reachable(\@model, $goldlhl->{$qf}))
                             {
                                 print STDERR ("The gold-standard value is not reachable given the available features!\n");
@@ -502,13 +505,15 @@ sub model_take_strongest
 #------------------------------------------------------------------------------
 sub model_strongest_threshold
 {
+    my $threshold = 2.1; # only do something special if score < $threshold
+    my $factor = 1.5; # second + third must be together better than $factor * first
     my @model = sort_model(@_);
     my $prediction = $model[0]{v};
     my $score = $model[0]{score};
-    if($score < 2.1 && scalar(@model) >= 3 && $model[1]{v} ne $model[0]{v} && $model[2]{v} eq $model[1]{v})
+    if($score < $threshold && scalar(@model) >= 3 && $model[1]{v} ne $model[0]{v} && $model[2]{v} eq $model[1]{v})
     {
         my $score12 = $model[1]{score} + $model[2]{score};
-        if($score12 > $score)
+        if($score12 > $score * $factor)
         {
             $prediction = $model[1]{v};
             $score = $score12;

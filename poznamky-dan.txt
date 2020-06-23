@@ -2,10 +2,7 @@ Repozitář github.com/ufal/ST2020 (založil Ruda).
 
 TO DO:
 
-Vylepšit analýzu chyb. Pokud nějaký rys předpovím špatně, byla vůbec šance předpovědět ho dobře, tj., stalo se
-v trénovacích datech alespoň jednou, že něco, co teď mám na vstupu, se vyskytlo spolu se správnou odpovědí?
-Soustředit se na případy, kde nějakou šanci máme. A spočítat, jaké procento případů je takových, že máme šanci;
-tohle bude horní mez úspěšnosti, které můžeme dosáhnout.
+Spočítat dílčí úspěšnost pro každý jazyk a každý rys.
 
 Countrycodes by možná byly užitečnější, kdybych rozsekal případy, kdy jeden jazyk má několik zemí, na binární
 rysy (countryCZ = yes).
@@ -14,9 +11,6 @@ Clustering jazyků podle vzdálenosti od jednoho z předem připravených bodů 
 Nebo k-means, ale místo náhodného rozmístění počátečních centroidů asi zase zvolit body ručně.
 
 Zakomponovat druh rysu, aby lexikální rys jako Hand_and_Arm nezávisel třeba na morfologii.
-
-Měli bychom otestovat, zda se na pořadí metod něco změní, když dostaneme na vstupu výrazně více nebo výrazně
-méně vyplněných rysů. (Organizátoři řekli, že těch rysů dostaneme "a handful". Nic přesnějšího nevíme.)
 
 Ještě se znova podívat na to, proč nefunguje hlasování více rysů.
 
