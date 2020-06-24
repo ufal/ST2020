@@ -389,10 +389,19 @@ sub predict_masked_features
         {
             $leval{$lcode}{accuracy} = $leval{$lcode}{correct} / $leval{$lcode}{total} * 100 unless($leval{$lcode}{total}==0);
         }
-        @lcodes = sort {$leval{$b}{accuracy} <=> $leval{$a}{accuracy}} (@lcodes);
+        @lcodes = sort
+        {
+            my $r = $leval{$b}{accuracy} <=> $leval{$a}{accuracy};
+            unless($r)
+            {
+                $r = $a cmp $b;
+            }
+            $r
+        }
+        (@lcodes);
         foreach my $lcode (@lcodes)
         {
-            printf STDERR ("  $lcode: %3d / %3d = %.2f%%\n", $leval{$lcode}{correct}, $leval{$lcode}{total}, $leval{$lcode}{accuracy});
+            printf STDERR ("  $lcode: %3d / %3d = %.2f%% : %s (%s/%s)\n", $leval{$lcode}{correct}, $leval{$lcode}{total}, $leval{$lcode}{accuracy}, $blinddata->{lh}{$lcode}{name}, $blinddata->{lh}{$lcode}{family}, $blinddata->{lh}{$lcode}{genus});
         }
         print STDERR ("Per-feature accuracy:\n");
         my @features = keys(%feval);
@@ -400,7 +409,16 @@ sub predict_masked_features
         {
             $feval{$feature}{accuracy} = $feval{$feature}{correct} / $feval{$feature}{total} * 100 unless($feval{$feature}{total}==0);
         }
-        @features = sort {$feval{$b}{accuracy} <=> $feval{$a}{accuracy}} (@features);
+        @features = sort
+        {
+            my $r = $feval{$b}{accuracy} <=> $feval{$a}{accuracy};
+            unless($r)
+            {
+                $r = $a cmp $b;
+            }
+            $r
+        }
+        (@features);
         foreach my $feature (@features)
         {
             printf STDERR ("  %3d / %3d = %.2f%% : %s\n", $feval{$feature}{correct}, $feval{$feature}{total}, $feval{$feature}{accuracy}, $feature);
