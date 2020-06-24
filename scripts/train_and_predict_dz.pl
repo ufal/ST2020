@@ -606,6 +606,7 @@ sub merge_data
                 # In this function we also handle all question marks as empty values (we are copying test data but only the non-blind/input part of it).
                 $value = 'nan' if(!defined($value) || $value eq '' || $value eq 'nan' || $value eq '?');
                 $d1->{lh}{$lcode}{$feature} = $value;
+                print STDERR ("MERGE: language $lcode, $feature = $value\n") unless($value eq 'nan');
             }
         }
     }
