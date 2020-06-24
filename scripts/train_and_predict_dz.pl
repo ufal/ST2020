@@ -135,7 +135,6 @@ print STDERR ("Found $traindata{nl} language lines.\n");
 print STDERR ("Reading the development data...\n");
 my %devdata = Sigtypio::read_csv("$data_folder/dev_x.csv");
 Sigtypio::convert_table_to_lh(\%devdata, 0);
-merge_data(\%traindata, \%devdata);
 # Read the gold standard development data. It will help us with debugging and error analysis.
 print STDERR ("Reading the development gold standard data...\n");
 my %devgdata = Sigtypio::read_csv("$data_folder/dev_y.csv");
@@ -145,13 +144,15 @@ print STDERR ("Found $devdata{nl} language lines.\n");
 print STDERR ("Reading the blind test data...\n");
 my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
 Sigtypio::convert_table_to_lh(\%testdata, 0);
-merge_data(\%traindata, \%testdata);
 print STDERR ("Found $testdata{nf} headers.\n");
 print STDERR ("Found $testdata{nl} language lines.\n");
+# First compare, then merge. Otherwise the comparing function will complain that a language occurs in both sets.
 print STDERR ("Comparing training and development data...\n");
 compare_data_sets(\%traindata, \%devdata);
 print STDERR ("Comparing training and test data...\n");
 compare_data_sets(\%traindata, \%testdata);
+merge_data(\%traindata, \%devdata);
+merge_data(\%traindata, \%testdata);
 # Everything is read. Now organize the data better.
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
