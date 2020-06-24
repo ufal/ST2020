@@ -201,8 +201,11 @@ sub predict_masked_features
     my $traindata = shift; # hash ref
     my $blinddata = shift; # hash ref
     my $golddata = shift; # hash ref; may be undefined for evaluation test data
+    # Variables used to evaluate the accuracy (total, per language, per feature).
     my $n_predicted = 0;
     my $n_predicted_correctly = 0;
+    my %leval; # $leval{$lcode}{correct|total}
+    my %feval; # $feval{$feature}{correct|total}
     # We will also save the scores of the answers so that we can later assess their credibility.
     my %scores; # $scores{$lcode}{$feature} = $score
     $blinddata->{scores} = \%scores;
@@ -233,6 +236,8 @@ sub predict_masked_features
         foreach my $qf (@qfeatures)
         {
             $n_predicted++;
+            $leval{$language}{total}++;
+            $feval{$qf}{total}++;
             my @model;
             foreach my $rf (@rfeatures)
             {
@@ -299,6 +304,8 @@ sub predict_masked_features
                     if($lhl->{$qf} eq $goldlhl->{$qf})
                     {
                         $n_predicted_correctly++;
+                        $leval{$language}{correct}++;
+                        $feval{$qf}{correct}++;
                         if($config{debug} >= 1)
                         {
                             print STDERR ("Language $lhl->{name} feature $qf:\n");
@@ -376,6 +383,28 @@ sub predict_masked_features
         print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
         printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
         print STDERR ("\n");
+        print STDERR ("Per-language accuracy:\n");
+        my @lcodes = keys(%leval);
+        foreach my $lcode (@lcodes)
+        {
+            $leval{$lcode}{accuracy} = $leval{$lcode}{correct} / $leval{$lcode}{total} * 100 unless($leval{$lcode}{total}==0);
+        }
+        @lcodes = sort {$leval{$b}{accuracy} <=> $leval{$a}{accuracy}} (@lcodes);
+        foreach my $lcode (@lcodes)
+        {
+            printf STDERR ("  $lcode: %3d / %3d = %.2f%%\n", $leval{$lcode}{correct}, $leval{$lcode}{total}, $leval{$lcode}{accuracy});
+        }
+        print STDERR ("Per-feature accuracy:\n");
+        my @features = keys(%feval);
+        foreach my $feature (@features)
+        {
+            $feval{$feature}{accuracy} = $feval{$feature}{correct} / $feval{$feature}{total} * 100 unless($feval{$feature}{total}==0);
+        }
+        @features = sort {$feval{$b}{accuracy} <=> $feval{$a}{accuracy}} (@features);
+        foreach my $feature (@features)
+        {
+            printf STDERR ("  %3d / %3d = %.2f%% : %s\n", $feval{$feature}{correct}, $feval{$feature}{total}, $feval{$feature}{accuracy}, $feature);
+        }
     }
     else
     {
