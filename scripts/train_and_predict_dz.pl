@@ -594,13 +594,14 @@ sub merge_data
     my $d1 = shift; # hash ref
     my $d2 = shift; # hash ref
     my $n = scalar(keys(%{$d1->{lh}}));
-    print STDERR ("The first data set contains $n languages before merging.\n");
+    #print STDERR ("The first data set contains $n languages before merging.\n");
     foreach my $lcode (@{$d2->{lcodes}})
     {
         # No language should originally be in both data sets. If it happens,
         # ignore the language, i.e., keep its values from the target set.
         unless(exists($d1->{lh}{$lcode}))
         {
+            push(@{$d1->{lcodes}}, $lcode);
             foreach my $feature (@{$d1->{features}})
             {
                 my $value = $d2->{lh}{$lcode}{$feature};
@@ -613,7 +614,7 @@ sub merge_data
         }
     }
     $n = scalar(keys(%{$d1->{lh}}));
-    print STDERR ("The first data set contains $n languages after merging.\n");
+    #print STDERR ("The first data set contains $n languages after merging.\n");
 }
 
 
