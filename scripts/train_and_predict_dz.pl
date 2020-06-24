@@ -15,6 +15,32 @@ binmode(STDIN, ':utf8');
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
 use Getopt::Long;
+# We need to tell Perl where to find my IO module.
+# If this does not work, you can put the script together with Sigtypio.pm
+# in a folder of you choice, say, /home/joe/scripts, and then
+# invoke Perl explicitly telling it where the modules are:
+# perl -I/home/joe/scripts /home/joe/scripts/train_and_predict_dz.pl ...
+BEGIN
+{
+    use Cwd;
+    my $path = $0;
+    $path =~ s/\\/\//g;
+    #print STDERR ("path=$path\n");
+    my $currentpath = getcwd();
+    $currentpath =~ s/\r?\n$//;
+    $libpath = $currentpath;
+    if($path =~ m:/:)
+    {
+        $path =~ s:/[^/]*$:/:;
+        chdir($path);
+        $libpath = getcwd();
+        chdir($currentpath);
+    }
+    $libpath =~ s/\r?\n$//;
+    #print STDERR ("libpath=$libpath\n");
+}
+use lib $libpath;
+use Sigtypio;
 
 my %config;
 # Possible debug levels:
@@ -52,6 +78,8 @@ $config{latlon2d} = 0;
 # so latlon can enter pairs as a single feature.
 # --feats2d ... switch on pairs of features
 $config{feats2d} = 0;
+# Base name of the output files.
+$config{name} = 'dz';
 GetOptions
 (
     'debug=i'  => \$config{debug},
@@ -61,7 +89,8 @@ GetOptions
     'countrycodes=s' => \$config{countrycodes},
     'latlon=s' => \$config{latlon},
     'latlon2d' => \$config{latlon2d},
-    'feats2d'  => \$config{feats2d}
+    'feats2d'  => \$config{feats2d},
+    'name=s'   => \$config{name}
 );
 
 #==============================================================================
@@ -92,55 +121,71 @@ GetOptions
 #     {jprob} ..... hash {f}{fv}{g}{gv} => joint probability(f=fv, g=gv)
 #     {centropy} .. hash {f}{g} => conditional entropy(g|f)
 #     {information} ... hash {f}{g} => mutual information between f and g
+#   Filled by predict_masked_features()
+#     {scores} .... hash {language}{feature} => score of the predicted value in lh
 #==============================================================================
 
 my $data_folder = 'data';
+my $output_folder = 'outputs';
 print STDERR ("Reading the training data...\n");
-my %traindata = read_csv("$data_folder/train_y.csv");
+my %traindata = Sigtypio::read_csv("$data_folder/train_y.csv");
+Sigtypio::convert_table_to_lh(\%traindata, 0);
 print STDERR ("Found $traindata{nf} headers.\n");
 print STDERR ("Found $traindata{nl} language lines.\n");
+print STDERR ("Reading the development data...\n");
+my %devdata = Sigtypio::read_csv("$data_folder/dev_x.csv");
+Sigtypio::convert_table_to_lh(\%devdata, 0);
+merge_data(\%traindata, \%devdata);
+# Read the gold standard development data. It will help us with debugging and error analysis.
+print STDERR ("Reading the development gold standard data...\n");
+my %devgdata = Sigtypio::read_csv("$data_folder/dev_y.csv");
+Sigtypio::convert_table_to_lh(\%devgdata, 0);
+print STDERR ("Found $devdata{nf} headers.\n");
+print STDERR ("Found $devdata{nl} language lines.\n");
+print STDERR ("Reading the blind test data...\n");
+my %testdata = Sigtypio::read_csv("$data_folder/test_x.csv");
+Sigtypio::convert_table_to_lh(\%testdata, 0);
+merge_data(\%traindata, \%testdata);
+print STDERR ("Found $testdata{nf} headers.\n");
+print STDERR ("Found $testdata{nl} language lines.\n");
+print STDERR ("Comparing training and development data...\n");
+compare_data_sets(\%traindata, \%devdata);
+print STDERR ("Comparing training and test data...\n");
+compare_data_sets(\%traindata, \%testdata);
+# Everything is read. Now organize the data better.
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
-hash_features(\%traindata, 0);
+hash_features(\%traindata);
 compute_pairwise_cooccurrence(\%traindata);
 if($config{print_hi})
 {
     print_hi(\%traindata);
 }
-print STDERR ("Reading the development data...\n");
-my %devdata = read_csv("$data_folder/dev_x.csv");
-# Read the gold standard development data. It will help us with debugging and error analysis.
-print STDERR ("Reading the development gold standard data...\n");
-my %devgdata = read_csv("$data_folder/dev_y.csv");
-print STDERR ("Found $devdata{nf} headers.\n");
-print STDERR ("Found $devdata{nl} language lines.\n");
 my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
 print STDERR ("$ndevlangs languages × $ndevfeats features would be $ndevlangfeats.\n");
-hash_features(\%devdata, 0);
-hash_features(\%devgdata, 0);
+hash_features(\%devdata);
+hash_features(\%devgdata);
 print_qm_analysis(\%devdata);
 # Predict the masked features.
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%devdata, \%devgdata);
 print STDERR ("Writing the completed file...\n");
-write_csv(\%devdata);
-print STDERR ("Reading the blind test data...\n");
-my %testdata = read_csv("$data_folder/test_x.csv");
-print STDERR ("Found $testdata{nf} headers.\n");
-print STDERR ("Found $testdata{nl} language lines.\n");
+Sigtypio::write_csv(\%devdata, "$output_folder/$config{name}-dev.csv");
+Sigtypio::write_scores(\%devdata, "$output_folder/$config{name}-dev-scores.csv");
 my $ntestlangs = $testdata{nl};
 my $ntestfeats = $testdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ntestlangfeats = $ntestlangs*$ntestfeats;
 print STDERR ("$ntestlangs languages × $ntestfeats features would be $ntestlangfeats.\n");
-hash_features(\%testdata, 0);
+hash_features(\%testdata);
 print_qm_analysis(\%testdata);
 # Predict the masked features.
 print STDERR ("Predicting the masked features...\n");
 predict_masked_features(\%traindata, \%testdata);
 print STDERR ("Writing the completed file...\n");
-write_csv(\%testdata);
+Sigtypio::write_csv(\%testdata, "$output_folder/$config{name}-test.csv");
+Sigtypio::write_scores(\%testdata, "$output_folder/$config{name}-test-scores.csv");
 
 
 
@@ -154,15 +199,22 @@ sub predict_masked_features
 {
     my $traindata = shift; # hash ref
     my $blinddata = shift; # hash ref
-    my $golddata = shift; # hash ref
+    my $golddata = shift; # hash ref; may be undefined for evaluation test data
     my $n_predicted = 0;
     my $n_predicted_correctly = 0;
+    # We will also save the scores of the answers so that we can later assess their credibility.
+    my %scores; # $scores{$lcode}{$feature} = $score
+    $blinddata->{scores} = \%scores;
     # Always process the languages in the same order so that diagnostic outputs can be compared.
     my @lcodes = sort(@{$blinddata->{lcodes}});
     foreach my $language (@lcodes)
     {
         my $lhl = $blinddata->{lh}{$language}; # hash ref: feature-value hash of one language
-        my $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
+        my $goldlhl;
+        if(defined($golddata))
+        {
+            $goldlhl = $golddata->{lh}{$language}; # hash ref: gold standard version of $lhl, used for debugging and analysis
+        }
         if($config{debug})
         {
             print STDERR ("----------------------------------------------------------------------\n");
@@ -223,7 +275,11 @@ sub predict_masked_features
                 # The global parameter $config{model} tells us how to use the scores to obtain the winner.
                 if($config{model} eq 'strongest')
                 {
-                    $lhl->{$qf} = model_take_strongest(@model);
+                    ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_take_strongest(@model);
+                }
+                elsif($config{model} eq 'threshold')
+                {
+                    ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_strongest_threshold(@model);
                 }
                 elsif($config{model} eq 'vote')
                 {
@@ -247,6 +303,11 @@ sub predict_masked_features
                             print STDERR ("Language $lhl->{name} feature $qf:\n");
                             print STDERR ("  correctly predicted == $lhl->{$qf}\n");
                         }
+                        if($config{debug} >= 3)
+                        {
+                            # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
+                            print STDERR ("SCORESULT CORRECT $blinddata->{scores}{$language}{$qf}\n");
+                        }
                     }
                     else
                     {
@@ -255,6 +316,11 @@ sub predict_masked_features
                             print STDERR ("Language $lhl->{name} feature $qf:\n");
                             print STDERR ("  wrongly predicted   == $lhl->{$qf}\n");
                             print STDERR ("  should be           == $goldlhl->{$qf}\n");
+                        }
+                        if($config{debug} >= 3)
+                        {
+                            # By grepping the SCORESULT lines, we can assess correlation between scores and correctness of the prediction.
+                            print STDERR ("SCORESULT WRONG   $blinddata->{scores}{$language}{$qf}\n");
                         }
                         if($config{debug} >= 2)
                         {
@@ -304,9 +370,16 @@ sub predict_masked_features
             }
         }
     }
-    print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
-    printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
-    print STDERR ("\n");
+    if(defined($golddata))
+    {
+        print STDERR ("Correctly predicted $n_predicted_correctly features out of $n_predicted total predictions");
+        printf STDERR (", accuracy = %.2f%%", $n_predicted_correctly / $n_predicted * 100) unless($n_predicted==0);
+        print STDERR ("\n");
+    }
+    else
+    {
+        print STDERR ("Predicted $n_predicted feature values. Accuracy is unknown because we cannot access the gold-standard data.\n");
+    }
 }
 
 
@@ -420,7 +493,33 @@ sub model_take_strongest
 {
     my @model = sort_model(@_);
     my $prediction = $model[0]{v};
-    return $prediction;
+    my $score = $model[0]{score};
+    return ($prediction, $score);
+}
+
+
+
+#------------------------------------------------------------------------------
+# Conditional vote. Take the strongest signal but if it is not strong enough
+# (score < threshold), organize a vote among three strongest signals.
+#------------------------------------------------------------------------------
+sub model_strongest_threshold
+{
+    my $threshold = 2.1; # only do something special if score < $threshold
+    my $factor = 1.5; # second + third must be together better than $factor * first
+    my @model = sort_model(@_);
+    my $prediction = $model[0]{v};
+    my $score = $model[0]{score};
+    if($score < $threshold && scalar(@model) >= 3 && $model[1]{v} ne $model[0]{v} && $model[2]{v} eq $model[1]{v})
+    {
+        my $score12 = $model[1]{score} + $model[2]{score};
+        if($score12 > $score * $factor)
+        {
+            $prediction = $model[1]{v};
+            $score = $score12;
+        }
+    }
+    return ($prediction, $score);
 }
 
 
@@ -484,9 +583,38 @@ sub model_information_vote
 
 
 #------------------------------------------------------------------------------
-# Converts the input table to hashes.
-#   {lcodes} ...... list of wals codes of known languages (index to lh)
-#   {lh} .......... data from {table} indexed by {language}{feature}
+# Merges two datasets. Looks at {lh} and not at later more sophisticated
+# hashes, so it should be called early. Can be used to add non-blinded
+# information from the dev/test set to the training data. The first data set
+# is the target where additional information from the second data set will be
+# added.
+#------------------------------------------------------------------------------
+sub merge_data
+{
+    my $d1 = shift; # hash ref
+    my $d2 = shift; # hash ref
+    foreach my $lcode (@{$d2->{lcodes}})
+    {
+        # No language should originally be in both data sets. If it happens,
+        # ignore the language, i.e., keep its values from the target set.
+        unless(exists($d1->{lh}{$lcode}))
+        {
+            foreach my $feature (@{$d1->{features}})
+            {
+                my $value = $d2->{lh}{$lcode}{$feature};
+                # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
+                # In this function we also handle all question marks as empty values (we are copying test data but only the non-blind/input part of it).
+                $value = 'nan' if(!defined($value) || $value eq '' || $value eq 'nan' || $value eq '?');
+                $d1->{lh}{$lcode}{$feature} = $value;
+            }
+        }
+    }
+}
+
+
+
+#------------------------------------------------------------------------------
+# Reads the initial hash {lh} and indexes the data by further hashes.
 #   {restore} ..... like {lh} but only original values where we modified them
 #   {lhclean} ..... like {lh} but contains only non-empty values (that are not
 #                   '', 'nan' or '?')
@@ -498,42 +626,20 @@ sub model_information_vote
 sub hash_features
 {
     my $data = shift; # hash ref
-    my $qm_is_nan = shift; # convert question marks to 'nan'?
-    my @lcodes;
-    my %lh; # hash indexed by language code
     my %lhclean; # like %lh but only non-empty values
     my %fcount;
     my %fvcount;
     my %fvprob;
     my %fentropy;
-    # Create the initial language-feature-value hash but do not infer anything
-    # further yet. We may want to modify some features before we proceed.
-    foreach my $line (@{$data->{table}})
-    {
-        my $lcode = $line->[1];
-        push(@lcodes, $lcode);
-        for(my $i = 0; $i <= $#{$data->{features}}; $i++)
-        {
-            my $feature = $data->{features}[$i];
-            # Make sure that a feature missing from the database is always indicated as 'nan' (normally 'nan' appears already in the input).
-            $line->[$i] = 'nan' if(!defined($line->[$i]) || $line->[$i] eq '' || $line->[$i] eq 'nan');
-            # Our convention: a question mark masks a feature value that is available in WALS but we want our model to predict it.
-            # If desired, we can convert question marks to 'nan' here.
-            $line->[$i] = 'nan' if($line->[$i] eq '?' && $qm_is_nan);
-            $lh{$lcode}{$feature} = $line->[$i];
-        }
-    }
-    $data->{lcodes} = \@lcodes;
-    $data->{lh} = \%lh;
     # Modify features to improve prediction.
     modify_features($data);
     # Now go on and fill the other hashes that depend solely on one language-feature-value triple.
-    foreach my $lcode (@lcodes)
+    foreach my $lcode (@{$data->{lcodes}})
     {
         # Remember observed features and values.
         foreach my $feature (@{$data->{features}})
         {
-            my $value = $lh{$lcode}{$feature};
+            my $value = $data->{lh}{$lcode}{$feature};
             unless($value eq 'nan' || $value eq '?')
             {
                 $lhclean{$lcode}{$feature} = $value;
@@ -762,6 +868,23 @@ sub modify_features
             130,  # 118-130 East (West border of Yakutia, Amur Region, Eastern China, Korea, Taiwan, Philippines, Sulawesi, Western Australia)
             160   # 130-160 East (Yakutia, Southwestern Kamchatka, Japan, Papua New Guinea, Central and Eastern Australia)
         );
+        # For some specifically picked regions, register also directly their bounding box.
+        my @latlon =
+        (
+            # minlat, maxlat, minlon, maxlon, region
+            #[ 42,  60, -141, -114, 'pacusacan'], # Pacific USA and Canada
+            #[ 21,  42, -125,  -93, 'usamexico'], # Southwestern USA and Northern Mexico
+            [ 13,  21, -106,  -86, 'guatemala'], # Southern Mexico and Guatemala
+            #[ -7,   4,  -75,  -60, 'wamazonia'], # Western Amazonia
+            [  2,  18,  -17,   17, 'sahel'    ], # Western Sahel ###!!! First box that somewhat helps!
+            [ 34,  47,   17,   29, 'balkans'  ], # Balkans
+            #[ 41,  45,   38,   49, 'caucasus' ], # Caucasus
+            [  5,  26,   66,   91, 'india'    ], # India, Sri Lanka, Bangladesh but not Nepal and not easternmost India
+            #[  9,  37,   99,  123, 'indochina'], # Indochina, Southeastern China
+            #[-11,   0,  131,  151, 'newguinea'], # New Guinea
+            [-44, -11,  112,  154, 'australia'], # Australia
+            #[-50,  30,  163, -120, 'oceania'  ], # Oceania
+        );
         foreach my $lcode (@{$data->{lcodes}})
         {
             for(my $i = 0; $i < $#lat; $i++)
@@ -787,7 +910,30 @@ sub modify_features
             # which combines the latitude and longitude zones into 2D areas.
             if($config{latlon2d})
             {
-                my $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
+                my $zone2d;
+                # First try predefined regions. If none of them matches, use a
+                # combination of latitude zone and longitude zone.
+                # We must look at $restore{$lcode} because the coordinates in $data->{lh}{$lcode} have been zoned already!
+                foreach my $box (@latlon)
+                {
+                    if($restore{$lcode}{latitude} >= $box->[0] &&
+                       $restore{$lcode}{latitude} <= $box->[1] &&
+                       ($box->[2] <= $box->[3] &&
+                        $restore{$lcode}{longitude} >= $box->[2] &&
+                        $restore{$lcode}{longitude} <= $box->[3]) ||
+                       ($box->[2] > $box->[3] &&
+                        ($restore{$lcode}{longitude} >= $box->[2] ||
+                         $restore{$lcode}{longitude} <= $box->[3])))
+                    {
+                        $zone2d = $box->[4];
+                        #print STDERR ("A $data->{lh}{$lcode}{family} language located in $box->[4].\n");
+                        last;
+                    }
+                }
+                if(!defined($zone2d))
+                {
+                    $zone2d = $data->{lh}{$lcode}{latitude}.';'.$data->{lh}{$lcode}{longitude};
+                }
                 $data->{lh}{$lcode}{latlon} = $zone2d;
             }
         }
@@ -842,208 +988,8 @@ sub modify_features
 
 
 #==============================================================================
-# Input and output functions.
+# Statistics and sanity checks.
 #==============================================================================
-
-
-
-#------------------------------------------------------------------------------
-# Takes the column headers (needed because of their order) and the current
-# language-feature hash with the newly predicted values and prints them as
-# a CSV file to STDOUT.
-#------------------------------------------------------------------------------
-sub write_csv
-{
-    my $data = shift; # hash ref
-    my @headers = map {escape_commas($_)} (@{$data->{infeatures}});
-    print(join(',', @headers), "\n");
-    my @lcodes = sort {$data->{lh}{$a}{index} <=> $data->{lh}{$b}{index}} (@{$data->{lcodes}});
-    foreach my $l (@lcodes)
-    {
-        my @values = map
-        {
-            # If we modified some values of some input features, restore the
-            # original values now.
-            my $v = exists($data->{restore}{$l}{$_}) ? $data->{restore}{$l}{$_} : $data->{lh}{$l}{$_};
-            escape_commas($v);
-        }
-        (@{$data->{infeatures}});
-        print(join(',', @values), "\n");
-    }
-}
-
-
-
-#------------------------------------------------------------------------------
-# Takes a value of a CSV cell and makes sure that it is enclosed in quotation
-# marks if it contains a comma.
-#------------------------------------------------------------------------------
-sub escape_commas
-{
-    my $string = shift;
-    if($string =~ m/"/) # "
-    {
-        die("A CSV value must not contain a double quotation mark");
-    }
-    if($string =~ m/,/)
-    {
-        $string = '"'.$string.'"';
-    }
-    return $string;
-}
-
-
-
-#------------------------------------------------------------------------------
-# Reads the input CSV (comma-separated values) file: either from STDIN, or from
-# files supplied as arguments. Returns a list of column headers and a list of
-# table rows (both as array refs).
-#------------------------------------------------------------------------------
-sub read_csv
-{
-    # @_ can optionally contain the list of files to read from.
-    # If it does not exist, @ARGV will be tried. If it is empty, read from STDIN.
-    my $myfiles = 0;
-    my @oldargv;
-    if(scalar(@_) > 0)
-    {
-        $myfiles = 1;
-        @oldargv = @ARGV;
-        @ARGV = @_;
-    }
-    my @headers = ();
-    my $nf;
-    my $iline = 0;
-    my @data; # the table, without the header line
-    my $rcomma = chr(12289); # IDEOGRAPHIC COMMA
-    while(<>)
-    {
-        $iline++;
-        s/\r?\n$//;
-        # In the non-original (comma-separated) file, we must distinguish commas inside quotes from those outside.
-        unless($original)
-        {
-            $_ = process_quoted_commas($_, $rcomma);
-        }
-        my @f = ();
-        if(scalar(@headers)==0)
-        {
-            # In the original dev.csv, the headers are separated by one or more spaces, while the rest is separated by tabulators!
-            if($original)
-            {
-                @f = split(/\s+/, $_);
-            }
-            else
-            {
-                @f = split(/,/, $_);
-            }
-            @headers = map {restore_commas($_, $rcomma)} (@f);
-            $nf = scalar(@headers);
-        }
-        else
-        {
-            if($original)
-            {
-                @f = split(/\t/, $_);
-            }
-            else
-            {
-                @f = split(/,/, $_);
-            }
-            @f = map {restore_commas($_, $rcomma)} (@f);
-            my $n = scalar(@f);
-            # The number of values may be less than the number of columns if the trailing columns are empty.
-            # However, the number of values must not be greater than the number of columns (which would happen if a value contained the separator character).
-            if($n > $nf)
-            {
-                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n.\n");
-            }
-            push(@data, \@f);
-        }
-    }
-    if($myfiles)
-    {
-        @ARGV = @oldargv;
-    }
-    if(scalar(@headers) > 0 && $headers[0] eq '')
-    {
-        $headers[0] = 'index';
-    }
-    # We may want to add new combined features but we will not want to output them;
-    # therefore we must save the original list of features.
-    my @infeatures = @headers;
-    my %data =
-    (
-        'infeatures' => \@infeatures,
-        'features'   => \@headers,
-        'table'      => \@data,
-        'nf'         => scalar(@headers),
-        'nl'         => scalar(@data)
-    );
-    return %data;
-}
-
-
-
-#------------------------------------------------------------------------------
-# Substitutes commas surrounded by quotation marks. Removes quotation marks.
-#------------------------------------------------------------------------------
-sub process_quoted_commas
-{
-    my $string = shift;
-    my $rcomma = shift; # the replacement
-    # We will replace inside commas by another character.
-    # Perform a sanity check first: the replacement character must not appear in the input.
-    if($string =~ m/$rcomma/)
-    {
-        die("Want to use '$rcomma' as a replacement for comma but it occurs in the input.");
-    }
-    my @inchars = split(//, $string);
-    my @outchars = ();
-    my $inside = 0;
-    foreach my $char (@inchars)
-    {
-        # Assume that the quotation mark always has the special function and never occurs as a part of the value.
-        if($char eq '"')
-        {
-            if($inside)
-            {
-                $inside = 0;
-            }
-            else
-            {
-                $inside = 1;
-            }
-        }
-        else
-        {
-            if($inside && $char eq ',')
-            {
-                push(@outchars, $rcomma);
-            }
-            else
-            {
-                push(@outchars, $char);
-            }
-        }
-    }
-    $string = join('', @outchars);
-    return $string;
-}
-
-
-
-#------------------------------------------------------------------------------
-# Once the input line has been split to fields, the commas in the fields can be
-# restored.
-#------------------------------------------------------------------------------
-sub restore_commas
-{
-    my $string = shift;
-    my $rcomma = shift; # the replacement
-    $string =~ s/$rcomma/,/g;
-    return $string;
-}
 
 
 
@@ -1139,4 +1085,56 @@ sub print_qm_analysis
     print STDERR ("On average, a language has $avgreg non-empty features and $avgqm features to predict.\n");
     print STDERR ("Minimum knowledge is $minreg non-empty features (language $minreg_langname); in that case, $minreg_qm features are to be predicted.\n");
     print STDERR ("Note that the non-empty features always include 8 non-typologic features: ord, code, name, latitude, longitude, genus, family, countrycodes.\n");
+}
+
+
+
+#------------------------------------------------------------------------------
+# Compares two data sets that have been just read (i.e., %data does not yet
+# contain hashed indexes). Looks for features that exist in one data set and
+# not in the other.
+#------------------------------------------------------------------------------
+sub compare_data_sets
+{
+    my $d1 = shift; # hash ref
+    my $d2 = shift; # hash ref
+    my $f1 = $d1->{features};
+    my $f2 = $d2->{features};
+    my %hf1;
+    foreach my $feature (@{$f1})
+    {
+        $hf1{$feature}++;
+    }
+    my %hf2;
+    foreach my $feature (@{$f2})
+    {
+        $hf2{$feature}++;
+        if(!exists($hf1{$feature}))
+        {
+            print STDERR ("Feature '$feature' exists only in the second dataset.\n");
+        }
+    }
+    foreach my $feature (@{$f1})
+    {
+        if(!exists($hf2{$feature}))
+        {
+            print STDERR ("Feature '$feature' exists only in the first dataset.\n");
+        }
+    }
+    # If the first set is for training and the second for dev or test, then we
+    # do not expect a language to appear in both sets.
+    my $l1 = $d1->{lcodes};
+    my $l2 = $d2->{lcodes};
+    my %hl1;
+    foreach my $lcode (@{$l1})
+    {
+        $hl1{$lcode}++;
+    }
+    foreach my $lcode (@{$l2})
+    {
+        if(exists($hl1{$lcode}))
+        {
+            print STDERR ("Language '$lcode' occurs in both sets.\n");
+        }
+    }
 }

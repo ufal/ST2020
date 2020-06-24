@@ -6,6 +6,6 @@ Only the strongest signal (source feature) is taken, all other source features a
 Unreliable countrycodes=US is replaced by countrycodes=nan.
 Latitude and longitude grouped into wide zones; added a combined latlon feature.
 
-( perl scripts/train_and_predict_dz.pl --score plogcinf --model strongest --countrycodes nous --latlon zones --latlon2d --debug 1 > outputs/cond_prob_info_nous_latlon2d.csv ) |& tee outputs/cond_prob_info_nous_latlon2d.debug
-Correctly predicted 1151 features out of 1596 total predictions, accuracy = 72.12%
+perl scripts/train_and_predict_dz.pl --score plogcinf --model strongest --countrycodes nous --latlon zones --latlon2d --name cond_prob_info_nous_latlon2d --debug 1 |& tee outputs/cond_prob_info_nous_latlon2d.debug
 
+Correctly predicted 1158 features out of 1596 total predictions, accuracy = 72.56%
