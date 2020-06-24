@@ -28,7 +28,7 @@ Language Acholi feature Comitatives_and_Instrumentals:
   wrongly predicted   == 2 Differentiation
   should be           == 1 Identity
 Language Acholi feature Definite_Articles:
-  wrongly predicted   == 1 Definite word distinct from demonstrative
+  wrongly predicted   == 5 No definite or indefinite article
   should be           == 3 Definite affix
 Language Acholi feature Expression_of_Pronominal_Subjects:
   correctly predicted == 2 Subject affixes on verb
@@ -106,7 +106,8 @@ Language Aguacatec feature Number_of_Non-Derived_Basic_Colour_Categories:
 Language Aguacatec feature The_Velar_Nasal:
   correctly predicted == 3 No velar nasal
 Language Aguacatec feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
-  correctly predicted == 2 Long vowel
+  wrongly predicted   == 1 No weight
+  should be           == 2 Long vowel
 ----------------------------------------------------------------------
 Language ame (Amele, Trans-New Guinea/Madang, nan):
   79 features known, 79 features to be predicted.
@@ -134,12 +135,13 @@ Language Amele feature Conjunctions_and_Universal_Quantifiers:
 Language Amele feature Consonant-Vowel_Ratio:
   correctly predicted == 3 Average
 Language Amele feature Distance_Contrasts_in_Demonstratives:
-  correctly predicted == 3 Three-way contrast
+  wrongly predicted   == 2 Two-way contrast
+  should be           == 3 Three-way contrast
 Language Amele feature Distributive_Numerals:
-  wrongly predicted   == 4 Marked by suffix
-  should be           == 1 No distributive numerals
+  correctly predicted == 1 No distributive numerals
 Language Amele feature Ditransitive_Constructions:_The_Verb_'Give':
-  correctly predicted == 1 Indirect-object construction
+  wrongly predicted   == 3 Secondary-object construction
+  should be           == 1 Indirect-object construction
 Language Amele feature Epistemic_Possibility:
   correctly predicted == 3 Other
 Language Amele feature Exponence_of_Selected_Inflectional_Formatives:
@@ -197,8 +199,7 @@ Language Amele feature Optional_Double_Negation_in_SOV_languages:
 Language Amele feature Order_of_Adposition_and_Noun_Phrase:
   correctly predicted == 1 Postpositions
 Language Amele feature Order_of_Degree_Word_and_Adjective:
-  wrongly predicted   == 1 Degree word-Adjective
-  should be           == 2 Adjective-Degree word
+  correctly predicted == 2 Adjective-Degree word
 Language Amele feature Order_of_Demonstrative_and_Noun:
   correctly predicted == 2 Noun-Demonstrative
 Language Amele feature Order_of_Numeral_and_Noun:
@@ -229,7 +230,7 @@ Language Amele feature Position_of_Pronominal_Possessive_Affixes:
 Language Amele feature Position_of_Tense-Aspect_Affixes:
   correctly predicted == 2 Tense-aspect suffixes
 Language Amele feature Predicative_Possession:
-  wrongly predicted   == 3 Topic
+  wrongly predicted   == 5 'Have'
   should be           == 4 Conjunctional
 Language Amele feature Presence_of_Uncommon_Consonants:
   wrongly predicted   == 1 None
@@ -243,7 +244,7 @@ Language Amele feature Rhythm_Types:
   wrongly predicted   == 1 Trochaic
   should be           == 5 No rhythmic stress
 Language Amele feature SONegV_Order:
-  wrongly predicted   == 8 No SONegV
+  wrongly predicted   == 1 Word&NoDoubleNeg
   should be           == 3 Word&OptDoubleNeg
 Language Amele feature Sex-based_and_Non-sex-based_Gender_Systems:
   correctly predicted == 1 No gender
@@ -258,9 +259,11 @@ Language Amele feature The_Associative_Plural:
   wrongly predicted   == 1 Associative same as additive plural
   should be           == 4 No associative plural
 Language Amele feature The_Future_Tense:
-  correctly predicted == 1 Inflectional future exists
+  wrongly predicted   == 2 No inflectional future
+  should be           == 1 Inflectional future exists
 Language Amele feature The_Morphological_Imperative:
-  correctly predicted == 5 No second-person imperatives
+  wrongly predicted   == 1 Second singular and second plural
+  should be           == 5 No second-person imperatives
 Language Amele feature The_Past_Tense:
   wrongly predicted   == 1 Present, no remoteness distinctions
   should be           == 2 Present, 2-3 remoteness distinctions
@@ -284,7 +287,7 @@ Language Amele feature Verbal_Number_and_Suppletion:
 Language Amele feature Verbal_Person_Marking:
   correctly predicted == 5 Both the A and P arguments
 Language Amele feature Voicing_and_Gaps_in_Plosive_Systems:
-  wrongly predicted   == 1 Other
+  wrongly predicted   == 2 None missing in /p t k b d g/
   should be           == 3 Missing /p/
 Language Amele feature Voicing_in_Plosives_and_Fricatives:
   wrongly predicted   == 1 No voicing contrast
@@ -372,8 +375,7 @@ Language Athpare feature Internally-headed_relative_clauses:
 Language Athpare feature NegSOV_Order:
   correctly predicted == 4 No NegSOV
 Language Athpare feature Order_of_Adjective_and_Noun:
-  wrongly predicted   == 2 Noun-Adjective
-  should be           == 1 Adjective-Noun
+  correctly predicted == 1 Adjective-Noun
 Language Athpare feature Order_of_Numeral_and_Noun:
   wrongly predicted   == 2 Noun-Numeral
   should be           == 1 Numeral-Noun
@@ -396,8 +398,7 @@ Language Athpare feature Relationship_between_the_Order_of_Object_and_Verb_and_t
 Language Athpare feature SNegOV_Order:
   correctly predicted == 4 No SNegOV
 Language Athpare feature The_Morphological_Imperative:
-  wrongly predicted   == 5 No second-person imperatives
-  should be           == 1 Second singular and second plural
+  correctly predicted == 1 Second singular and second plural
 Language Athpare feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
   correctly predicted == 6 SO[V-Neg]
 Language Athpare feature The_Prohibitive:
@@ -410,11 +411,9 @@ Language Bari feature Alignment_of_Verbal_Person_Marking:
   wrongly predicted   == 2 Accusative
   should be           == 1 Neutral
 Language Bari feature Definite_Articles:
-  wrongly predicted   == 1 Definite word distinct from demonstrative
-  should be           == 5 No definite or indefinite article
+  correctly predicted == 5 No definite or indefinite article
 Language Bari feature Indefinite_Articles:
-  wrongly predicted   == 2 Indefinite word same as 'one'
-  should be           == 5 No definite or indefinite article
+  correctly predicted == 5 No definite or indefinite article
 Language Bari feature Minor_morphological_means_of_signaling_negation:
   correctly predicted == 4 None
 Language Bari feature Negative_Morphemes:
@@ -453,7 +452,8 @@ Language Bari feature Third_Person_Zero_of_Verbal_Person_Marking:
 Language Bari feature Verbal_Person_Marking:
   correctly predicted == 1 No person marking
 Language Bari feature Zero_Copula_for_Predicate_Nominals:
-  correctly predicted == 1 Impossible
+  wrongly predicted   == 2 Possible
+  should be           == 1 Impossible
 ----------------------------------------------------------------------
 Language bel (Belhare, Sino-Tibetan/Mahakiranti, nan):
   29 features known, 30 features to be predicted.
@@ -467,8 +467,7 @@ Language Belhare feature Exponence_of_Tense-Aspect-Mood_Inflection:
 Language Belhare feature Fusion_of_Selected_Inflectional_Formatives:
   correctly predicted == 1 Exclusively concatenative
 Language Belhare feature Genitives,_Adjectives_and_Relative_Clauses:
-  wrongly predicted   == 1 Weakly differentiated
-  should be           == 6 Highly differentiated
+  correctly predicted == 6 Highly differentiated
 Language Belhare feature Inflectional_Synthesis_of_the_Verb:
   wrongly predicted   == 2 2-3 categories per word
   should be           == 4 6-7 categories per word
@@ -508,13 +507,11 @@ Language Belhare feature Para-Linguistic_Usages_of_Clicks:
   wrongly predicted   == 1 Logical meanings
   should be           == 3 Other or none
 Language Belhare feature Position_of_Case_Affixes:
-  wrongly predicted   == 9 No case affixes or adpositional clitics
-  should be           == 1 Case suffixes
+  correctly predicted == 1 Case suffixes
 Language Belhare feature Position_of_Polar_Question_Particles:
   correctly predicted == 2 Final
 Language Belhare feature Position_of_Pronominal_Possessive_Affixes:
-  wrongly predicted   == 4 No possessive affixes
-  should be           == 1 Possessive prefixes
+  correctly predicted == 1 Possessive prefixes
 Language Belhare feature Possessive_Classification:
   correctly predicted == 1 No possessive classification
 Language Belhare feature Postverbal_Negative_Morphemes:
@@ -528,16 +525,14 @@ Language Belhare feature Relationship_between_the_Order_of_Object_and_Verb_and_t
 Language Belhare feature The_Associative_Plural:
   correctly predicted == 1 Associative same as additive plural
 Language Belhare feature The_Morphological_Imperative:
-  wrongly predicted   == 5 No second-person imperatives
-  should be           == 1 Second singular and second plural
+  correctly predicted == 1 Second singular and second plural
 Language Belhare feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
   correctly predicted == 17 OptDoubleNeg
 ----------------------------------------------------------------------
 Language bii (Biri, Pama-Nyungan/Northern Pama-Nyungan, nan):
   30 features known, 15 features to be predicted.
 Language Biri feature Ditransitive_Constructions:_The_Verb_'Give':
-  wrongly predicted   == 2 Double-object construction
-  should be           == 1 Indirect-object construction
+  correctly predicted == 1 Indirect-object construction
 Language Biri feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
   wrongly predicted   == 2 Inclusive and exclusive differentiated
   should be           == 1 No inclusive/exclusive opposition
@@ -589,8 +584,7 @@ Language Waimaha feature Lateral_Consonants:
 Language Waimaha feature Presence_of_Uncommon_Consonants:
   correctly predicted == 1 None
 Language Waimaha feature Syllable_Structure:
-  wrongly predicted   == 2 Moderately complex
-  should be           == 1 Simple
+  correctly predicted == 1 Simple
 Language Waimaha feature Uvular_Consonants:
   correctly predicted == 1 None
 Language Waimaha feature Voicing_and_Gaps_in_Plosive_Systems:
@@ -694,8 +688,7 @@ Language Barasano feature Order_of_Adverbial_Subordinator_and_Clause:
   wrongly predicted   == 2 Final subordinator word
   should be           == 4 Subordinating suffix
 Language Barasano feature Order_of_Demonstrative_and_Noun:
-  wrongly predicted   == 2 Noun-Demonstrative
-  should be           == 1 Demonstrative-Noun
+  correctly predicted == 1 Demonstrative-Noun
 Language Barasano feature Order_of_Genitive_and_Noun:
   correctly predicted == 1 Genitive-Noun
 Language Barasano feature Order_of_Object,_Oblique,_and_Verb:
@@ -719,8 +712,7 @@ Language Barasano feature Other_Roles_of_Applied_Objects:
 Language Barasano feature Person_Marking_on_Adpositions:
   correctly predicted == 2 No person marking
 Language Barasano feature Polar_Questions:
-  wrongly predicted   == 1 Question particle
-  should be           == 2 Interrogative verb morphology
+  correctly predicted == 2 Interrogative verb morphology
 Language Barasano feature Politeness_Distinctions_in_Pronouns:
   correctly predicted == 1 No politeness distinction
 Language Barasano feature Position_of_Interrogative_Phrases_in_Content_Questions:
@@ -752,7 +744,7 @@ Language Barasano feature The_Associative_Plural:
 Language Barasano feature The_Future_Tense:
   correctly predicted == 2 No inflectional future
 Language Barasano feature The_Prohibitive:
-  wrongly predicted   == 2 Normal imperative + special negative
+  wrongly predicted   == 3 Special imperative + normal negative
   should be           == 1 Normal imperative + normal negative
 Language Barasano feature The_Velar_Nasal:
   correctly predicted == 3 No velar nasal
@@ -788,8 +780,7 @@ Language Cakchiquel feature Order_of_Demonstrative_and_Noun:
 Language Cakchiquel feature Order_of_Subject_and_Verb:
   correctly predicted == 2 VS
 Language Cakchiquel feature Ordinal_Numerals:
-  wrongly predicted   == 7 First, second, three-th
-  should be           == 6 First, two-th, three-th
+  correctly predicted == 6 First, two-th, three-th
 Language Cakchiquel feature Position_of_Interrogative_Phrases_in_Content_Questions:
   correctly predicted == 1 Initial interrogative phrase
 Language Cakchiquel feature Postnominal_relative_clauses:
@@ -817,8 +808,7 @@ Language Chuj feature Double_negation_in_verb-initial_languages:
   wrongly predicted   == 4 NegNegVSO
   should be           == 15 VOS & NegVNeg
 Language Chuj feature Hand_and_Arm:
-  wrongly predicted   == 2 Different
-  should be           == 1 Identical
+  correctly predicted == 1 Identical
 Language Chuj feature Order_of_Adposition_and_Noun_Phrase:
   correctly predicted == 2 Prepositions
 Language Chuj feature Order_of_Demonstrative_and_Noun:
@@ -840,8 +830,7 @@ Language Chuj feature Postnominal_relative_clauses:
 Language Chuj feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
   correctly predicted == 4 VO and NRel
 Language Chuj feature The_Morphological_Imperative:
-  wrongly predicted   == 5 No second-person imperatives
-  should be           == 1 Second singular and second plural
+  correctly predicted == 1 Second singular and second plural
 Language Chuj feature Verb-Initial_with_Clause-Final_Negative:
   correctly predicted == 4 No clause-final neg
 Language Chuj feature Verb-Initial_with_Preverbal_Negative:
@@ -883,14 +872,13 @@ Language cmy (Chontal Maya, Mayan/Mayan, nan):
 Language Chontal Maya feature Coding_of_Nominal_Plurality:
   correctly predicted == 2 Plural suffix
 Language Chontal Maya feature Definite_Articles:
-  wrongly predicted   == 5 No definite or indefinite article
-  should be           == 1 Definite word distinct from demonstrative
+  correctly predicted == 1 Definite word distinct from demonstrative
 Language Chontal Maya feature Expression_of_Pronominal_Subjects:
   correctly predicted == 2 Subject affixes on verb
 Language Chontal Maya feature Finger_and_Hand:
   correctly predicted == 2 Different
 Language Chontal Maya feature Indefinite_Articles:
-  wrongly predicted   == 5 No definite or indefinite article
+  wrongly predicted   == 2 Indefinite word same as 'one'
   should be           == 4 No indefinite, but definite article
 Language Chontal Maya feature Minor_morphological_means_of_signaling_negation:
   correctly predicted == 4 None
@@ -911,8 +899,7 @@ Language Chontal Maya feature Order_of_Relative_Clause_and_Noun:
 Language Chontal Maya feature Order_of_Subject,_Object_and_Verb:
   correctly predicted == 2 SVO
 Language Chontal Maya feature Position_of_Case_Affixes:
-  wrongly predicted   == 1 Case suffixes
-  should be           == 9 No case affixes or adpositional clitics
+  correctly predicted == 9 No case affixes or adpositional clitics
 Language Chontal Maya feature Position_of_Polar_Question_Particles:
   correctly predicted == 6 No question particle
 Language Chontal Maya feature Position_of_Pronominal_Possessive_Affixes:
@@ -949,8 +936,7 @@ Language Chortí feature The_Prohibitive:
 Language col (Chol, Mayan/Mayan, nan):
   11 features known, 2 features to be predicted.
 Language Chol feature Hand_and_Arm:
-  wrongly predicted   == 2 Different
-  should be           == 1 Identical
+  correctly predicted == 1 Identical
 Language Chol feature Reduplication:
   correctly predicted == 1 Productive full and partial reduplication
 ----------------------------------------------------------------------
@@ -1001,8 +987,7 @@ Language Carapana feature Finger_and_Hand:
 Language Carapana feature Order_of_Adjective_and_Noun:
   correctly predicted == 2 Noun-Adjective
 Language Carapana feature Order_of_Demonstrative_and_Noun:
-  wrongly predicted   == 2 Noun-Demonstrative
-  should be           == 1 Demonstrative-Noun
+  correctly predicted == 1 Demonstrative-Noun
 Language Carapana feature Order_of_Numeral_and_Noun:
   correctly predicted == 1 Numeral-Noun
 Language Carapana feature Position_of_Tense-Aspect_Affixes:
@@ -1111,8 +1096,7 @@ Language Ubykh feature Order_of_Relative_Clause_and_Noun:
 Language Ubykh feature Position_of_Polar_Question_Particles:
   correctly predicted == 6 No question particle
 Language Ubykh feature Position_of_Pronominal_Possessive_Affixes:
-  wrongly predicted   == 2 Possessive suffixes
-  should be           == 1 Possessive prefixes
+  correctly predicted == 1 Possessive prefixes
 Language Ubykh feature Predicative_Adjectives:
   correctly predicted == 1 Verbal encoding
 Language Ubykh feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
@@ -1471,13 +1455,11 @@ Language Ungarinjin feature Gender_Distinctions_in_Independent_Personal_Pronouns
   wrongly predicted   == 6 No gender distinctions
   should be           == 3 3rd person singular only
 Language Ungarinjin feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
-  wrongly predicted   == 3 No inclusive/exclusive
-  should be           == 5 Inclusive/exclusive
+  correctly predicted == 5 Inclusive/exclusive
 Language Ungarinjin feature Lateral_Consonants:
   correctly predicted == 2 /l/, no obstruent laterals
 Language Ungarinjin feature Locus_of_Marking_in_Possessive_Noun_Phrases:
-  wrongly predicted   == 1 Head marking
-  should be           == 2 Dependent marking
+  correctly predicted == 2 Dependent marking
 Language Ungarinjin feature M-T_Pronouns:
   correctly predicted == 1 No M-T pronouns
 Language Ungarinjin feature M_in_Second_Person_Singular:
@@ -1515,23 +1497,22 @@ Language Ungarinjin feature Order_of_Subject,_Object_and_Verb:
 Language Ungarinjin feature Order_of_Subject_and_Verb:
   correctly predicted == 1 SV
 Language Ungarinjin feature Person_Marking_on_Adpositions:
-  wrongly predicted   == 2 No person marking
-  should be           == 1 No adpositions
+  correctly predicted == 1 No adpositions
 Language Ungarinjin feature Plurality_in_Independent_Personal_Pronouns:
-  correctly predicted == 5 Person-number stem + pronominal plural affix
+  wrongly predicted   == 4 Person-number stem
+  should be           == 5 Person-number stem + pronominal plural affix
 Language Ungarinjin feature Position_of_Case_Affixes:
   wrongly predicted   == 9 No case affixes or adpositional clitics
   should be           == 6 Postpositional clitics
 Language Ungarinjin feature Position_of_Interrogative_Phrases_in_Content_Questions:
   correctly predicted == 2 Not initial interrogative phrase
 Language Ungarinjin feature Position_of_Pronominal_Possessive_Affixes:
-  wrongly predicted   == 2 Possessive suffixes
+  wrongly predicted   == 1 Possessive prefixes
   should be           == 3 Prefixes and suffixes
 Language Ungarinjin feature Postnominal_relative_clauses:
   correctly predicted == 1 Noun-Relative clause (NRel) dominant
 Language Ungarinjin feature Purpose_Clauses:
-  wrongly predicted   == 1 Balanced
-  should be           == 3 Deranked
+  correctly predicted == 3 Deranked
 Language Ungarinjin feature Reduplication:
   correctly predicted == 1 Productive full and partial reduplication
 Language Ungarinjin feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
@@ -1654,15 +1635,15 @@ Language Urubú-Kaapor feature Distance_Contrasts_in_Demonstratives:
 Language Urubú-Kaapor feature Ditransitive_Constructions:_The_Verb_'Give':
   correctly predicted == 1 Indirect-object construction
 Language Urubú-Kaapor feature Epistemic_Possibility:
-  correctly predicted == 3 Other
+  wrongly predicted   == 2 Affixes on verbs
+  should be           == 3 Other
 Language Urubú-Kaapor feature Expression_of_Pronominal_Subjects:
   correctly predicted == 2 Subject affixes on verb
 Language Urubú-Kaapor feature Finger_and_Hand:
   wrongly predicted   == 2 Different
   should be           == 1 Identical
 Language Urubú-Kaapor feature Fixed_Stress_Locations:
-  wrongly predicted   == 1 No fixed stress
-  should be           == 7 Ultimate
+  correctly predicted == 7 Ultimate
 Language Urubú-Kaapor feature Glottalized_Consonants:
   correctly predicted == 1 No glottalized consonants
 Language Urubú-Kaapor feature Hand_and_Arm:
@@ -1841,7 +1822,7 @@ Language Uru feature Relationship_between_the_Order_of_Object_and_Verb_and_the_O
   wrongly predicted   == 2 OV and NAdj
   should be           == 5 Other
 Language Uru feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
-  wrongly predicted   == 14 Other NegV
+  wrongly predicted   == 3 SONegV
   should be           == 18 SV&OV&NegV
 ----------------------------------------------------------------------
 Language ute (Ute, Uto-Aztecan/Numic, nan):
@@ -2010,7 +1991,8 @@ Language vaf (Vafsi, Indo-European/Iranian, IR):
 Language Vafsi feature Conjunctions_and_Universal_Quantifiers:
   correctly predicted == 1 Formally different
 Language Vafsi feature Genitives,_Adjectives_and_Relative_Clauses:
-  correctly predicted == 6 Highly differentiated
+  wrongly predicted   == 2 Genitives and adjectives collapsed
+  should be           == 6 Highly differentiated
 Language Vafsi feature Nominal_and_Verbal_Conjunction:
   correctly predicted == 1 Identity
 Language Vafsi feature Numeral_Classifiers:
@@ -2198,7 +2180,8 @@ Language Vietnamese feature Negative_Morphemes:
 Language Vietnamese feature Nominal_and_Locational_Predication:
   correctly predicted == 1 Different
 Language Vietnamese feature Noun_Phrase_Conjunction:
-  correctly predicted == 1 'And' different from 'with'
+  wrongly predicted   == 2 'And' identical to 'with'
+  should be           == 1 'And' different from 'with'
 Language Vietnamese feature Number_of_Cases:
   correctly predicted == 1 No morphological case-marking
 Language Vietnamese feature Number_of_Genders:
@@ -2350,8 +2333,7 @@ Language Votic feature Ordinal_Numerals:
 Language Votic feature Weight-Sensitive_Stress:
   correctly predicted == 8 Fixed stress (no weight-sensitivity)
 Language Votic feature Zero_Copula_for_Predicate_Nominals:
-  wrongly predicted   == 2 Possible
-  should be           == 1 Impossible
+  correctly predicted == 1 Impossible
 ----------------------------------------------------------------------
 Language wag (Wagiman, Wagiman/Wagiman, AU):
   16 features known, 14 features to be predicted.
@@ -2413,7 +2395,7 @@ Language wak (Wakhi, Indo-European/Iranian, AF PK TJ):
 Language Wakhi feature Coding_of_Nominal_Plurality:
   correctly predicted == 2 Plural suffix
 Language Wakhi feature Definite_Articles:
-  wrongly predicted   == 4 No definite, but indefinite article
+  wrongly predicted   == 1 Definite word distinct from demonstrative
   should be           == 2 Demonstrative word used as definite article
 Language Wakhi feature Negative_Morphemes:
   correctly predicted == 2 Negative particle
@@ -2434,7 +2416,7 @@ Language Wakhi feature Position_of_Tense-Aspect_Affixes:
 Language Wakhi feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
   correctly predicted == 2 Strongly suffixing
 Language Wakhi feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  wrongly predicted   == 2 OV and NAdj
+  wrongly predicted   == 5 Other
   should be           == 1 OV and AdjN
 Language Wakhi feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
   wrongly predicted   == 5 Other
@@ -2452,8 +2434,7 @@ Language Wappo feature Consonant-Vowel_Ratio:
   wrongly predicted   == 5 High
   should be           == 4 Moderately high
 Language Wappo feature Consonant_Inventories:
-  wrongly predicted   == 5 Large
-  should be           == 4 Moderately large
+  correctly predicted == 4 Moderately large
 Language Wappo feature Internally-headed_relative_clauses:
   correctly predicted == 1 Internally-headed relative clause dominant
 Language Wappo feature M-T_Pronouns:
@@ -2714,7 +2695,8 @@ Language Washo feature Position_of_Polar_Question_Particles:
 Language Washo feature Position_of_Pronominal_Possessive_Affixes:
   correctly predicted == 1 Possessive prefixes
 Language Washo feature Possessive_Classification:
-  correctly predicted == 2 Two classes
+  wrongly predicted   == 1 No possessive classification
+  should be           == 2 Two classes
 Language Washo feature Postverbal_Negative_Morphemes:
   correctly predicted == 2 [V-Neg]
 Language Washo feature Preverbal_Negative_Morphemes:
@@ -2768,7 +2750,8 @@ Language Watjarri feature Position_of_Case_Affixes:
   wrongly predicted   == 1 Case suffixes
   should be           == 6 Postpositional clitics
 Language Watjarri feature Position_of_Pronominal_Possessive_Affixes:
-  correctly predicted == 2 Possessive suffixes
+  wrongly predicted   == 4 No possessive affixes
+  should be           == 2 Possessive suffixes
 Language Watjarri feature Position_of_Tense-Aspect_Affixes:
   correctly predicted == 2 Tense-aspect suffixes
 Language Watjarri feature Postverbal_Negative_Morphemes:
@@ -2855,7 +2838,7 @@ Language Wichí feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
   wrongly predicted   == 3 No inclusive/exclusive
   should be           == 2 'We' the same as 'I'
 Language Wichí feature Inflectional_Synthesis_of_the_Verb:
-  wrongly predicted   == 5 8-9 categories per word
+  wrongly predicted   == 3 4-5 categories per word
   should be           == 2 2-3 categories per word
 Language Wichí feature Locus_of_Marking_in_the_Clause:
   correctly predicted == 3 Double marking
@@ -2977,7 +2960,8 @@ Language Wichí feature The_Perfect:
 Language Wichí feature The_Position_of_Negative_Morphemes_in_SVO_Languages:
   correctly predicted == 13 More than one construction
 Language Wichí feature The_Prohibitive:
-  correctly predicted == 4 Special imperative + special negative
+  wrongly predicted   == 2 Normal imperative + special negative
+  should be           == 4 Special imperative + special negative
 Language Wichí feature Third_Person_Zero_of_Verbal_Person_Marking:
   wrongly predicted   == 2 No zero realization
   should be           == 5 Zero in all 3rd person forms
@@ -2988,16 +2972,15 @@ Language Wichí feature Voicing_and_Gaps_in_Plosive_Systems:
 Language Wichí feature Vowel_Nasalization:
   correctly predicted == 2 Contrast absent
 Language Wichí feature Vowel_Quality_Inventories:
-  wrongly predicted   == 1 Small (2-4)
-  should be           == 2 Average (5-6)
+  correctly predicted == 2 Average (5-6)
 ----------------------------------------------------------------------
 Language wdo (Western Desert (Ooldea), Pama-Nyungan/Western Pama-Nyungan, AU):
   17 features known, 5 features to be predicted.
 Language Western Desert (Ooldea) feature Consonant-Vowel_Ratio:
-  correctly predicted == 4 Moderately high
-Language Western Desert (Ooldea) feature Consonant_Inventories:
   wrongly predicted   == 3 Average
-  should be           == 2 Moderately small
+  should be           == 4 Moderately high
+Language Western Desert (Ooldea) feature Consonant_Inventories:
+  correctly predicted == 2 Moderately small
 Language Western Desert (Ooldea) feature Glottalized_Consonants:
   correctly predicted == 1 No glottalized consonants
 Language Western Desert (Ooldea) feature Uvular_Consonants:
@@ -3017,7 +3000,7 @@ Language Welsh (Colloquial) feature Position_of_Negative_Word_With_Respect_to_Su
   wrongly predicted   == 4 SVONeg
   should be           == 10 VSNegO
 Language Welsh (Colloquial) feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
-  wrongly predicted   == 6 End, not immed postverbal
+  wrongly predicted   == 3 Immed preverbal
   should be           == 5 Postverbal, not immed or end
 Language Welsh (Colloquial) feature Postverbal_Negative_Morphemes:
   correctly predicted == 1 VNeg
@@ -3162,8 +3145,7 @@ Language Wichita feature Consonant-Vowel_Ratio:
   wrongly predicted   == 5 High
   should be           == 3 Average
 Language Wichita feature Consonant_Inventories:
-  wrongly predicted   == 1 Small
-  should be           == 3 Average
+  correctly predicted == 3 Average
 Language Wichita feature Fixed_Stress_Locations:
   correctly predicted == 1 No fixed stress
 Language Wichita feature Front_Rounded_Vowels:
@@ -3179,7 +3161,7 @@ Language Wichita feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
 Language Wichita feature Indefinite_Pronouns:
   correctly predicted == 1 Interrogative-based
 Language Wichita feature Inflectional_Synthesis_of_the_Verb:
-  wrongly predicted   == 5 8-9 categories per word
+  wrongly predicted   == 3 4-5 categories per word
   should be           == 7 12-13 categories per word
 Language Wichita feature Locus_of_Marking:_Whole-language_Typology:
   correctly predicted == 1 Head-marking
@@ -3214,7 +3196,8 @@ Language Wichita feature Order_of_Subject,_Object_and_Verb:
 Language Wichita feature Order_of_Subject_and_Verb:
   correctly predicted == 3 No dominant order
 Language Wichita feature Passive_Constructions:
-  correctly predicted == 2 Absent
+  wrongly predicted   == 1 Present
+  should be           == 2 Absent
 Language Wichita feature Perfective/Imperfective_Aspect:
   correctly predicted == 1 Grammatical marking
 Language Wichita feature Plurality_in_Independent_Personal_Pronouns:
@@ -3306,7 +3289,8 @@ Language Wikchamni feature Position_of_Tense-Aspect_Affixes:
 Language Wikchamni feature Reduplication:
   correctly predicted == 1 Productive full and partial reduplication
 Language Wikchamni feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  correctly predicted == 5 Other
+  wrongly predicted   == 1 OV and AdjN
+  should be           == 5 Other
 Language Wikchamni feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   correctly predicted == 5 Other
 Language Wikchamni feature The_Velar_Nasal:
@@ -3331,8 +3315,7 @@ Language Wintu feature Consonant-Vowel_Ratio:
   wrongly predicted   == 5 High
   should be           == 4 Moderately high
 Language Wintu feature Consonant_Inventories:
-  wrongly predicted   == 5 Large
-  should be           == 4 Moderately large
+  correctly predicted == 4 Moderately large
 Language Wintu feature Finger_and_Hand:
   wrongly predicted   == 2 Different
   should be           == 1 Identical
@@ -3351,7 +3334,8 @@ Language Wintu feature Number_of_Cases:
 Language Wintu feature Obligatory_Double_Negation:
   correctly predicted == 2 Neg[V-Neg]
 Language Wintu feature Obligatory_Possessive_Inflection:
-  correctly predicted == 1 Exists
+  wrongly predicted   == 2 Absent
+  should be           == 1 Exists
 Language Wintu feature Order_of_Adverbial_Subordinator_and_Clause:
   wrongly predicted   == 1 Initial subordinator word
   should be           == 4 Subordinating suffix
@@ -3360,8 +3344,7 @@ Language Wintu feature Order_of_Object,_Oblique,_and_Verb:
 Language Wintu feature Order_of_Object_and_Verb:
   correctly predicted == 3 No dominant order
 Language Wintu feature Order_of_Person_Markers_on_the_Verb:
-  wrongly predicted   == 3 P precedes A
-  should be           == 1 A and P do not or do not both occur on the verb
+  correctly predicted == 1 A and P do not or do not both occur on the verb
 Language Wintu feature Person_Marking_on_Adpositions:
   correctly predicted == 1 No adpositions
 Language Wintu feature Position_of_Case_Affixes:
@@ -3407,7 +3390,8 @@ Language Wintu feature Zero_Marking_of_A_and_P_Arguments:
 Language wir (Wirangu, Pama-Nyungan/Central Pama-Nyungan, AU):
   16 features known, 5 features to be predicted.
 Language Wirangu feature Ditransitive_Constructions:_The_Verb_'Give':
-  correctly predicted == 1 Indirect-object construction
+  wrongly predicted   == 3 Secondary-object construction
+  should be           == 1 Indirect-object construction
 Language Wirangu feature Hand_and_Arm:
   correctly predicted == 2 Different
 Language Wirangu feature Negative_Morphemes:
@@ -3431,8 +3415,7 @@ Language Wiyot feature Consonant-Vowel_Ratio:
   wrongly predicted   == 5 High
   should be           == 4 Moderately high
 Language Wiyot feature Definite_Articles:
-  wrongly predicted   == 3 Definite affix
-  should be           == 2 Demonstrative word used as definite article
+  correctly predicted == 2 Demonstrative word used as definite article
 Language Wiyot feature Expression_of_Pronominal_Subjects:
   wrongly predicted   == 3 Subject clitics on variable host
   should be           == 2 Subject affixes on verb
@@ -3469,8 +3452,7 @@ Language Wiyot feature Polar_Questions:
 Language Wiyot feature Position_of_Interrogative_Phrases_in_Content_Questions:
   correctly predicted == 1 Initial interrogative phrase
 Language Wiyot feature Position_of_Polar_Question_Particles:
-  wrongly predicted   == 6 No question particle
-  should be           == 3 Second position
+  correctly predicted == 3 Second position
 Language Wiyot feature Postverbal_Negative_Morphemes:
   wrongly predicted   == 4 None
   should be           == 2 [V-Neg]
@@ -3675,8 +3657,7 @@ Language West Makian feature Alignment_of_Verbal_Person_Marking:
 Language West Makian feature Consonant-Vowel_Ratio:
   correctly predicted == 3 Average
 Language West Makian feature Consonant_Inventories:
-  wrongly predicted   == 3 Average
-  should be           == 2 Moderately small
+  correctly predicted == 2 Moderately small
 Language West Makian feature Minor_morphological_means_of_signaling_negation:
   correctly predicted == 4 None
 Language West Makian feature Nonperiphrastic_Causative_Constructions:
@@ -3786,8 +3767,7 @@ Language Woisika feature Consonant-Vowel_Ratio:
   wrongly predicted   == 3 Average
   should be           == 1 Low
 Language Woisika feature Consonant_Inventories:
-  wrongly predicted   == 3 Average
-  should be           == 2 Moderately small
+  correctly predicted == 2 Moderately small
 Language Woisika feature Fixed_Stress_Locations:
   wrongly predicted   == 6 Penultimate
   should be           == 1 No fixed stress
@@ -3900,7 +3880,7 @@ Language Wapishana feature Voicing_in_Plosives_and_Fricatives:
 Language Wapishana feature Vowel_Quality_Inventories:
   wrongly predicted   == 2 Average (5-6)
   should be           == 1 Small (2-4)
-Correctly predicted 1158 features out of 1596 total predictions, accuracy = 72.56%
+Correctly predicted 1178 features out of 1596 total predictions, accuracy = 73.81%
 Writing the completed file...
 149 languages × 190 features would be 28310.
 Found 21899 nan values.
@@ -3963,7 +3943,7 @@ Language Desano feature Postverbal_Negative_Morphemes:
 Language Desano feature Preverbal_Negative_Morphemes:
   predicted == 4 None
 Language Desano feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 2 OV and NAdj
+  predicted == 1 OV and AdjN
 Language Desano feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 OV and Postpositions
 Language Desano feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
@@ -3991,9 +3971,9 @@ Language Dinka feature Absence_of_Common_Consonants:
 Language Dinka feature Consonant-Vowel_Ratio:
   predicted == 3 Average
 Language Dinka feature Consonant_Inventories:
-  predicted == 3 Average
+  predicted == 1 Small
 Language Dinka feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 5 No definite or indefinite article
 Language Dinka feature Expression_of_Pronominal_Subjects:
   predicted == 2 Subject affixes on verb
 Language Dinka feature Languages_with_different_word_order_in_negative_clauses:
@@ -4021,13 +4001,13 @@ Language Dinka feature Position_of_Polar_Question_Particles:
 Language Dinka feature Position_of_Pronominal_Possessive_Affixes:
   predicted == 2 Possessive suffixes
 Language Dinka feature Position_of_Tense-Aspect_Affixes:
-  predicted == 2 Tense-aspect suffixes
+  predicted == 4 Mixed type
 Language Dinka feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
   predicted == 3 Immed preverbal
 Language Dinka feature Postnominal_relative_clauses:
   predicted == 1 Noun-Relative clause (NRel) dominant
 Language Dinka feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
-  predicted == 2 Strongly suffixing
+  predicted == 4 Equal prefixing and suffixing
 Language Dinka feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Dinka feature SNegOV_Order:
@@ -4039,14 +4019,14 @@ Language Dinka feature Syllable_Structure:
 Language Dinka feature Vowel_Quality_Inventories:
   predicted == 3 Large (7-14)
 Language Dinka feature Zero_Copula_for_Predicate_Nominals:
-  predicted == 1 Impossible
+  predicted == 2 Possible
 ----------------------------------------------------------------------
 Language dja (Djabugay, Pama-Nyungan/Northern Pama-Nyungan, nan):
   23 features known, 11 features to be predicted.
 Language Djabugay feature Cultural_Categories_of_Languages_with_Identity_of_'Finger'_and_'Hand':
   predicted == 1 Hunter-gatherers
 Language Djabugay feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 2 Double-object construction
+  predicted == 1 Indirect-object construction
 Language Djabugay feature Finger_and_Hand:
   predicted == 2 Different
 Language Djabugay feature Hand_and_Arm:
@@ -4058,7 +4038,7 @@ Language Djabugay feature Indefinite_Pronouns:
 Language Djabugay feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Djabugay feature Occurrence_of_Nominal_Plurality:
-  predicted == 3 Only human nouns, obligatory
+  predicted == 6 All nouns, always obligatory
 Language Djabugay feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Djabugay feature SOVNeg_Order:
@@ -4073,13 +4053,13 @@ Language Dumi feature Coding_of_Evidentiality:
 Language Dumi feature Negative_Morphemes:
   predicted == 1 Negative affix
 Language Dumi feature Order_of_Adjective_and_Noun:
-  predicted == 2 Noun-Adjective
+  predicted == 1 Adjective-Noun
 Language Dumi feature Order_of_Numeral_and_Noun:
   predicted == 2 Noun-Numeral
 Language Dumi feature Ordinal_Numerals:
   predicted == 4 One-th, two-th, three-th
 Language Dumi feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 2 OV and NAdj
+  predicted == 1 OV and AdjN
 Language Dumi feature Third_Person_Pronouns_and_Demonstratives:
   predicted == 1 Unrelated
 Language Dumi feature Zero_Copula_for_Predicate_Nominals:
@@ -4134,7 +4114,7 @@ Language Dyirbal feature Number_of_Possessive_Nouns:
 Language Dyirbal feature Obligatory_Possessive_Inflection:
   predicted == 2 Absent
 Language Dyirbal feature Occurrence_of_Nominal_Plurality:
-  predicted == 3 Only human nouns, obligatory
+  predicted == 1 No nominal plural
 Language Dyirbal feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Dyirbal feature Order_of_Adposition_and_Noun_Phrase:
@@ -4146,11 +4126,11 @@ Language Dyirbal feature Order_of_Negative_Morpheme_and_Verb:
 Language Dyirbal feature Order_of_Object,_Oblique,_and_Verb:
   predicted == 6 No dominant order
 Language Dyirbal feature Order_of_Object_and_Verb:
-  predicted == 2 VO
+  predicted == 1 OV
 Language Dyirbal feature Order_of_Relative_Clause_and_Noun:
   predicted == 1 Noun-Relative clause
 Language Dyirbal feature Order_of_Subject,_Object_and_Verb:
-  predicted == 7 No dominant order
+  predicted == 1 SOV
 Language Dyirbal feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Dyirbal feature Other_Roles_of_Applied_Objects:
@@ -4168,7 +4148,7 @@ Language Dyirbal feature Position_of_Tense-Aspect_Affixes:
 Language Dyirbal feature Postnominal_relative_clauses:
   predicted == 1 Noun-Relative clause (NRel) dominant
 Language Dyirbal feature Predicative_Adjectives:
-  predicted == 1 Verbal encoding
+  predicted == 2 Nonverbal encoding
 Language Dyirbal feature Predicative_Possession:
   predicted == 3 Topic
 Language Dyirbal feature Preverbal_Negative_Morphemes:
@@ -4184,7 +4164,7 @@ Language Dyirbal feature Relationship_between_the_Order_of_Object_and_Verb_and_t
 Language Dyirbal feature Rhythm_Types:
   predicted == 1 Trochaic
 Language Dyirbal feature Semantic_Distinctions_of_Evidentiality:
-  predicted == 2 Indirect only
+  predicted == 1 No grammatical evidentials
 Language Dyirbal feature Sex-based_and_Non-sex-based_Gender_Systems:
   predicted == 2 Sex-based
 Language Dyirbal feature Syllable_Structure:
@@ -4196,7 +4176,7 @@ Language Dyirbal feature The_Morphological_Imperative:
 Language Dyirbal feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
   predicted == 14 Other NegV
 Language Dyirbal feature The_Prohibitive:
-  predicted == 3 Special imperative + normal negative
+  predicted == 1 Normal imperative + normal negative
 Language Dyirbal feature Tone:
   predicted == 1 No tones
 Language Dyirbal feature Uvular_Consonants:
@@ -4243,7 +4223,7 @@ Language Guugu Yimidhirr feature 'Want'_Complement_Subjects:
 Language Guugu Yimidhirr feature Coding_of_Nominal_Plurality:
   predicted == 2 Plural suffix
 Language Guugu Yimidhirr feature Expression_of_Pronominal_Subjects:
-  predicted == 2 Subject affixes on verb
+  predicted == 1 Obligatory pronouns in subject position
 Language Guugu Yimidhirr feature Gender_Distinctions_in_Independent_Personal_Pronouns:
   predicted == 6 No gender distinctions
 Language Guugu Yimidhirr feature Hand_and_Arm:
@@ -4257,13 +4237,13 @@ Language Guugu Yimidhirr feature Nominal_and_Locational_Predication:
 Language Guugu Yimidhirr feature Nonperiphrastic_Causative_Constructions:
   predicted == 2 Morphological but no compound
 Language Guugu Yimidhirr feature Order_of_Numeral_and_Noun:
-  predicted == 1 Numeral-Noun
+  predicted == 2 Noun-Numeral
 Language Guugu Yimidhirr feature Order_of_Subject,_Object_and_Verb:
   predicted == 1 SOV
 Language Guugu Yimidhirr feature Passive_Constructions:
   predicted == 2 Absent
 Language Guugu Yimidhirr feature Person_Marking_on_Adpositions:
-  predicted == 2 No person marking
+  predicted == 1 No adpositions
 Language Guugu Yimidhirr feature Position_of_Negative_Word_With_Respect_to_Subject,_Object,_and_Verb:
   predicted == 7 SONegV
 Language Guugu Yimidhirr feature Position_of_Tense-Aspect_Affixes:
@@ -4284,7 +4264,7 @@ Language hay (Hayu, Sino-Tibetan/Mahakiranti, nan):
 Language Hayu feature Ditransitive_Constructions:_The_Verb_'Give':
   predicted == 1 Indirect-object construction
 Language Hayu feature Expression_of_Pronominal_Subjects:
-  predicted == 5 Optional pronouns in subject position
+  predicted == 2 Subject affixes on verb
 Language Hayu feature Imperative-Hortative_Systems:
   predicted == 4 Neither type of system
 Language Hayu feature Minor_morphological_means_of_signaling_negation:
@@ -4312,7 +4292,7 @@ Language Hayu feature Polar_Questions:
 Language Hayu feature Position_of_Polar_Question_Particles:
   predicted == 2 Final
 Language Hayu feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 4 No possessive affixes
+  predicted == 1 Possessive prefixes
 Language Hayu feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
   predicted == 3 Immed preverbal
 Language Hayu feature Prenominal_relative_clauses:
@@ -4326,7 +4306,7 @@ Language Hayu feature Systems_of_Gender_Assignment:
 Language Hayu feature The_Associative_Plural:
   predicted == 1 Associative same as additive plural
 Language Hayu feature The_Morphological_Imperative:
-  predicted == 5 No second-person imperatives
+  predicted == 1 Second singular and second plural
 Language Hayu feature The_Optative:
   predicted == 2 Inflectional optative absent
 Language Hayu feature Vowel_Nasalization:
@@ -4335,7 +4315,7 @@ Language Hayu feature Vowel_Nasalization:
 Language htc (Huastec, Mayan/Mayan, nan):
   60 features known, 10 features to be predicted.
 Language Huastec feature Consonant-Vowel_Ratio:
-  predicted == 3 Average
+  predicted == 4 Moderately high
 Language Huastec feature Lateral_Consonants:
   predicted == 2 /l/, no obstruent laterals
 Language Huastec feature Negative_Morphemes:
@@ -4349,7 +4329,7 @@ Language Huastec feature Postnominal_relative_clauses:
 Language Huastec feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
   predicted == 1 Little affixation
 Language Huastec feature Rhythm_Types:
-  predicted == 1 Trochaic
+  predicted == 5 No rhythmic stress
 Language Huastec feature SVNegO_Order:
   predicted == 7 No SVNegO
 Language Huastec feature Voicing_in_Plosives_and_Fricatives:
@@ -4358,7 +4338,7 @@ Language Huastec feature Voicing_in_Plosives_and_Fricatives:
 Language itz (Itzaj, Mayan/Mayan, nan):
   10 features known, 12 features to be predicted.
 Language Itzaj feature 'Want'_Complement_Subjects:
-  predicted == 4 Desiderative verbal affix
+  predicted == 2 Subject is expressed overtly
 Language Itzaj feature 'When'_Clauses:
   predicted == 1 Balanced
 Language Itzaj feature Ditransitive_Constructions:_The_Verb_'Give':
@@ -4366,15 +4346,15 @@ Language Itzaj feature Ditransitive_Constructions:_The_Verb_'Give':
 Language Itzaj feature Finger_and_Hand:
   predicted == 2 Different
 Language Itzaj feature Hand_and_Arm:
-  predicted == 2 Different
+  predicted == 1 Identical
 Language Itzaj feature Indefinite_Pronouns:
   predicted == 1 Interrogative-based
 Language Itzaj feature Negative_Indefinite_Pronouns_and_Predicate_Negation:
   predicted == 1 Predicate negation also present
 Language Itzaj feature Nominal_and_Verbal_Conjunction:
-  predicted == 2 Differentiation
+  predicted == 1 Identity
 Language Itzaj feature Occurrence_of_Nominal_Plurality:
-  predicted == 3 Only human nouns, obligatory
+  predicted == 4 All nouns, always optional
 Language Itzaj feature Purpose_Clauses:
   predicted == 3 Deranked
 Language Itzaj feature Reduplication:
@@ -4415,7 +4395,7 @@ Language Jakaltek feature Verb-Initial_with_Negative_that_is_Immediately_Postver
 Language jlu (Luwo, Eastern Sudanic/Nilotic, nan):
   10 features known, 7 features to be predicted.
 Language Luwo feature Coding_of_Nominal_Plurality:
-  predicted == 1 Plural prefix
+  predicted == 2 Plural suffix
 Language Luwo feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Luwo feature Order_of_Adposition_and_Noun_Phrase:
@@ -4432,7 +4412,7 @@ Language Luwo feature Postverbal_Negative_Morphemes:
 Language kek (K'ekchí, Mayan/Mayan, nan):
   14 features known, 9 features to be predicted.
 Language K'ekchí feature Consonant-Vowel_Ratio:
-  predicted == 3 Average
+  predicted == 4 Moderately high
 Language K'ekchí feature Consonant_Inventories:
   predicted == 3 Average
 Language K'ekchí feature Finger_and_Hand:
@@ -4440,7 +4420,7 @@ Language K'ekchí feature Finger_and_Hand:
 Language K'ekchí feature Front_Rounded_Vowels:
   predicted == 1 None
 Language K'ekchí feature Hand_and_Arm:
-  predicted == 2 Different
+  predicted == 1 Identical
 Language K'ekchí feature Presence_of_Uncommon_Consonants:
   predicted == 1 None
 Language K'ekchí feature Uvular_Consonants:
@@ -4448,7 +4428,7 @@ Language K'ekchí feature Uvular_Consonants:
 Language K'ekchí feature Voicing_and_Gaps_in_Plosive_Systems:
   predicted == 1 Other
 Language K'ekchí feature Vowel_Quality_Inventories:
-  predicted == 1 Small (2-4)
+  predicted == 2 Average (5-6)
 ----------------------------------------------------------------------
 Language kgu (Kalkatungu, Pama-Nyungan/Northern Pama-Nyungan, nan):
   41 features known, 11 features to be predicted.
@@ -4461,7 +4441,7 @@ Language Kalkatungu feature Gender_Distinctions_in_Independent_Personal_Pronouns
 Language Kalkatungu feature Indefinite_Pronouns:
   predicted == 1 Interrogative-based
 Language Kalkatungu feature Nominal_and_Verbal_Conjunction:
-  predicted == 3 Both expressed by juxtaposition
+  predicted == 2 Differentiation
 Language Kalkatungu feature Nonperiphrastic_Causative_Constructions:
   predicted == 2 Morphological but no compound
 Language Kalkatungu feature Occurrence_of_Nominal_Plurality:
@@ -4486,7 +4466,7 @@ Language Khaling feature Optional_Double_Negation:
 Language Khaling feature Order_of_Adjective_and_Noun:
   predicted == 1 Adjective-Noun
 Language Khaling feature Order_of_Adverbial_Subordinator_and_Clause:
-  predicted == 2 Final subordinator word
+  predicted == 1 Initial subordinator word
 Language Khaling feature Order_of_Demonstrative_and_Noun:
   predicted == 1 Demonstrative-Noun
 Language Khaling feature Order_of_Genitive_and_Noun:
@@ -4500,7 +4480,7 @@ Language Khaling feature Order_of_Subject,_Object_and_Verb:
 Language Khaling feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Khaling feature Position_of_Case_Affixes:
-  predicted == 9 No case affixes or adpositional clitics
+  predicted == 1 Case suffixes
 Language Khaling feature Position_of_Negative_Word_With_Respect_to_Subject,_Object,_and_Verb:
   predicted == 18 ObligDoubleNeg
 Language Khaling feature Position_of_Tense-Aspect_Affixes:
@@ -4523,7 +4503,7 @@ Language Koreguaje feature Hand_and_Arm:
 Language Koreguaje feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Koreguaje feature Order_of_Numeral_and_Noun:
-  predicted == 2 Noun-Numeral
+  predicted == 1 Numeral-Noun
 Language Koreguaje feature Order_of_Object_and_Verb:
   predicted == 2 VO
 Language Koreguaje feature Order_of_Relative_Clause_and_Noun:
@@ -4541,7 +4521,7 @@ Language Koreguaje feature Relationship_between_the_Order_of_Object_and_Verb_and
 Language Koreguaje feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
   predicted == 4 VO and NRel
 Language Koreguaje feature Semantic_Distinctions_of_Evidentiality:
-  predicted == 2 Indirect only
+  predicted == 3 Direct and indirect
 ----------------------------------------------------------------------
 Language kjn (Kunjen, Pama-Nyungan/Northern Pama-Nyungan, nan):
   10 features known, 3 features to be predicted.
@@ -4563,7 +4543,7 @@ Language Kulung feature Order_of_Object_and_Verb:
 Language Kulung feature Position_of_Case_Affixes:
   predicted == 9 No case affixes or adpositional clitics
 Language Kulung feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 4 No possessive affixes
+  predicted == 1 Possessive prefixes
 Language Kulung feature Postnominal_relative_clauses:
   predicted == 2 NRel or RelN
 Language Kulung feature Postverbal_Negative_Morphemes:
@@ -4595,7 +4575,7 @@ Language Kalam feature Relationship_between_the_Order_of_Object_and_Verb_and_the
 Language kly (Kala Lagaw Ya, Pama-Nyungan/Northern Pama-Nyungan, nan):
   23 features known, 1 features to be predicted.
 Language Kala Lagaw Ya feature Vowel_Quality_Inventories:
-  predicted == 2 Average (5-6)
+  predicted == 1 Small (2-4)
 ----------------------------------------------------------------------
 Language kmh (Kham, Sino-Tibetan/Mahakiranti, nan):
   32 features known, 22 features to be predicted.
@@ -4626,7 +4606,7 @@ Language Kham feature Position_of_Case_Affixes:
 Language Kham feature Position_of_Negative_Word_With_Respect_to_Subject,_Object,_and_Verb:
   predicted == 20 MorphNeg
 Language Kham feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 4 No possessive affixes
+  predicted == 1 Possessive prefixes
 Language Kham feature Postverbal_Negative_Morphemes:
   predicted == 4 None
 Language Kham feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
@@ -4642,7 +4622,7 @@ Language Kham feature Relationship_between_the_Order_of_Object_and_Verb_and_the_
 Language Kham feature SONegV_Order:
   predicted == 2 Prefix&NoDoubleNeg
 Language Kham feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
-  predicted == 14 Other NegV
+  predicted == 3 SONegV
 ----------------------------------------------------------------------
 Language kmj (Karimojong, Eastern Sudanic/Nilotic, nan):
   40 features known, 10 features to be predicted.
@@ -4672,23 +4652,23 @@ Language knc (Kugu Nganhcara, Pama-Nyungan/Northern Pama-Nyungan, nan):
 Language Kugu Nganhcara feature Coding_of_Nominal_Plurality:
   predicted == 2 Plural suffix
 Language Kugu Nganhcara feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 5 No definite or indefinite article
 Language Kugu Nganhcara feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 2 Double-object construction
+  predicted == 1 Indirect-object construction
 Language Kugu Nganhcara feature Expression_of_Pronominal_Subjects:
-  predicted == 2 Subject affixes on verb
+  predicted == 1 Obligatory pronouns in subject position
 Language Kugu Nganhcara feature Finger_and_Hand:
   predicted == 2 Different
 Language Kugu Nganhcara feature Hand_and_Arm:
   predicted == 2 Different
 Language Kugu Nganhcara feature Indefinite_Articles:
-  predicted == 5 No definite or indefinite article
+  predicted == 4 No indefinite, but definite article
 Language Kugu Nganhcara feature Indefinite_Pronouns:
   predicted == 1 Interrogative-based
 Language Kugu Nganhcara feature Negative_Morphemes:
   predicted == 2 Negative particle
 Language Kugu Nganhcara feature Nominal_and_Verbal_Conjunction:
-  predicted == 3 Both expressed by juxtaposition
+  predicted == 2 Differentiation
 Language Kugu Nganhcara feature Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 Postpositions
 Language Kugu Nganhcara feature Order_of_Demonstrative_and_Noun:
@@ -4702,7 +4682,7 @@ Language Kugu Nganhcara feature Order_of_Relative_Clause_and_Noun:
 Language Kugu Nganhcara feature Polar_Questions:
   predicted == 1 Question particle
 Language Kugu Nganhcara feature Position_of_Interrogative_Phrases_in_Content_Questions:
-  predicted == 1 Initial interrogative phrase
+  predicted == 2 Not initial interrogative phrase
 Language Kugu Nganhcara feature Position_of_Negative_Word_With_Respect_to_Subject,_Object,_and_Verb:
   predicted == 2 SNegVO
 Language Kugu Nganhcara feature Position_of_Polar_Question_Particles:
@@ -4723,7 +4703,7 @@ Language Kobon feature Coding_of_Evidentiality:
 Language Kobon feature Consonant-Vowel_Ratio:
   predicted == 3 Average
 Language Kobon feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 1 Indirect-object construction
+  predicted == 3 Secondary-object construction
 Language Kobon feature Expression_of_Pronominal_Subjects:
   predicted == 2 Subject affixes on verb
 Language Kobon feature Gender_Distinctions_in_Independent_Personal_Pronouns:
@@ -4759,7 +4739,7 @@ Language Kobon feature Polar_Questions:
 Language Kobon feature Position_of_Case_Affixes:
   predicted == 9 No case affixes or adpositional clitics
 Language Kobon feature Position_of_Polar_Question_Particles:
-  predicted == 6 No question particle
+  predicted == 2 Final
 Language Kobon feature Position_of_Pronominal_Possessive_Affixes:
   predicted == 1 Possessive prefixes
 Language Kobon feature Possessive_Classification:
@@ -4785,12 +4765,12 @@ Language Kobon feature Uvular_Consonants:
 Language Kobon feature Vowel_Nasalization:
   predicted == 2 Contrast absent
 Language Kobon feature Zero_Copula_for_Predicate_Nominals:
-  predicted == 1 Impossible
+  predicted == 2 Possible
 ----------------------------------------------------------------------
 Language kuk (Kukú, Eastern Sudanic/Nilotic, nan):
   15 features known, 4 features to be predicted.
 Language Kukú feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 1 Indirect-object construction
+  predicted == 2 Double-object construction
 Language Kukú feature Nominal_and_Verbal_Conjunction:
   predicted == 2 Differentiation
 Language Kukú feature Person_Marking_on_Adpositions:
@@ -4811,7 +4791,7 @@ Language Kuuku Ya'u feature Order_of_Subject_and_Verb:
 Language Kuuku Ya'u feature Position_of_Polar_Question_Particles:
   predicted == 6 No question particle
 Language Kuuku Ya'u feature Weight-Sensitive_Stress:
-  predicted == 3 Right-edge: Ultimate or penultimate
+  predicted == 8 Fixed stress (no weight-sensitivity)
 ----------------------------------------------------------------------
 Language kwe (Kanjobal (Western), Mayan/Mayan, nan):
   9 features known, 4 features to be predicted.
@@ -4820,7 +4800,7 @@ Language Kanjobal (Western) feature Comitatives_and_Instrumentals:
 Language Kanjobal (Western) feature Finger_and_Hand:
   predicted == 2 Different
 Language Kanjobal (Western) feature Hand_and_Arm:
-  predicted == 2 Different
+  predicted == 1 Identical
 Language Kanjobal (Western) feature The_Morphological_Imperative:
   predicted == 1 Second singular and second plural
 ----------------------------------------------------------------------
@@ -4841,7 +4821,7 @@ Language Kuku-Yalanji feature Perfective/Imperfective_Aspect:
 Language Kuku-Yalanji feature Position_of_Polar_Question_Particles:
   predicted == 2 Final
 Language Kuku-Yalanji feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 2 Possessive suffixes
+  predicted == 4 No possessive affixes
 Language Kuku-Yalanji feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   predicted == 4 VO and Prepositions
 Language Kuku-Yalanji feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
@@ -4899,17 +4879,17 @@ Language Lango feature Conjunctions_and_Universal_Quantifiers:
 Language Lango feature Consonant-Vowel_Ratio:
   predicted == 3 Average
 Language Lango feature Consonant_Inventories:
-  predicted == 3 Average
+  predicted == 1 Small
 Language Lango feature Definite_Articles:
   predicted == 3 Definite affix
 Language Lango feature Distance_Contrasts_in_Demonstratives:
-  predicted == 2 Two-way contrast
+  predicted == 3 Three-way contrast
 Language Lango feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 1 Indirect-object construction
+  predicted == 2 Double-object construction
 Language Lango feature Epistemic_Possibility:
   predicted == 1 Verbal constructions
 Language Lango feature Exponence_of_Selected_Inflectional_Formatives:
-  predicted == 5 No case
+  predicted == 1 Monoexponential case
 Language Lango feature Exponence_of_Tense-Aspect-Mood_Inflection:
   predicted == 1 monoexponential TAM
 Language Lango feature Expression_of_Pronominal_Subjects:
@@ -4919,7 +4899,7 @@ Language Lango feature Fixed_Stress_Locations:
 Language Lango feature Front_Rounded_Vowels:
   predicted == 1 None
 Language Lango feature Fusion_of_Selected_Inflectional_Formatives:
-  predicted == 1 Exclusively concatenative
+  predicted == 5 Tonal/concatenative
 Language Lango feature Gender_Distinctions_in_Independent_Personal_Pronouns:
   predicted == 6 No gender distinctions
 Language Lango feature Glottalized_Consonants:
@@ -4941,7 +4921,7 @@ Language Lango feature Locus_of_Marking:_Whole-language_Typology:
 Language Lango feature Locus_of_Marking_in_Possessive_Noun_Phrases:
   predicted == 2 Dependent marking
 Language Lango feature Locus_of_Marking_in_the_Clause:
-  predicted == 4 No marking
+  predicted == 1 Head marking
 Language Lango feature M-T_Pronouns:
   predicted == 1 No M-T pronouns
 Language Lango feature M_in_Second_Person_Singular:
@@ -4989,9 +4969,9 @@ Language Lango feature Order_of_Subject_and_Verb:
 Language Lango feature Other_Roles_of_Applied_Objects:
   predicted == 5 No applicative construction
 Language Lango feature Overlap_between_Situational_and_Epistemic_Modal_Marking:
-  predicted == 2 Overlap for either possibility or necessity
+  predicted == 3 No overlap
 Language Lango feature Passive_Constructions:
-  predicted == 2 Absent
+  predicted == 1 Present
 Language Lango feature Periphrastic_Causative_Constructions:
   predicted == 2 Purposive but no sequential
 Language Lango feature Person_Marking_on_Adpositions:
@@ -5029,7 +5009,7 @@ Language Lango feature Relationship_between_the_Order_of_Object_and_Verb_and_the
 Language Lango feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
   predicted == 4 VO and NRel
 Language Lango feature Relativization_on_Obliques:
-  predicted == 4 Gap
+  predicted == 3 Pronoun-retention
 Language Lango feature Relativization_on_Subjects:
   predicted == 4 Gap
 Language Lango feature SNegVO_Order:
@@ -5114,7 +5094,7 @@ Language Limbu feature Obligatory_Double_Negation:
 Language Limbu feature Obligatory_Double_Negation_in_SOV_languages:
   predicted == 6 SO[Neg-V-Neg]
 Language Limbu feature Order_of_Adjective_and_Noun:
-  predicted == 2 Noun-Adjective
+  predicted == 1 Adjective-Noun
 Language Limbu feature Order_of_Adverbial_Subordinator_and_Clause:
   predicted == 2 Final subordinator word
 Language Limbu feature Order_of_Degree_Word_and_Adjective:
@@ -5126,9 +5106,9 @@ Language Limbu feature Order_of_Negative_Morpheme_and_Verb:
 Language Limbu feature Order_of_Numeral_and_Noun:
   predicted == 2 Noun-Numeral
 Language Limbu feature Passive_Constructions:
-  predicted == 1 Present
+  predicted == 2 Absent
 Language Limbu feature Position_of_Case_Affixes:
-  predicted == 9 No case affixes or adpositional clitics
+  predicted == 1 Case suffixes
 Language Limbu feature Position_of_Interrogative_Phrases_in_Content_Questions:
   predicted == 2 Not initial interrogative phrase
 Language Limbu feature Position_of_Tense-Aspect_Affixes:
@@ -5167,7 +5147,7 @@ Language Luo feature Comitatives_and_Instrumentals:
 Language Luo feature Consonant_Inventories:
   predicted == 3 Average
 Language Luo feature Distance_Contrasts_in_Demonstratives:
-  predicted == 2 Two-way contrast
+  predicted == 3 Three-way contrast
 Language Luo feature Distributive_Numerals:
   predicted == 2 Marked by reduplication
 Language Luo feature Front_Rounded_Vowels:
@@ -5201,7 +5181,7 @@ Language Luo feature The_Optative:
 Language Luo feature The_Position_of_Negative_Morphemes_in_SVO_Languages:
   predicted == 13 More than one construction
 Language Luo feature The_Prohibitive:
-  predicted == 1 Normal imperative + normal negative
+  predicted == 2 Normal imperative + special negative
 ----------------------------------------------------------------------
 Language maa (Maasai, Eastern Sudanic/Nilotic, nan):
   58 features known, 23 features to be predicted.
@@ -5283,7 +5263,7 @@ Language Magar feature Position_of_Tense-Aspect_Affixes:
 Language Magar feature Postverbal_Negative_Morphemes:
   predicted == 4 None
 Language Magar feature Preverbal_Negative_Morphemes:
-  predicted == 1 NegV
+  predicted == 2 [Neg-V]
 Language Magar feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 OV and Postpositions
 Language Magar feature SNegOV_Order:
@@ -5295,7 +5275,7 @@ Language Magar feature SOVNeg_Order:
 Language Magar feature The_Associative_Plural:
   predicted == 1 Associative same as additive plural
 Language Magar feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
-  predicted == 3 SONegV
+  predicted == 5 SO[Neg-V]
 ----------------------------------------------------------------------
 Language mam (Mam, Mayan/Mayan, nan):
   63 features known, 4 features to be predicted.
@@ -5313,11 +5293,11 @@ Language mbb (Mbabaram, Pama-Nyungan/Northern Pama-Nyungan, nan):
 Language Mbabaram feature Absence_of_Common_Consonants:
   predicted == 3 No fricatives
 Language Mbabaram feature Consonant-Vowel_Ratio:
-  predicted == 5 High
+  predicted == 3 Average
 Language Mbabaram feature Consonant_Inventories:
   predicted == 3 Average
 Language Mbabaram feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 2 Double-object construction
+  predicted == 1 Indirect-object construction
 Language Mbabaram feature Fixed_Stress_Locations:
   predicted == 2 Initial
 Language Mbabaram feature Glottalized_Consonants:
@@ -5335,7 +5315,7 @@ Language Mbabaram feature Syllable_Structure:
 Language Mbabaram feature The_Morphological_Imperative:
   predicted == 4 Second person number-neutral
 Language Mbabaram feature The_Prohibitive:
-  predicted == 3 Special imperative + normal negative
+  predicted == 1 Normal imperative + normal negative
 Language Mbabaram feature Tone:
   predicted == 1 No tones
 Language Mbabaram feature Voicing_and_Gaps_in_Plosive_Systems:
@@ -5366,7 +5346,7 @@ Language Margany feature SNegOV_Order:
 Language Margany feature SOVNeg_Order:
   predicted == 11 NoSOVNeg
 Language Margany feature Semantic_Distinctions_of_Evidentiality:
-  predicted == 2 Indirect only
+  predicted == 1 No grammatical evidentials
 Language Margany feature Weight-Sensitive_Stress:
   predicted == 8 Fixed stress (no weight-sensitivity)
 ----------------------------------------------------------------------
@@ -5375,7 +5355,7 @@ Language mop (Mopan, Mayan/Mayan, nan):
 Language Mopan feature Finger_and_Hand:
   predicted == 2 Different
 Language Mopan feature Hand_and_Arm:
-  predicted == 2 Different
+  predicted == 1 Identical
 Language Mopan feature The_Optative:
   predicted == 2 Inflectional optative absent
 ----------------------------------------------------------------------
@@ -5423,7 +5403,7 @@ Language Newari (Kathmandu) feature Order_of_Adjective_and_Noun:
 Language Newari (Kathmandu) feature Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 Postpositions
 Language Newari (Kathmandu) feature Order_of_Adverbial_Subordinator_and_Clause:
-  predicted == 2 Final subordinator word
+  predicted == 1 Initial subordinator word
 Language Newari (Kathmandu) feature Order_of_Degree_Word_and_Adjective:
   predicted == 1 Degree word-Adjective
 Language Newari (Kathmandu) feature Order_of_Demonstrative_and_Noun:
@@ -5439,11 +5419,11 @@ Language Newari (Kathmandu) feature Order_of_Subject,_Object_and_Verb:
 Language Newari (Kathmandu) feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Newari (Kathmandu) feature Position_of_Case_Affixes:
-  predicted == 9 No case affixes or adpositional clitics
+  predicted == 1 Case suffixes
 Language Newari (Kathmandu) feature Position_of_Polar_Question_Particles:
   predicted == 2 Final
 Language Newari (Kathmandu) feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 4 No possessive affixes
+  predicted == 1 Possessive prefixes
 Language Newari (Kathmandu) feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Newari (Kathmandu) feature Prenominal_relative_clauses:
@@ -5490,7 +5470,7 @@ Language Ngawun feature Order_of_Numeral_and_Noun:
 Language Ngawun feature Order_of_Object_and_Verb:
   predicted == 1 OV
 Language Ngawun feature Order_of_Subject,_Object_and_Verb:
-  predicted == 7 No dominant order
+  predicted == 1 SOV
 Language Ngawun feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Ngawun feature Position_of_Case_Affixes:
@@ -5574,7 +5554,7 @@ Language Nuer feature Predicative_Adjectives:
 Language Nuer feature Predicative_Possession:
   predicted == 4 Conjunctional
 Language Nuer feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 5 Other
+  predicted == 4 VO and NAdj
 Language Nuer feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
   predicted == 4 VO and NRel
 Language Nuer feature SNegOV_Order:
@@ -5582,7 +5562,7 @@ Language Nuer feature SNegOV_Order:
 Language Nuer feature SONegV_Order:
   predicted == 1 Word&NoDoubleNeg
 Language Nuer feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
-  predicted == 14 Other NegV
+  predicted == 3 SONegV
 ----------------------------------------------------------------------
 Language nwd (Newar (Dolakha), Sino-Tibetan/Mahakiranti, nan):
   16 features known, 38 features to be predicted.
@@ -5609,7 +5589,7 @@ Language Newar (Dolakha) feature Negative_Morphemes:
 Language Newar (Dolakha) feature Nominal_and_Verbal_Conjunction:
   predicted == 1 Identity
 Language Newar (Dolakha) feature Order_of_Adjective_and_Noun:
-  predicted == 2 Noun-Adjective
+  predicted == 1 Adjective-Noun
 Language Newar (Dolakha) feature Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 Postpositions
 Language Newar (Dolakha) feature Order_of_Adverbial_Subordinator_and_Clause:
@@ -5617,7 +5597,7 @@ Language Newar (Dolakha) feature Order_of_Adverbial_Subordinator_and_Clause:
 Language Newar (Dolakha) feature Order_of_Degree_Word_and_Adjective:
   predicted == 1 Degree word-Adjective
 Language Newar (Dolakha) feature Order_of_Demonstrative_and_Noun:
-  predicted == 2 Noun-Demonstrative
+  predicted == 1 Demonstrative-Noun
 Language Newar (Dolakha) feature Order_of_Genitive_and_Noun:
   predicted == 1 Genitive-Noun
 Language Newar (Dolakha) feature Order_of_Numeral_and_Noun:
@@ -5637,17 +5617,17 @@ Language Newar (Dolakha) feature Position_of_Interrogative_Phrases_in_Content_Qu
 Language Newar (Dolakha) feature Position_of_Polar_Question_Particles:
   predicted == 2 Final
 Language Newar (Dolakha) feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 4 No possessive affixes
+  predicted == 1 Possessive prefixes
 Language Newar (Dolakha) feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Newar (Dolakha) feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
-  predicted == 1 Little affixation
+  predicted == 2 Strongly suffixing
 Language Newar (Dolakha) feature Prenominal_relative_clauses:
   predicted == 1 Relative clause-Noun (RelN) dominant
 Language Newar (Dolakha) feature Preverbal_Negative_Morphemes:
   predicted == 4 None
 Language Newar (Dolakha) feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 2 OV and NAdj
+  predicted == 1 OV and AdjN
 Language Newar (Dolakha) feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
   predicted == 1 OV and RelN
 Language Newar (Dolakha) feature SNegOV_Order:
@@ -5666,9 +5646,9 @@ Language Newar (Dolakha) feature The_Position_of_Negative_Morphemes_in_SOV_Langu
 Language nya (Nyawaygi, Pama-Nyungan/Northern Pama-Nyungan, nan):
   17 features known, 7 features to be predicted.
 Language Nyawaygi feature Expression_of_Pronominal_Subjects:
-  predicted == 2 Subject affixes on verb
+  predicted == 1 Obligatory pronouns in subject position
 Language Nyawaygi feature Finger_and_Hand:
-  predicted == 1 Identical
+  predicted == 2 Different
 Language Nyawaygi feature Hand_and_Arm:
   predicted == 2 Different
 Language Nyawaygi feature Order_of_Object_and_Verb:
@@ -5683,7 +5663,7 @@ Language Nyawaygi feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
 Language par (Päri, Eastern Sudanic/Nilotic, nan):
   34 features known, 15 features to be predicted.
 Language Päri feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 5 No definite or indefinite article
 Language Päri feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Päri feature Order_of_Adverbial_Subordinator_and_Clause:
@@ -5707,9 +5687,9 @@ Language Päri feature Position_of_Polar_Question_Particles:
 Language Päri feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Päri feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
-  predicted == 2 Strongly suffixing
+  predicted == 4 Equal prefixing and suffixing
 Language Päri feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 2 OV and NAdj
+  predicted == 4 VO and NAdj
 Language Päri feature The_Position_of_Negative_Morphemes_in_Object-Initial_Languages:
   predicted == 4 O[V-Neg]S
 ----------------------------------------------------------------------
@@ -5723,7 +5703,7 @@ Language pkt (Pokot, Eastern Sudanic/Nilotic, nan):
 Language Pokot feature Coding_of_Nominal_Plurality:
   predicted == 2 Plural suffix
 Language Pokot feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 5 No definite or indefinite article
 Language Pokot feature Negative_Morphemes:
   predicted == 1 Negative affix
 Language Pokot feature Optional_Double_Negation:
@@ -5761,9 +5741,9 @@ Language Pokot feature Position_of_Pronominal_Possessive_Affixes:
 Language Pokot feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
   predicted == 3 Immed preverbal
 Language Pokot feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
-  predicted == 2 Strongly suffixing
+  predicted == 4 Equal prefixing and suffixing
 Language Pokot feature Preverbal_Negative_Morphemes:
-  predicted == 4 None
+  predicted == 1 NegV
 Language Pokot feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
   predicted == 4 VO and NAdj
 Language Pokot feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
@@ -5774,7 +5754,7 @@ Language Pokot feature Verb-Initial_with_Clause-Final_Negative:
 Language qch (Quiché, Mayan/Mayan, nan):
   12 features known, 3 features to be predicted.
 Language Quiché feature Action_Nominal_Constructions:
-  predicted == 7 Restricted
+  predicted == 1 Sentential
 Language Quiché feature Fixed_Stress_Locations:
   predicted == 6 Penultimate
 Language Quiché feature Weight-Sensitive_Stress:
@@ -5804,7 +5784,7 @@ Language Retuarã feature Ditransitive_Constructions:_The_Verb_'Give':
 Language Retuarã feature Finger_and_Hand:
   predicted == 2 Different
 Language Retuarã feature Gender_Distinctions_in_Independent_Personal_Pronouns:
-  predicted == 6 No gender distinctions
+  predicted == 1 In 3rd person + 1st and/or 2nd person
 Language Retuarã feature Hand_and_Arm:
   predicted == 2 Different
 Language Retuarã feature Internally-headed_relative_clauses:
@@ -5830,7 +5810,7 @@ Language Retuarã feature Order_of_Demonstrative_and_Noun:
 Language Retuarã feature Order_of_Genitive_and_Noun:
   predicted == 1 Genitive-Noun
 Language Retuarã feature Order_of_Negative_Morpheme_and_Verb:
-  predicted == 1 NegV
+  predicted == 4 [V-Neg]
 Language Retuarã feature Order_of_Numeral_and_Noun:
   predicted == 1 Numeral-Noun
 Language Retuarã feature Order_of_Object_and_Verb:
@@ -5866,7 +5846,7 @@ Language Retuarã feature Postverbal_Negative_Morphemes:
 Language Retuarã feature Predicative_Adjectives:
   predicted == 1 Verbal encoding
 Language Retuarã feature Preverbal_Negative_Morphemes:
-  predicted == 1 NegV
+  predicted == 4 None
 Language Retuarã feature Pronominal_and_Adnominal_Demonstratives:
   predicted == 1 Identical
 Language Retuarã feature Reason_Clauses:
@@ -5884,11 +5864,11 @@ Language Retuarã feature SOVNeg_Order:
 Language Retuarã feature Systems_of_Gender_Assignment:
   predicted == 3 Semantic and formal
 Language Retuarã feature The_Morphological_Imperative:
-  predicted == 1 Second singular and second plural
+  predicted == 4 Second person number-neutral
 Language Retuarã feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
-  predicted == 6 SO[V-Neg]
+  predicted == 21 SV&OV&[V-Neg]
 Language Retuarã feature The_Prohibitive:
-  predicted == 2 Normal imperative + special negative
+  predicted == 1 Normal imperative + normal negative
 Language Retuarã feature Third_Person_Zero_of_Verbal_Person_Marking:
   predicted == 2 No zero realization
 Language Retuarã feature Verbal_Person_Marking:
@@ -5901,7 +5881,7 @@ Language seb (Sebei, Eastern Sudanic/Nilotic, nan):
 Language Sebei feature Absence_of_Common_Consonants:
   predicted == 1 All present
 Language Sebei feature Coding_of_Nominal_Plurality:
-  predicted == 1 Plural prefix
+  predicted == 2 Plural suffix
 Language Sebei feature Glottalized_Consonants:
   predicted == 1 No glottalized consonants
 Language Sebei feature Lateral_Consonants:
@@ -5973,7 +5953,7 @@ Language Shilluk feature The_Optative:
 Language Shilluk feature The_Position_of_Negative_Morphemes_in_SVO_Languages:
   predicted == 2 SNegVO
 Language Shilluk feature The_Prohibitive:
-  predicted == 1 Normal imperative + normal negative
+  predicted == 2 Normal imperative + special negative
 ----------------------------------------------------------------------
 Language sin (Siona, Tucanoan/Tucanoan, nan):
   15 features known, 28 features to be predicted.
@@ -5988,7 +5968,7 @@ Language Siona feature Finger_and_Hand:
 Language Siona feature Glottalized_Consonants:
   predicted == 1 No glottalized consonants
 Language Siona feature Lateral_Consonants:
-  predicted == 2 /l/, no obstruent laterals
+  predicted == 1 No laterals
 Language Siona feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Siona feature Negative_Morphemes:
@@ -5998,13 +5978,13 @@ Language Siona feature Numeral_Classifiers:
 Language Siona feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Siona feature Order_of_Demonstrative_and_Noun:
-  predicted == 2 Noun-Demonstrative
+  predicted == 1 Demonstrative-Noun
 Language Siona feature Order_of_Genitive_and_Noun:
   predicted == 1 Genitive-Noun
 Language Siona feature Order_of_Negative_Morpheme_and_Verb:
   predicted == 4 [V-Neg]
 Language Siona feature Order_of_Numeral_and_Noun:
-  predicted == 2 Noun-Numeral
+  predicted == 1 Numeral-Noun
 Language Siona feature Order_of_Object_and_Verb:
   predicted == 1 OV
 Language Siona feature Position_of_Case_Affixes:
@@ -6024,7 +6004,7 @@ Language Siona feature Preverbal_Negative_Morphemes:
 Language Siona feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
   predicted == 4 VO and NAdj
 Language Siona feature Semantic_Distinctions_of_Evidentiality:
-  predicted == 2 Indirect only
+  predicted == 3 Direct and indirect
 Language Siona feature Uvular_Consonants:
   predicted == 1 None
 Language Siona feature Voicing_and_Gaps_in_Plosive_Systems:
@@ -6039,7 +6019,7 @@ Language sro (Siroi, Trans-New Guinea/Madang, nan):
 Language Siroi feature Coding_of_Nominal_Plurality:
   predicted == 2 Plural suffix
 Language Siroi feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 4 No definite, but indefinite article
 Language Siroi feature Fixed_Stress_Locations:
   predicted == 1 No fixed stress
 Language Siroi feature Indefinite_Articles:
@@ -6047,7 +6027,7 @@ Language Siroi feature Indefinite_Articles:
 Language Siroi feature NegSOV_Order:
   predicted == 4 No NegSOV
 Language Siroi feature Nominal_and_Locational_Predication:
-  predicted == 1 Different
+  predicted == 2 Identical
 Language Siroi feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Siroi feature Order_of_Adposition_and_Noun_Phrase:
@@ -6100,7 +6080,7 @@ Language Siroi feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
 Language tau (Tauya, Trans-New Guinea/Madang, nan):
   51 features known, 30 features to be predicted.
 Language Tauya feature 'Want'_Complement_Subjects:
-  predicted == 1 Subject is left implicit
+  predicted == 2 Subject is expressed overtly
 Language Tauya feature Alignment_of_Verbal_Person_Marking:
   predicted == 2 Accusative
 Language Tauya feature Antipassive_Constructions:
@@ -6108,7 +6088,7 @@ Language Tauya feature Antipassive_Constructions:
 Language Tauya feature Coding_of_Evidentiality:
   predicted == 1 No grammatical evidentials
 Language Tauya feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 4 No definite, but indefinite article
 Language Tauya feature Indefinite_Articles:
   predicted == 1 Indefinite word distinct from 'one'
 Language Tauya feature Locus_of_Marking_in_the_Clause:
@@ -6187,7 +6167,7 @@ Language Teso feature Position_of_Interrogative_Phrases_in_Content_Questions:
 Language Teso feature Position_of_Pronominal_Possessive_Affixes:
   predicted == 2 Possessive suffixes
 Language Teso feature Position_of_Tense-Aspect_Affixes:
-  predicted == 2 Tense-aspect suffixes
+  predicted == 4 Mixed type
 Language Teso feature Postnominal_relative_clauses:
   predicted == 1 Noun-Relative clause (NRel) dominant
 Language Teso feature Postverbal_Negative_Morphemes:
@@ -6195,7 +6175,7 @@ Language Teso feature Postverbal_Negative_Morphemes:
 Language Teso feature Predicative_Adjectives:
   predicted == 1 Verbal encoding
 Language Teso feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
-  predicted == 2 Strongly suffixing
+  predicted == 4 Equal prefixing and suffixing
 Language Teso feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Teso feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
@@ -6247,11 +6227,11 @@ Language Thulung feature Obligatory_Double_Negation:
 Language Thulung feature Obligatory_Double_Negation_in_SOV_languages:
   predicted == 6 SO[Neg-V-Neg]
 Language Thulung feature Order_of_Adjective_and_Noun:
-  predicted == 2 Noun-Adjective
+  predicted == 1 Adjective-Noun
 Language Thulung feature Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 Postpositions
 Language Thulung feature Order_of_Demonstrative_and_Noun:
-  predicted == 2 Noun-Demonstrative
+  predicted == 1 Demonstrative-Noun
 Language Thulung feature Order_of_Genitive_and_Noun:
   predicted == 1 Genitive-Noun
 Language Thulung feature Order_of_Negative_Morpheme_and_Verb:
@@ -6290,7 +6270,7 @@ Language thy (Kuuk Thaayorre, Pama-Nyungan/Northern Pama-Nyungan, nan):
 Language Kuuk Thaayorre feature Coding_of_Nominal_Plurality:
   predicted == 2 Plural suffix
 Language Kuuk Thaayorre feature Expression_of_Pronominal_Subjects:
-  predicted == 2 Subject affixes on verb
+  predicted == 1 Obligatory pronouns in subject position
 Language Kuuk Thaayorre feature Indefinite_Articles:
   predicted == 5 No definite or indefinite article
 Language Kuuk Thaayorre feature NegSOV_Order:
@@ -6344,11 +6324,11 @@ Language Turkana feature Verb-Initial_with_Negative_that_is_Immediately_Postverb
 Language toj (Tojolabal, Mayan/Mayan, nan):
   11 features known, 5 features to be predicted.
 Language Tojolabal feature Hand_and_Arm:
-  predicted == 2 Different
+  predicted == 1 Identical
 Language Tojolabal feature Ordinal_Numerals:
   predicted == 6 First, two-th, three-th
 Language Tojolabal feature Perfective/Imperfective_Aspect:
-  predicted == 2 No grammatical marking
+  predicted == 1 Grammatical marking
 Language Tojolabal feature The_Future_Tense:
   predicted == 1 Inflectional future exists
 Language Tojolabal feature The_Past_Tense:
@@ -6365,9 +6345,9 @@ Language Tucano feature Order_of_Adjective_and_Noun:
 Language Tucano feature Order_of_Adverbial_Subordinator_and_Clause:
   predicted == 1 Initial subordinator word
 Language Tucano feature Order_of_Demonstrative_and_Noun:
-  predicted == 2 Noun-Demonstrative
+  predicted == 1 Demonstrative-Noun
 Language Tucano feature Order_of_Numeral_and_Noun:
-  predicted == 2 Noun-Numeral
+  predicted == 1 Numeral-Noun
 Language Tucano feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Tucano feature Position_of_Negative_Word_With_Respect_to_Subject,_Object,_and_Verb:
@@ -6450,7 +6430,7 @@ Language Uradhi feature Finger_and_Hand:
 Language Uradhi feature Fixed_Stress_Locations:
   predicted == 2 Initial
 Language Uradhi feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
-  predicted == 1 No inclusive/exclusive opposition
+  predicted == 2 Inclusive and exclusive differentiated
 Language Uradhi feature Locus_of_Marking:_Whole-language_Typology:
   predicted == 2 Dependent-marking
 Language Uradhi feature Locus_of_Marking_in_Possessive_Noun_Phrases:
@@ -6480,7 +6460,7 @@ Language Uradhi feature Obligatory_Possessive_Inflection:
 Language Uradhi feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Uradhi feature Order_of_Demonstrative_and_Noun:
-  predicted == 2 Noun-Demonstrative
+  predicted == 1 Demonstrative-Noun
 Language Uradhi feature Order_of_Genitive_and_Noun:
   predicted == 1 Genitive-Noun
 Language Uradhi feature Order_of_Person_Markers_on_the_Verb:
@@ -6492,11 +6472,11 @@ Language Uradhi feature Order_of_Subject_and_Verb:
 Language Uradhi feature Passive_Constructions:
   predicted == 2 Absent
 Language Uradhi feature Plurality_in_Independent_Personal_Pronouns:
-  predicted == 5 Person-number stem + pronominal plural affix
+  predicted == 4 Person-number stem
 Language Uradhi feature Position_of_Case_Affixes:
   predicted == 1 Case suffixes
 Language Uradhi feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 2 Possessive suffixes
+  predicted == 4 No possessive affixes
 Language Uradhi feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Uradhi feature Possessive_Classification:
@@ -6547,7 +6527,7 @@ Language Usan feature Nominal_and_Verbal_Conjunction:
 Language Usan feature Number_of_Cases:
   predicted == 1 No morphological case-marking
 Language Usan feature Order_of_Degree_Word_and_Adjective:
-  predicted == 1 Degree word-Adjective
+  predicted == 2 Adjective-Degree word
 Language Usan feature Order_of_Demonstrative_and_Noun:
   predicted == 2 Noun-Demonstrative
 Language Usan feature Order_of_Person_Markers_on_the_Verb:
@@ -6583,14 +6563,14 @@ Language Usan feature Vowel_Nasalization:
 Language Usan feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
   predicted == 6 Lexical stress
 Language Usan feature Zero_Copula_for_Predicate_Nominals:
-  predicted == 1 Impossible
+  predicted == 2 Possible
 ----------------------------------------------------------------------
 Language wgu (Warrongo, Pama-Nyungan/Northern Pama-Nyungan, nan):
   9 features known, 3 features to be predicted.
 Language Warrongo feature Antipassive_Constructions:
-  predicted == 3 No antipassive
+  predicted == 2 Oblique patient
 Language Warrongo feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
-  predicted == 2 Inclusive and exclusive differentiated
+  predicted == 1 No inclusive/exclusive opposition
 Language Warrongo feature Productivity_of_the_Antipassive_Construction:
   predicted == 4 no antipassive
 ----------------------------------------------------------------------
@@ -6605,9 +6585,9 @@ Language Wambule feature Minor_morphological_means_of_signaling_negation:
 Language Wambule feature NegSOV_Order:
   predicted == 4 No NegSOV
 Language Wambule feature Order_of_Adjective_and_Noun:
-  predicted == 2 Noun-Adjective
+  predicted == 1 Adjective-Noun
 Language Wambule feature Order_of_Adposition_and_Noun_Phrase:
-  predicted == 2 Prepositions
+  predicted == 1 Postpositions
 Language Wambule feature Order_of_Degree_Word_and_Adjective:
   predicted == 1 Degree word-Adjective
 Language Wambule feature Order_of_Genitive_and_Noun:
@@ -6615,7 +6595,7 @@ Language Wambule feature Order_of_Genitive_and_Noun:
 Language Wambule feature Order_of_Numeral_and_Noun:
   predicted == 2 Noun-Numeral
 Language Wambule feature Order_of_Object_and_Verb:
-  predicted == 2 VO
+  predicted == 1 OV
 Language Wambule feature Order_of_Subject,_Object_and_Verb:
   predicted == 1 SOV
 Language Wambule feature Order_of_Subject_and_Verb:
@@ -6627,7 +6607,7 @@ Language Wambule feature Position_of_Negative_Word_With_Respect_to_Subject,_Obje
 Language Wambule feature Postverbal_Negative_Morphemes:
   predicted == 4 None
 Language Wambule feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 2 OV and NAdj
+  predicted == 1 OV and AdjN
 Language Wambule feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   predicted == 4 VO and Prepositions
 Language Wambule feature SONegV_Order:
@@ -6644,7 +6624,7 @@ Language Wik Munkan feature Glottalized_Consonants:
 Language Wik Munkan feature Hand_and_Arm:
   predicted == 2 Different
 Language Wik Munkan feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
-  predicted == 2 Inclusive and exclusive differentiated
+  predicted == 1 No inclusive/exclusive opposition
 Language Wik Munkan feature Indefinite_Pronouns:
   predicted == 1 Interrogative-based
 Language Wik Munkan feature Negative_Morphemes:
@@ -6748,19 +6728,19 @@ Language Warao feature Inclusive/Exclusive_Distinction_in_Verbal_Inflection:
 Language Warao feature Indefinite_Pronouns:
   predicted == 1 Interrogative-based
 Language Warao feature Intensifiers_and_Reflexive_Pronouns:
-  predicted == 1 Identical
+  predicted == 2 Differentiated
 Language Warao feature Lateral_Consonants:
-  predicted == 2 /l/, no obstruent laterals
+  predicted == 1 No laterals
 Language Warao feature M-T_Pronouns:
   predicted == 2 M-T pronouns, paradigmatic
 Language Warao feature M_in_Second_Person_Singular:
-  predicted == 1 No m in second person singular
+  predicted == 2 m in second person singular
 Language Warao feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Warao feature N-M_Pronouns:
   predicted == 1 No N-M pronouns
 Language Warao feature Negative_Morphemes:
-  predicted == 2 Negative particle
+  predicted == 1 Negative affix
 Language Warao feature Nominal_and_Verbal_Conjunction:
   predicted == 1 Identity
 Language Warao feature Nonperiphrastic_Causative_Constructions:
@@ -6776,9 +6756,9 @@ Language Warao feature Order_of_Demonstrative_and_Noun:
 Language Warao feature Order_of_Genitive_and_Noun:
   predicted == 1 Genitive-Noun
 Language Warao feature Order_of_Negative_Morpheme_and_Verb:
-  predicted == 1 NegV
+  predicted == 4 [V-Neg]
 Language Warao feature Order_of_Numeral_and_Noun:
-  predicted == 2 Noun-Numeral
+  predicted == 1 Numeral-Noun
 Language Warao feature Order_of_Object_and_Verb:
   predicted == 1 OV
 Language Warao feature Order_of_Person_Markers_on_the_Verb:
@@ -6808,9 +6788,9 @@ Language Warao feature Position_of_Polar_Question_Particles:
 Language Warao feature Possessive_Classification:
   predicted == 1 No possessive classification
 Language Warao feature Postverbal_Negative_Morphemes:
-  predicted == 2 [V-Neg]
+  predicted == 4 None
 Language Warao feature Preverbal_Negative_Morphemes:
-  predicted == 1 NegV
+  predicted == 4 None
 Language Warao feature Productivity_of_the_Antipassive_Construction:
   predicted == 4 no antipassive
 Language Warao feature Pronominal_and_Adnominal_Demonstratives:
@@ -6830,7 +6810,7 @@ Language Warao feature Relativization_on_Obliques:
 Language Warao feature Semantic_Distinctions_of_Evidentiality:
   predicted == 2 Indirect only
 Language Warao feature Sex-based_and_Non-sex-based_Gender_Systems:
-  predicted == 1 No gender
+  predicted == 2 Sex-based
 Language Warao feature Suppletion_in_Imperatives_and_Hortatives:
   predicted == 5 None (= no suppletive imperatives reported in the reference material)
 Language Warao feature Systems_of_Gender_Assignment:
@@ -6842,7 +6822,7 @@ Language Warao feature The_Morphological_Imperative:
 Language Warao feature The_Optative:
   predicted == 2 Inflectional optative absent
 Language Warao feature The_Past_Tense:
-  predicted == 4 No past tense
+  predicted == 2 Present, 2-3 remoteness distinctions
 Language Warao feature The_Perfect:
   predicted == 4 No perfect
 Language Warao feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
@@ -6989,7 +6969,7 @@ Language wrg (Warrgamay, Pama-Nyungan/Northern Pama-Nyungan, nan):
 Language Warrgamay feature Distance_Contrasts_in_Demonstratives:
   predicted == 2 Two-way contrast
 Language Warrgamay feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 2 Double-object construction
+  predicted == 1 Indirect-object construction
 Language Warrgamay feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
   predicted == 2 Inclusive and exclusive differentiated
 Language Warrgamay feature Minor_morphological_means_of_signaling_negation:
@@ -7019,7 +6999,7 @@ Language Warrgamay feature Relationship_between_the_Order_of_Object_and_Verb_and
 Language Warrgamay feature Semantic_Distinctions_of_Evidentiality:
   predicted == 1 No grammatical evidentials
 Language Warrgamay feature Weight-Sensitive_Stress:
-  predicted == 3 Right-edge: Ultimate or penultimate
+  predicted == 8 Fixed stress (no weight-sensitivity)
 Language Warrgamay feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
   predicted == 1 No weight
 ----------------------------------------------------------------------
@@ -7068,15 +7048,15 @@ Language Waskia feature Alignment_of_Verbal_Person_Marking:
 Language Waskia feature Comitatives_and_Instrumentals:
   predicted == 2 Differentiation
 Language Waskia feature Definite_Articles:
-  predicted == 1 Definite word distinct from demonstrative
+  predicted == 4 No definite, but indefinite article
 Language Waskia feature Indefinite_Articles:
   predicted == 1 Indefinite word distinct from 'one'
 Language Waskia feature Locus_of_Marking:_Whole-language_Typology:
   predicted == 5 Inconsistent or other
 Language Waskia feature Locus_of_Marking_in_Possessive_Noun_Phrases:
-  predicted == 2 Dependent marking
+  predicted == 1 Head marking
 Language Waskia feature Locus_of_Marking_in_the_Clause:
-  predicted == 2 Dependent marking
+  predicted == 1 Head marking
 Language Waskia feature M-T_Pronouns:
   predicted == 1 No M-T pronouns
 Language Waskia feature M_in_First_Person_Singular:
@@ -7086,7 +7066,7 @@ Language Waskia feature NegSOV_Order:
 Language Waskia feature Negative_Morphemes:
   predicted == 2 Negative particle
 Language Waskia feature Nominal_and_Locational_Predication:
-  predicted == 1 Different
+  predicted == 2 Identical
 Language Waskia feature Numeral_Bases:
   predicted == 1 Decimal
 Language Waskia feature Obligatory_Possessive_Inflection:
@@ -7094,7 +7074,7 @@ Language Waskia feature Obligatory_Possessive_Inflection:
 Language Waskia feature Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 Postpositions
 Language Waskia feature Order_of_Degree_Word_and_Adjective:
-  predicted == 1 Degree word-Adjective
+  predicted == 2 Adjective-Degree word
 Language Waskia feature Order_of_Demonstrative_and_Noun:
   predicted == 2 Noun-Demonstrative
 Language Waskia feature Order_of_Genitive_and_Noun:
@@ -7106,7 +7086,7 @@ Language Waskia feature Order_of_Person_Markers_on_the_Verb:
 Language Waskia feature Order_of_Subject,_Object_and_Verb:
   predicted == 1 SOV
 Language Waskia feature Passive_Constructions:
-  predicted == 1 Present
+  predicted == 2 Absent
 Language Waskia feature Person_Marking_on_Adpositions:
   predicted == 2 No person marking
 Language Waskia feature Polar_Questions:
@@ -7143,7 +7123,7 @@ Language Wathawurrung feature Order_of_Subject,_Object_and_Verb:
 Language Wathawurrung feature Position_of_Case_Affixes:
   predicted == 1 Case suffixes
 Language Wathawurrung feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 2 Possessive suffixes
+  predicted == 4 No possessive affixes
 Language Wathawurrung feature The_Prohibitive:
   predicted == 3 Special imperative + normal negative
 ----------------------------------------------------------------------
@@ -7193,7 +7173,7 @@ Language Waama feature Position_of_Polar_Question_Particles:
 Language wwr (Woiwurrung, Pama-Nyungan/Southeastern Pama-Nyungan, AU):
   12 features known, 2 features to be predicted.
 Language Woiwurrung feature Finger_and_Hand:
-  predicted == 1 Identical
+  predicted == 2 Different
 Language Woiwurrung feature Hand_and_Arm:
   predicted == 2 Different
 ----------------------------------------------------------------------
@@ -7432,13 +7412,13 @@ Language Xokleng feature Gender_Distinctions_in_Independent_Personal_Pronouns:
 Language Xokleng feature Locus_of_Marking:_Whole-language_Typology:
   predicted == 2 Dependent-marking
 Language Xokleng feature Locus_of_Marking_in_Possessive_Noun_Phrases:
-  predicted == 2 Dependent marking
+  predicted == 1 Head marking
 Language Xokleng feature N-M_Pronouns:
   predicted == 1 No N-M pronouns
 Language Xokleng feature Order_of_Person_Markers_on_the_Verb:
   predicted == 1 A and P do not or do not both occur on the verb
 Language Xokleng feature Reciprocal_Constructions:
-  predicted == 2 Distinct from reflexive
+  predicted == 4 Identical to reflexive
 Language Xokleng feature Third_Person_Zero_of_Verbal_Person_Marking:
   predicted == 2 No zero realization
 Language Xokleng feature Verbal_Person_Marking:
@@ -7501,7 +7481,7 @@ Language Yana feature Absence_of_Common_Consonants:
 Language Yana feature Consonant-Vowel_Ratio:
   predicted == 5 High
 Language Yana feature Consonant_Inventories:
-  predicted == 5 Large
+  predicted == 3 Average
 Language Yana feature Cultural_Categories_of_Languages_with_Identity_of_'Finger'_and_'Hand':
   predicted == 1 Hunter-gatherers
 Language Yana feature Glottalized_Consonants:
@@ -7528,7 +7508,7 @@ Language Yao (in Malawi) feature Negative_Morphemes:
 Language Yao (in Malawi) feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Yao (in Malawi) feature Order_of_Negative_Morpheme_and_Verb:
-  predicted == 14 ObligDoubleNeg
+  predicted == 3 [Neg-V]
 Language Yao (in Malawi) feature Order_of_Object_and_Verb:
   predicted == 2 VO
 Language Yao (in Malawi) feature Order_of_Subject,_Object_and_Verb:
@@ -7594,7 +7574,7 @@ Language Yaqui feature Locus_of_Marking:_Whole-language_Typology:
 Language Yaqui feature M-T_Pronouns:
   predicted == 1 No M-T pronouns
 Language Yaqui feature M_in_First_Person_Singular:
-  predicted == 2 m in first person singular
+  predicted == 1 No m in first person singular
 Language Yaqui feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Yaqui feature N-M_Pronouns:
@@ -7606,7 +7586,7 @@ Language Yaqui feature Nominal_and_Verbal_Conjunction:
 Language Yaqui feature Nonperiphrastic_Causative_Constructions:
   predicted == 2 Morphological but no compound
 Language Yaqui feature Noun_Phrase_Conjunction:
-  predicted == 1 'And' different from 'with'
+  predicted == 2 'And' identical to 'with'
 Language Yaqui feature Number_of_Possessive_Nouns:
   predicted == 1 None reported
 Language Yaqui feature Order_of_Adjective_and_Noun:
@@ -7628,7 +7608,7 @@ Language Yaqui feature Periphrastic_Causative_Constructions:
 Language Yaqui feature Politeness_Distinctions_in_Pronouns:
   predicted == 1 No politeness distinction
 Language Yaqui feature Position_of_Interrogative_Phrases_in_Content_Questions:
-  predicted == 2 Not initial interrogative phrase
+  predicted == 1 Initial interrogative phrase
 Language Yaqui feature Position_of_Pronominal_Possessive_Affixes:
   predicted == 1 Possessive prefixes
 Language Yaqui feature Position_of_Tense-Aspect_Affixes:
@@ -7750,7 +7730,7 @@ Language Yup'ik (Chevak) feature Rhythm_Types:
 Language yct (Yucatec, Mayan/Mayan, nan):
   16 features known, 15 features to be predicted.
 Language Yucatec feature Consonant-Vowel_Ratio:
-  predicted == 3 Average
+  predicted == 4 Moderately high
 Language Yucatec feature Consonant_Inventories:
   predicted == 3 Average
 Language Yucatec feature Finger_and_Hand:
@@ -7758,9 +7738,9 @@ Language Yucatec feature Finger_and_Hand:
 Language Yucatec feature Front_Rounded_Vowels:
   predicted == 1 None
 Language Yucatec feature Glottalized_Consonants:
-  predicted == 1 No glottalized consonants
+  predicted == 2 Ejectives only
 Language Yucatec feature Hand_and_Arm:
-  predicted == 2 Different
+  predicted == 1 Identical
 Language Yucatec feature Lateral_Consonants:
   predicted == 2 /l/, no obstruent laterals
 Language Yucatec feature Numeral_Classifiers:
@@ -7841,14 +7821,14 @@ Language Yi feature Preverbal_Negative_Morphemes:
 Language Yi feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 OV and Postpositions
 Language Yi feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
-  predicted == 14 Other NegV
+  predicted == 3 SONegV
 ----------------------------------------------------------------------
 Language yid (Yidiny, Pama-Nyungan/Northern Pama-Nyungan, nan):
   37 features known, 85 features to be predicted.
 Language Yidiny feature 'When'_Clauses:
   predicted == 3 Deranked
 Language Yidiny feature Absence_of_Common_Consonants:
-  predicted == 1 All present
+  predicted == 3 No fricatives
 Language Yidiny feature Adjectives_without_Nouns:
   predicted == 2 Without marking
 Language Yidiny feature Alignment_of_Case_Marking_of_Full_Noun_Phrases:
@@ -7858,15 +7838,15 @@ Language Yidiny feature Alignment_of_Verbal_Person_Marking:
 Language Yidiny feature Antipassive_Constructions:
   predicted == 2 Oblique patient
 Language Yidiny feature Asymmetrical_Case-Marking:
-  predicted == 2 Symmetrical
+  predicted == 5 Qualitatively asymmetrical
 Language Yidiny feature Case_Syncretism:
   predicted == 1 No case marking
 Language Yidiny feature Coding_of_Evidentiality:
-  predicted == 2 Verbal affix or clitic
+  predicted == 1 No grammatical evidentials
 Language Yidiny feature Coding_of_Nominal_Plurality:
   predicted == 2 Plural suffix
 Language Yidiny feature Consonant-Vowel_Ratio:
-  predicted == 4 Moderately high
+  predicted == 3 Average
 Language Yidiny feature Consonant_Inventories:
   predicted == 3 Average
 Language Yidiny feature Definite_Articles:
@@ -7874,11 +7854,11 @@ Language Yidiny feature Definite_Articles:
 Language Yidiny feature Distance_Contrasts_in_Demonstratives:
   predicted == 2 Two-way contrast
 Language Yidiny feature Ditransitive_Constructions:_The_Verb_'Give':
-  predicted == 2 Double-object construction
+  predicted == 1 Indirect-object construction
 Language Yidiny feature Epistemic_Possibility:
   predicted == 3 Other
 Language Yidiny feature Expression_of_Pronominal_Subjects:
-  predicted == 2 Subject affixes on verb
+  predicted == 1 Obligatory pronouns in subject position
 Language Yidiny feature Fixed_Stress_Locations:
   predicted == 2 Initial
 Language Yidiny feature Fusion_of_Selected_Inflectional_Formatives:
@@ -7888,9 +7868,9 @@ Language Yidiny feature Genitives,_Adjectives_and_Relative_Clauses:
 Language Yidiny feature Glottalized_Consonants:
   predicted == 1 No glottalized consonants
 Language Yidiny feature Inclusive/Exclusive_Distinction_in_Independent_Pronouns:
-  predicted == 3 No inclusive/exclusive
+  predicted == 5 Inclusive/exclusive
 Language Yidiny feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
-  predicted == 2 Inclusive and exclusive differentiated
+  predicted == 1 No inclusive/exclusive opposition
 Language Yidiny feature Indefinite_Articles:
   predicted == 5 No definite or indefinite article
 Language Yidiny feature Indefinite_Pronouns:
@@ -7910,7 +7890,7 @@ Language Yidiny feature Noun_Phrase_Conjunction:
 Language Yidiny feature Number_of_Cases:
   predicted == 8 10 or more cases
 Language Yidiny feature Numeral_Bases:
-  predicted == 1 Decimal
+  predicted == 6 Restricted
 Language Yidiny feature Numeral_Classifiers:
   predicted == 1 Absent
 Language Yidiny feature Occurrence_of_Nominal_Plurality:
@@ -7940,9 +7920,9 @@ Language Yidiny feature Passive_Constructions:
 Language Yidiny feature Periphrastic_Causative_Constructions:
   predicted == 2 Purposive but no sequential
 Language Yidiny feature Person_Marking_on_Adpositions:
-  predicted == 2 No person marking
+  predicted == 1 No adpositions
 Language Yidiny feature Plurality_in_Independent_Personal_Pronouns:
-  predicted == 5 Person-number stem + pronominal plural affix
+  predicted == 4 Person-number stem
 Language Yidiny feature Polar_Questions:
   predicted == 1 Question particle
 Language Yidiny feature Position_of_Case_Affixes:
@@ -7950,7 +7930,7 @@ Language Yidiny feature Position_of_Case_Affixes:
 Language Yidiny feature Position_of_Polar_Question_Particles:
   predicted == 6 No question particle
 Language Yidiny feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 2 Possessive suffixes
+  predicted == 4 No possessive affixes
 Language Yidiny feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Yidiny feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
@@ -7966,7 +7946,7 @@ Language Yidiny feature Preverbal_Negative_Morphemes:
 Language Yidiny feature Reciprocal_Constructions:
   predicted == 2 Distinct from reflexive
 Language Yidiny feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
-  predicted == 5 Other
+  predicted == 2 OV and NAdj
 Language Yidiny feature Rhythm_Types:
   predicted == 1 Trochaic
 Language Yidiny feature SNegOV_Order:
@@ -7976,7 +7956,7 @@ Language Yidiny feature SONegV_Order:
 Language Yidiny feature SOVNeg_Order:
   predicted == 11 NoSOVNeg
 Language Yidiny feature Semantic_Distinctions_of_Evidentiality:
-  predicted == 2 Indirect only
+  predicted == 1 No grammatical evidentials
 Language Yidiny feature Sex-based_and_Non-sex-based_Gender_Systems:
   predicted == 1 No gender
 Language Yidiny feature Subtypes_of_Asymmetric_Standard_Negation:
@@ -8031,7 +8011,7 @@ Language Yindjibarndi feature Order_of_Negative_Morpheme_and_Verb:
 Language Yindjibarndi feature Order_of_Object,_Oblique,_and_Verb:
   predicted == 1 VOX
 Language Yindjibarndi feature Position_of_Interrogative_Phrases_in_Content_Questions:
-  predicted == 1 Initial interrogative phrase
+  predicted == 2 Not initial interrogative phrase
 Language Yindjibarndi feature SNegVO_Order:
   predicted == 1 Word&NoDoubleNeg
 Language Yindjibarndi feature SVNegO_Order:
@@ -8044,13 +8024,13 @@ Language Yir Yiront feature 'Want'_Complement_Subjects:
 Language Yir Yiront feature Comitatives_and_Instrumentals:
   predicted == 2 Differentiation
 Language Yir Yiront feature Finger_and_Hand:
-  predicted == 1 Identical
+  predicted == 2 Different
 Language Yir Yiront feature Fixed_Stress_Locations:
   predicted == 2 Initial
 Language Yir Yiront feature Hand_and_Arm:
   predicted == 2 Different
 Language Yir Yiront feature Order_of_Demonstrative_and_Noun:
-  predicted == 2 Noun-Demonstrative
+  predicted == 1 Demonstrative-Noun
 Language Yir Yiront feature Reduplication:
   predicted == 1 Productive full and partial reduplication
 Language Yir Yiront feature Weight-Sensitive_Stress:
@@ -8088,7 +8068,7 @@ Language Yukaghir (Kolyma) feature Distance_Contrasts_in_Demonstratives:
 Language Yukaghir (Kolyma) feature Ditransitive_Constructions:_The_Verb_'Give':
   predicted == 1 Indirect-object construction
 Language Yukaghir (Kolyma) feature Epistemic_Possibility:
-  predicted == 3 Other
+  predicted == 2 Affixes on verbs
 Language Yukaghir (Kolyma) feature Fixed_Stress_Locations:
   predicted == 1 No fixed stress
 Language Yukaghir (Kolyma) feature Front_Rounded_Vowels:
@@ -8170,7 +8150,7 @@ Language Yukaghir (Kolyma) feature Predicative_Possession:
 Language Yukaghir (Kolyma) feature Presence_of_Uncommon_Consonants:
   predicted == 1 None
 Language Yukaghir (Kolyma) feature Reduplication:
-  predicted == 1 Productive full and partial reduplication
+  predicted == 3 No productive reduplication
 Language Yukaghir (Kolyma) feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adposition_and_Noun_Phrase:
   predicted == 1 OV and Postpositions
 Language Yukaghir (Kolyma) feature Relativization_on_Obliques:
@@ -8200,7 +8180,7 @@ Language Yukaghir (Kolyma) feature The_Associative_Plural:
 Language Yukaghir (Kolyma) feature The_Optative:
   predicted == 1 Inflectional optative present
 Language Yukaghir (Kolyma) feature The_Past_Tense:
-  predicted == 1 Present, no remoteness distinctions
+  predicted == 4 No past tense
 Language Yukaghir (Kolyma) feature The_Prohibitive:
   predicted == 4 Special imperative + special negative
 Language Yukaghir (Kolyma) feature The_Velar_Nasal:
@@ -8344,7 +8324,7 @@ Language Yakut feature Voicing_in_Plosives_and_Fricatives:
 Language Yakut feature Vowel_Quality_Inventories:
   predicted == 3 Large (7-14)
 Language Yakut feature Zero_Copula_for_Predicate_Nominals:
-  predicted == 2 Possible
+  predicted == 1 Impossible
 ----------------------------------------------------------------------
 Language ylb (Yulparija, Pama-Nyungan/Western Pama-Nyungan, AU):
   12 features known, 2 features to be predicted.
@@ -8373,14 +8353,14 @@ Language Yupik (Naukan) feature M_in_First_Person_Singular:
 Language Yupik (Naukan) feature N-M_Pronouns:
   predicted == 1 No N-M pronouns
 Language Yupik (Naukan) feature Plurality_in_Independent_Personal_Pronouns:
-  predicted == 5 Person-number stem + pronominal plural affix
+  predicted == 7 Person stem + pronominal plural affix
 ----------------------------------------------------------------------
 Language yng (Yingkarta, Pama-Nyungan/Western Pama-Nyungan, AU):
   17 features known, 28 features to be predicted.
 Language Yingkarta feature Expression_of_Pronominal_Subjects:
   predicted == 2 Subject affixes on verb
 Language Yingkarta feature Genitives,_Adjectives_and_Relative_Clauses:
-  predicted == 1 Weakly differentiated
+  predicted == 6 Highly differentiated
 Language Yingkarta feature Inclusive/Exclusive_Forms_in_Pama-Nyungan:
   predicted == 2 Inclusive and exclusive differentiated
 Language Yingkarta feature Indefinite_Pronouns:
@@ -8402,7 +8382,7 @@ Language Yingkarta feature Order_of_Numeral_and_Noun:
 Language Yingkarta feature Order_of_Object_and_Verb:
   predicted == 2 VO
 Language Yingkarta feature Order_of_Subject,_Object_and_Verb:
-  predicted == 2 SVO
+  predicted == 7 No dominant order
 Language Yingkarta feature Order_of_Subject_and_Verb:
   predicted == 1 SV
 Language Yingkarta feature Polar_Questions:
@@ -8414,7 +8394,7 @@ Language Yingkarta feature Position_of_Negative_Word_With_Respect_to_Subject,_Ob
 Language Yingkarta feature Position_of_Polar_Question_Particles:
   predicted == 6 No question particle
 Language Yingkarta feature Position_of_Pronominal_Possessive_Affixes:
-  predicted == 2 Possessive suffixes
+  predicted == 4 No possessive affixes
 Language Yingkarta feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Yingkarta feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
@@ -8593,7 +8573,7 @@ Language Yup'ik (Central) feature Position_of_Polar_Question_Particles:
 Language Yup'ik (Central) feature Position_of_Tense-Aspect_Affixes:
   predicted == 2 Tense-aspect suffixes
 Language Yup'ik (Central) feature Postverbal_Negative_Morphemes:
-  predicted == 2 [V-Neg]
+  predicted == 4 None
 Language Yup'ik (Central) feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
   predicted == 2 Strongly suffixing
 Language Yup'ik (Central) feature Preverbal_Negative_Morphemes:
@@ -8623,7 +8603,7 @@ Language Yup'ik (Central) feature Verbal_Number_and_Suppletion:
 Language Yup'ik (Central) feature Weight-Sensitive_Stress:
   predicted == 8 Fixed stress (no weight-sensitivity)
 Language Yup'ik (Central) feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
-  predicted == 1 No weight
+  predicted == 7 Combined
 ----------------------------------------------------------------------
 Language ysl (Yupik (St. Lawrence Island), Eskimo-Aleut/Eskimo, nan):
   9 features known, 3 features to be predicted.
@@ -8632,7 +8612,7 @@ Language Yupik (St. Lawrence Island) feature Fixed_Stress_Locations:
 Language Yupik (St. Lawrence Island) feature Rhythm_Types:
   predicted == 4 Undetermined
 Language Yupik (St. Lawrence Island) feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
-  predicted == 6 Lexical stress
+  predicted == 7 Combined
 ----------------------------------------------------------------------
 Language ytu (Yukaghir (Tundra), Yukaghir/Yukaghir, RU):
   44 features known, 9 features to be predicted.
@@ -8690,7 +8670,7 @@ Language Yuchi feature Numeral_Classifiers:
 Language Yuchi feature Order_of_Adjective_and_Noun:
   predicted == 2 Noun-Adjective
 Language Yuchi feature Order_of_Adverbial_Subordinator_and_Clause:
-  predicted == 1 Initial subordinator word
+  predicted == 2 Final subordinator word
 Language Yuchi feature Order_of_Demonstrative_and_Noun:
   predicted == 2 Noun-Demonstrative
 Language Yuchi feature Order_of_Negative_Morpheme_and_Verb:
@@ -8825,7 +8805,7 @@ Language Yupik (Siberian) feature Hand_and_Arm:
 Language Yupik (Siberian) feature Lateral_Consonants:
   predicted == 2 /l/, no obstruent laterals
 Language Yupik (Siberian) feature Number_of_Basic_Colour_Categories:
-  predicted == 7 11
+  predicted == 3 6-6.5
 Language Yupik (Siberian) feature Number_of_Non-Derived_Basic_Colour_Categories:
   predicted == 5 5
 Language Yupik (Siberian) feature Order_of_Object,_Oblique,_and_Verb:
@@ -8870,7 +8850,7 @@ Language Yawelmani feature M_in_First_Person_Singular:
 Language Yawelmani feature M_in_Second_Person_Singular:
   predicted == 2 m in second person singular
 Language Yawelmani feature N-M_Pronouns:
-  predicted == 1 No N-M pronouns
+  predicted == 2 N-M pronouns, paradigmatic
 Language Yawelmani feature Numeral_Classifiers:
   predicted == 1 Absent
 Language Yawelmani feature Occurrence_of_Nominal_Plurality:
@@ -9091,9 +9071,9 @@ Language Zulu feature Order_of_Person_Markers_on_the_Verb:
 Language Zulu feature Order_of_Relative_Clause_and_Noun:
   predicted == 1 Noun-Relative clause
 Language Zulu feature Other_Roles_of_Applied_Objects:
-  predicted == 3 Instrument and locative
+  predicted == 5 No applicative construction
 Language Zulu feature Perfective/Imperfective_Aspect:
-  predicted == 1 Grammatical marking
+  predicted == 2 No grammatical marking
 Language Zulu feature Position_of_Interrogative_Phrases_in_Content_Questions:
   predicted == 2 Not initial interrogative phrase
 Language Zulu feature Predicative_Adjectives:
@@ -9168,7 +9148,7 @@ Language Zuni feature Suppletion_According_to_Tense_and_Aspect:
 Language Zuni feature The_Optative:
   predicted == 2 Inflectional optative absent
 Language Zuni feature Tone:
-  predicted == 1 No tones
+  predicted == 2 Simple tone system
 Language Zuni feature Verbal_Number_and_Suppletion:
   predicted == 1 None
 Language Zuni feature Voicing_and_Gaps_in_Plosive_Systems:
