@@ -69,6 +69,7 @@ if($headers !~ m/^wals_code/)
     print STDERR ("         $headers\n");
 }
 print("wals_code\tname\tfamily\tfeatures\n");
+my $n_predicted = 0;
 while(<BLIND>)
 {
     my $line = $_;
@@ -108,8 +109,8 @@ while(<BLIND>)
                     }
                     else
                     {
-                        # In the trial test data, feature names are lowercased.
-                        $fv = lc($f).'='.$vp;
+                        $v = $vp;
+                        $n_predicted++;
                     }
                 }
                 else
@@ -117,6 +118,8 @@ while(<BLIND>)
                     print STDERR ("WARNING: No available prediction for language '$lname' feature '$f'\n");
                 }
             }
+            # In the trial test data, feature names are lowercased.
+            $fv = lc($f).'='.$v;
         }
         else
         {
@@ -127,3 +130,4 @@ while(<BLIND>)
     print("$lcode\t$lname\t$family\t$features\n");
 }
 close(BLIND);
+print STDERR ("Predicted $n_predicted feature values in total.\n");
