@@ -1,5 +1,5 @@
 python3 merge_score_thresh.py \
-    ../data/dev_x.csv \
+    ../data/test_x.csv \
     ../outputs/cond_prob_info_nous_latlon2d-test.csv \
     ../outputs/cond_prob_info_nous_latlon2d-test-scores.csv \
     ../outputs/lang_embedding_test.csv \
