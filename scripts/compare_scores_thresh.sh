@@ -1,1 +1,1 @@
-python3 compare_scores_thresh.py ../data/dev_x.csv ../data/dev_y.csv ../outputs/cond_prob_info_nous_latlon2d-dev.csv ../outputs/cond_prob_info_nous_latlon2d-dev-scores.csv ../outputs/lang_embedding.csv ../outputs/lang_embedding_probs.csv 0.8 0.65
+python3 compare_scores_thresh.py ../data/dev_x.csv ../data/dev_y.csv ../outputs/cond_prob_info_nous_latlon2d-dev.csv ../outputs/cond_prob_info_nous_latlon2d-dev-scores.csv ../outputs/lang_embedding.csv ../outputs/lang_embedding_probs.csv 0.5 0.65

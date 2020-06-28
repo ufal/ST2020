@@ -102,7 +102,7 @@ print('Different', '1 better', '2 better', 'Correctly 1', 'Incorrectly 1')
 print(different_count, better_1, better_2, len(correct_1_scores), len(incorrect_1_scores))
 
 
-diff_scores.sort(key=tuple2second, reverse=True)
+diff_scores.sort(key=tuple2first, reverse=True)
 print()
 print('Score 1', 'Score 2', '1 > 2', 'Acc', sep='\t')
 diff_correct_2 = 0
