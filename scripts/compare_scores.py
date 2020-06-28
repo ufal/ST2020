@@ -40,12 +40,12 @@ worse_2_scores = list()
 
 def percent(share, total):
     if total > 0:
-        return '{:.2f}%'.format(share*100/total)
+        return '{:.2f}'.format(share*100/total)
     else:
         return '--'
 
 def tdp(number):
-    return '{:.2f}'.format(number)
+    return '{:.3f}'.format(number)
 
 for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
         dev_x, dev_y, out_1, out_1_scores, out_2, out_2_scores):
@@ -92,14 +92,50 @@ for feat in total:
             better_1[feat] + better_2[feat],
             sep='\t')
 
+def tuple2first(tup):
+    return tup[0]
+
+dan_sc_bw = list()
+for score in better_1_scores:
+    dan_sc_bw.append((score, True))
+for score in worse_1_scores:
+    dan_sc_bw.append((score, False))
+dan_sc_bw.sort(key=tuple2first, reverse=True)
+
+martin_sc_bw = list()
+for score in better_2_scores:
+    martin_sc_bw.append((score, True))
+for score in worse_2_scores:
+    martin_sc_bw.append((score, False))
+martin_sc_bw.sort(key=tuple2first)
+
 print()
-print('Dan better than Martin')
-for dan, martin in zip(better_1_scores, worse_2_scores):
-    print(tdp(dan), '>', tdp(martin))
+print('Dan', 'Better?', '% better', sep='\t')
+better_count = 0
+total_count = 0
+for score, better in dan_sc_bw:
+    total_count += 1
+    better_count += better
+    print(tdp(score), better, percent(better_count, total_count), sep='\t')
+
 print()
-print('Martin better than Dan')
-for dan, martin in zip(worse_1_scores, better_2_scores):
-    print(tdp(dan), '<', tdp(martin))
+print('Martin', 'Better?', '% worse', sep='\t')
+worse_count = 0
+total_count = 0
+for score, better in martin_sc_bw:
+    total_count += 1
+    worse_count += not better
+    print(tdp(score), better, percent(worse_count, total_count), sep='\t')
+
+print()
+print('Martin', 'Better?', '% better', sep='\t')
+martin_sc_bw.sort(key=tuple2first, reverse=True)
+better_count = 0
+total_count = 0
+for score, better in martin_sc_bw:
+    total_count += 1
+    better_count += better
+    print(tdp(score), better, percent(better_count, total_count), sep='\t')
 
 print()
 print('Feature', 'Acc 1', 'Acc 2', 'Acc *', '1 > 2', 'Support', sep='\t')
