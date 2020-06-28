@@ -30,9 +30,14 @@ correct_1 = 0
 correct_2 = 0
 correct_any = 0
 correct_thresh = 0
+better_1 = 0
+better_2 = 0
 different_count = 0
 correct_1_scores = []
 incorrect_1_scores = []
+
+diff_scores = list()
+
 
 def percent(share, total):
     if total > 0:
@@ -49,7 +54,7 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
         if line_x[feat] == '?':
             is_correct_1 = line_y[feat] == line_1[feat]
             is_correct_2 = line_y[feat] == line_2[feat]
-            is_different = line_1[feat] != line_2[feat]
+            is_different = (line_1[feat] != line_2[feat]) and (is_correct_1 or is_correct_2)
             score_1 = float(line_1_score[feat])
             score_2 = float(line_2_score[feat])
             
@@ -68,12 +73,16 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
             correct_any += (is_correct_1 or is_correct_2)
             correct_thresh += is_correct_thresh
             
-#            if is_correct_1 and not is_correct_2:
-#                better_1 += 1
-#            if is_correct_2 and not is_correct_1:
-#                better_2 += 1
+            if is_correct_1 and not is_correct_2:
+                better_1 += 1
+            if is_correct_2 and not is_correct_1:
+                better_2 += 1
 
             different_count += is_different
+
+
+            if is_different:
+                diff_scores.append((score_1, score_2, is_correct_1))
 
 
             if is_different and choose_1:
@@ -85,25 +94,40 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
 def tuple2first(tup):
     return tup[0]
 
+def tuple2second(tup):
+    return tup[1]
 
-print('Different', 'Correctly 1', 'Incorrectly 1')
-print(different_count, len(correct_1_scores), len(incorrect_1_scores))
 
-dan_sc_bw = list()
-for score in correct_1_scores:
-    dan_sc_bw.append((score, True))
-for score in incorrect_1_scores:
-    dan_sc_bw.append((score, False))
-dan_sc_bw.sort(key=tuple2first, reverse=True)
+print('Different', '1 better', '2 better', 'Correctly 1', 'Incorrectly 1')
+print(different_count, better_1, better_2, len(correct_1_scores), len(incorrect_1_scores))
 
+
+diff_scores.sort(key=tuple2second, reverse=True)
 print()
-print('Dan', 'Better?', '% better', sep='\t')
-better_count = 0
-total_count = 0
-for score, better in dan_sc_bw:
-    total_count += 1
-    better_count += better
-    print(tdp(score), better, percent(better_count, total_count), sep='\t')
+print('Score 1', 'Score 2', '1 > 2', 'Acc', sep='\t')
+diff_correct_2 = 0
+diff_total = 0
+for score_1, score_2, is_correct_1 in diff_scores:
+    diff_total += 1
+    diff_correct_2 += not is_correct_1
+    print(tdp(score_1), tdp(score_2), is_correct_1, percent(diff_correct_2, diff_total), sep='\t')
+
+
+#dan_sc_bw = list()
+#for score in correct_1_scores:
+#    dan_sc_bw.append((score, True))
+#for score in incorrect_1_scores:
+#    dan_sc_bw.append((score, False))
+#dan_sc_bw.sort(key=tuple2first, reverse=True)
+
+#print()
+#print('Dan', 'Better?', '% better', sep='\t')
+#better_count = 0
+#total_count = 0
+#for score, better in dan_sc_bw:
+#    total_count += 1
+#    better_count += better
+#    print(tdp(score), better, percent(better_count, total_count), sep='\t')
 
 
 
