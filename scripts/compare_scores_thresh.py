@@ -30,10 +30,9 @@ correct_1 = 0
 correct_2 = 0
 correct_any = 0
 correct_thresh = 0
-better_1 = 0
-better_2 = 0
-correct_1_scores = list()
-incorrect_1_scores = list()
+different_count = 0
+correct_1_scores = []
+incorrect_1_scores = []
 
 def percent(share, total):
     if total > 0:
@@ -50,6 +49,7 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
         if line_x[feat] == '?':
             is_correct_1 = line_y[feat] == line_1[feat]
             is_correct_2 = line_y[feat] == line_2[feat]
+            is_different = line_1[feat] != line_2[feat]
             score_1 = float(line_1_score[feat])
             score_2 = float(line_2_score[feat])
             
@@ -68,12 +68,15 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
             correct_any += (is_correct_1 or is_correct_2)
             correct_thresh += is_correct_thresh
             
-            if is_correct_1 and not is_correct_2:
-                better_1 += 1
-            if is_correct_2 and not is_correct_1:
-                better_2 += 1
- 
-            if choose_1:
+#            if is_correct_1 and not is_correct_2:
+#                better_1 += 1
+#            if is_correct_2 and not is_correct_1:
+#                better_2 += 1
+
+            different_count += is_different
+
+
+            if is_different and choose_1:
                 if is_correct_thresh:
                     correct_1_scores.append(score_1)
                 else:
@@ -82,6 +85,9 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
 def tuple2first(tup):
     return tup[0]
 
+
+print('Different', 'Correctly 1', 'Incorrectly 1')
+print(different_count, len(correct_1_scores), len(incorrect_1_scores))
 
 dan_sc_bw = list()
 for score in correct_1_scores:
