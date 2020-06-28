@@ -33,6 +33,10 @@ correct_1_scores = list()
 incorrect_1_scores = list()
 correct_2_scores = list()
 incorrect_2_scores = list()
+better_1_scores = list()
+worse_1_scores = list()
+better_2_scores = list()
+worse_2_scores = list()
 
 def percent(share, total):
     if total > 0:
@@ -49,16 +53,23 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
         if line_x[feat] == '?':
             is_correct_1 = line_y[feat] == line_1[feat]
             is_correct_2 = line_y[feat] == line_2[feat]
+            score_1 = float(line_1_score[feat])
+            score_2 = float(line_2_score[feat])
             
             total[feat] += 1
             correct_1[feat] += is_correct_1
             correct_2[feat] += is_correct_2
             correct_any[feat] += (is_correct_1 or is_correct_2)
-            better_1[feat] += (is_correct_1 and not is_correct_2)
-            better_2[feat] += (is_correct_2 and not is_correct_1)
+            
+            if is_correct_1 and not is_correct_2:
+                better_1[feat] += 1
+                better_1_scores.append(score_1)
+                worse_2_scores.append(score_2)
+            if is_correct_2 and not is_correct_1:
+                better_2[feat] += 1
+                better_2_scores.append(score_2)
+                worse_1_scores.append(score_1)
 
-            score_1 = float(line_1_score[feat])
-            score_2 = float(line_2_score[feat])
             if is_correct_1:
                 correct_1_scores.append(score_1)
             else:
@@ -67,6 +78,8 @@ for line_x, line_y, line_1, line_1_score, line_2, line_2_score in zip(
                 correct_2_scores.append(score_2)
             else:
                 incorrect_2_scores.append(score_2)
+
+
 
 print()
 print('Feature', 'Acc 1', 'Acc 2', 'Acc *', '1 > 2', 'Support', sep='\t')
@@ -78,6 +91,15 @@ for feat in total:
             percent(better_1[feat], (better_1[feat] + better_2[feat])),
             better_1[feat] + better_2[feat],
             sep='\t')
+
+print()
+print('Dan better than Martin')
+for dan, martin in zip(better_1_scores, worse_2_scores):
+    print(tdp(dan), '>', tdp(martin))
+print()
+print('Martin better than Dan')
+for dan, martin in zip(worse_1_scores, better_2_scores):
+    print(tdp(dan), '<', tdp(martin))
 
 print()
 print('Feature', 'Acc 1', 'Acc 2', 'Acc *', '1 > 2', 'Support', sep='\t')
@@ -115,6 +137,33 @@ print('Martin',
         tdp(min(correct_2_scores)),
         tdp(max(correct_2_scores)),
         tdp(sum(correct_2_scores)/len(correct_2_scores)),
+        sep='\t')
+
+print()
+print('Setup', 'Eval', 'Min', 'Max', 'Avg', sep='\t')
+print('Dan',
+        'Worse',
+        tdp(min(worse_1_scores)),
+        tdp(max(worse_1_scores)),
+        tdp(sum(worse_1_scores)/len(worse_1_scores)),
+        sep='\t')
+print('Dan',
+        'Better',
+        tdp(min(better_1_scores)),
+        tdp(max(better_1_scores)),
+        tdp(sum(better_1_scores)/len(better_1_scores)),
+        sep='\t')
+print('Martin',
+        'Worse',
+        tdp(min(worse_2_scores)),
+        tdp(max(worse_2_scores)),
+        tdp(sum(worse_2_scores)/len(worse_2_scores)),
+        sep='\t')
+print('Martin',
+        'Better',
+        tdp(min(better_2_scores)),
+        tdp(max(better_2_scores)),
+        tdp(sum(better_2_scores)/len(better_2_scores)),
         sep='\t')
 
 # TODO correlation?
