@@ -118,6 +118,15 @@ while(<BLIND>)
                     print STDERR ("WARNING: No available prediction for language '$lname' feature '$f'\n");
                 }
             }
+            # Final sanity check.
+            if(!defined($v) || $v eq '' || $v eq 'nan' || $v eq '?')
+            {
+                print STDERR ("WARNING: Missing value for language '$lname' feature '$f'\n");
+            }
+            elsif($v !~ m/^\d+\s+.+$/)
+            {
+                print STDERR ("WARNING: Language '$lname' feature '$f' strange value '$v'\n");
+            }
             # In the trial test data, feature names are lowercased.
             $fv = lc($f).'='.$v;
         }
