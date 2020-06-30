@@ -49,6 +49,11 @@ my %config;
 #   2 ... print also other options so we can see why a wrong prediction was made
 $config{debug} = 0;
 $config{print_hi} = 0; # print entropy of each feature and mutual information of each pair of features
+# Possible train-on-dev values:
+#   no ... do not use any information from the development data when training
+#   blind (default) ... use the information that was left visible in the blinded development data
+#   gold ... use the full development set as additional training data
+$config{train_on_dev} = 'blind';
 # Possible scores:
 #   c ... how many times we observed that target feature = x and source feature = y in the same language
 #   p ... conditional probability that target feature = x given that source feature = y
@@ -84,6 +89,7 @@ GetOptions
 (
     'debug=i'  => \$config{debug},
     'print_hi' => \$config{print_hi},
+    'train_on_dev=s' => \$config{train_on_dev},
     'score=s'  => \$config{score},
     'model=s'  => \$config{model},
     'countrycodes=s' => \$config{countrycodes},
@@ -151,7 +157,14 @@ print STDERR ("Comparing training and development data...\n");
 compare_data_sets(\%traindata, \%devdata);
 print STDERR ("Comparing training and test data...\n");
 compare_data_sets(\%traindata, \%testdata);
-merge_data(\%traindata, \%devdata);
+if($config{train_on_dev} eq 'blind')
+{
+    merge_data(\%traindata, \%devdata);
+}
+elsif($config{train_on_dev} eq 'gold')
+{
+    merge_data(\%traindata, \%devgdata);
+}
 merge_data(\%traindata, \%testdata);
 # Everything is read. Now organize the data better.
 print STDERR ("Hashing the features and their cooccurrences...\n");
