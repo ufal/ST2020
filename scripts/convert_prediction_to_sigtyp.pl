@@ -84,7 +84,7 @@ while(<BLIND>)
     }
     elsif(scalar(@f) > 8)
     {
-        my $features = join('', @f[7..$#f]);
+        my $features = join('|', @f[7..$#f]);
         splice(@f, 7, scalar(@f)-7, $features);
     }
     my $lcode = $f[0];
