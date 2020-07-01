@@ -1246,5 +1246,42 @@ sub compare_data_sets
                 print STDERR ("Feature '$feature' from the second dataset is not know in WALS.\n");
             }
         }
+        # Invert the hash of codes (feature values) so that we can search feature values.
+        my %wvalues;
+        foreach $cid (keys(%{$wals->{codes}}))
+        {
+            my $name = $wals->{codes}{$cid}{number}.' '.$wals->{codes}{$cid}{name};
+            $wvalues{$name} = $wals->{codes}{$cid};
+        }
+        # Check that all feature values in d1 are known in WALS.
+        foreach my $line (@{$d1->{table}})
+        {
+            for(my $i = 0; $i <= $#{$line}; $i++)
+            {
+                if(exists($wfeatures{$f1->[$i]}))
+                {
+                    my $value = $line->[$i];
+                    if(!exists($wvalues{$value}))
+                    {
+                        print STDERR ("Feature value '$value' from the first dataset is not known in WALS.\n");
+                    }
+                }
+            }
+        }
+        # Check that all feature values in d2 are known in WALS.
+        foreach my $line (@{$d2->{table}})
+        {
+            for(my $i = 0; $i <= $#{$line}; $i++)
+            {
+                if(exists($wfeatures{$f2->[$i]}))
+                {
+                    my $value = $line->[$i];
+                    if(!exists($wvalues{$value}))
+                    {
+                        print STDERR ("Feature value '$value' from the second dataset is not known in WALS.\n");
+                    }
+                }
+            }
+        }
     }
 }
