@@ -3,6 +3,9 @@
 # Copyright © 2020 Dan Zeman <zeman@ufal.mff.cuni.cz>
 # License: GNU GPL
 
+# To convert the blinded test data from the organizers to our format:
+# perl scripts/check_csv.pl --original --write < data/test_blinded.csv > data/test_x.csv
+
 use utf8;
 use open ':utf8';
 binmode(STDIN, ':utf8');
