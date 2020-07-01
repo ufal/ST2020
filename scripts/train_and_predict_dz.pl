@@ -1266,21 +1266,18 @@ sub compare_data_sets
                     {
                         print STDERR ("Feature value '$value' from the first dataset is not known in WALS.\n");
                     }
-                    else
-                    {
-                        print STDERR ("Feature value '$value' is OK.\n");
-                    }
                 }
             }
         }
         # Check that all feature values in d2 are known in WALS.
-        foreach my $line (@{$d2->{table}})
+        foreach my $lcode (@{$l2})
         {
-            for(my $i = 0; $i <= $#{$line}; $i++)
+            foreach my $feature (@{$f2})
             {
-                if(exists($wfeatures{$f2->[$i]}))
+                if(exists($wfeatures{$feature}))
                 {
-                    my $value = $line->[$i];
+                    my $value = $d2->{lh}{$lcode}{$feature};
+                    next if($value eq 'nan');
                     if(!exists($wvalues{$value}))
                     {
                         print STDERR ("Feature value '$value' from the second dataset is not known in WALS.\n");
