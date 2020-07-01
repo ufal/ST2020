@@ -44,7 +44,7 @@ GetOptions
     'write'    => \$write
 );
 
-my %data = Sigtypio::read_csv();
+my %data = $original ? Sigtypio::read_tab() : Sigtypio::read_csv();
 print STDERR ("Found $data{nf} headers.\n");
 print STDERR ("Found $data{nl} language lines.\n");
 Sigtypio::convert_table_to_lh(\%data, 0);

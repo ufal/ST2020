@@ -135,39 +135,17 @@ sub read_csv
         $iline++;
         s/\r?\n$//;
         # In the non-original (comma-separated) file, we must distinguish commas inside quotes from those outside.
-        unless($original)
-        {
-            $_ = process_quoted_commas($_, $rcomma);
-        }
+        $_ = process_quoted_commas($_, $rcomma);
         my @f = ();
         if(scalar(@headers)==0)
         {
-            # In the original dev.csv, the headers are separated by one or more spaces, while the rest is separated by tabulators!
-            if($original)
-            {
-                @f = split(/\s+/, $_);
-                # Insert the column for the numeric id that we use in our format.
-                unshift(@f, '');
-            }
-            else
-            {
-                @f = split(/,/, $_);
-            }
+            @f = split(/,/, $_);
             @headers = map {restore_commas($_, $rcomma)} (@f);
             $nf = scalar(@headers);
         }
         else
         {
-            if($original)
-            {
-                @f = split(/\t/, $_);
-                # Insert the column for the numeric id that we use in our format.
-                unshift(@f, $id++);
-            }
-            else
-            {
-                @f = split(/,/, $_);
-            }
+            @f = split(/,/, $_);
             @f = map {restore_commas($_, $rcomma)} (@f);
             my $n = scalar(@f);
             # The number of values may be less than the number of columns if the trailing columns are empty.
@@ -175,51 +153,13 @@ sub read_csv
             if($n > $nf)
             {
                 # Assume that it can be fixed by joining the last column with the extra columns.
+                # The tabulator seems to appear at the boundary of two features, and there is no vertical bar, so we should probably add '|'.
                 my $ntojoin = $n-$nf+1;
                 print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n. Joining the last $ntojoin fields.\n");
-                $f[$nf-1] = join('', @f[($nf-1)..($n-1)]);
+                $f[$nf-1] = join('|', @f[($nf-1)..($n-1)]);
                 splice(@f, $nf);
             }
-            # The original format has 8 columns, now 9 because we added the numeric index.
-            # The ninth column contains all the features. Remember their names.
-            if($original && scalar(@f)==9)
-            {
-                my @features = map {s/=.*//; $_} (split(/\|/, $f[8]));
-                foreach my $feature (@features)
-                {
-                    $feature_names{$feature}++;
-                }
-            }
             push(@data, \@f);
-        }
-    }
-    # If we read the original format, split the features so that each has its own column.
-    if($original)
-    {
-        my @fnames = sort(keys(%feature_names));
-        splice(@headers, $#headers, 1, @fnames);
-        foreach my $row (@data)
-        {
-            my @features = split(/\|/, pop(@{$row}));
-            my %features;
-            foreach my $fv (@features)
-            {
-                if($fv =~ m/^(.+?)=(.+)$/)
-                {
-                    $features{$1} = $2;
-                }
-            }
-            foreach my $f (@fnames)
-            {
-                if(defined($features{$f}))
-                {
-                    push(@{$row}, $features{$f});
-                }
-                else
-                {
-                    push(@{$row}, 'nan');
-                }
-            }
         }
     }
     if($myfiles)
@@ -304,6 +244,118 @@ sub restore_commas
     my $rcomma = shift; # the replacement
     $string =~ s/$rcomma/,/g;
     return $string;
+}
+
+
+
+#------------------------------------------------------------------------------
+# Reads a table as a tab-separated text file: either from STDIN, or from files
+# supplied as arguments. Expects certain anomalies that appear in the data
+# provided by the shared task organizers: the last column sometimes contains
+# a tab character which is not meant to start a new column.
+#------------------------------------------------------------------------------
+sub read_tab
+{
+    # @_ can optionally contain the list of files to read from.
+    # If it does not exist, @ARGV will be tried. If it is empty, read from STDIN.
+    my $myfiles = 0;
+    my @oldargv;
+    if(scalar(@_) > 0)
+    {
+        $myfiles = 1;
+        @oldargv = @ARGV;
+        @ARGV = @_;
+    }
+    my @headers = ();
+    my $nf;
+    my $iline = 0;
+    my @data; # the table, without the header line
+    my $id = 0;
+    my %feature_names;
+    while(<>)
+    {
+        $iline++;
+        s/\r?\n$//;
+        if(scalar(@headers)==0)
+        {
+            # In the original dev.csv, the headers are separated by one or more spaces, while the rest is separated by tabulators!
+            @headers = split(/\s+/, $_);
+            # Insert the column for the numeric id that we use in our format.
+            unshift(@headers, 'index');
+            $nf = scalar(@headers);
+        }
+        else
+        {
+            my @f = split(/\t/, $_);
+            # Insert the column for the numeric id that we use in our format.
+            unshift(@f, $id++);
+            my $n = scalar(@f);
+            # The number of values may be less than the number of columns if the trailing columns are empty.
+            # However, the number of values must not be greater than the number of columns (which would happen if a value contained the separator character).
+            if($n > $nf)
+            {
+                # Assume that it can be fixed by joining the last column with the extra columns.
+                # The tabulator seems to appear at the boundary of two features, and there is no vertical bar, so we should probably add '|'.
+                my $ntojoin = $n-$nf+1;
+                print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n. Joining the last $ntojoin fields.\n");
+                $f[$nf-1] = join('|', @f[($nf-1)..($n-1)]);
+                splice(@f, $nf);
+            }
+            # The original format has 8 columns, now 9 because we added the numeric index.
+            # The ninth column contains all the features. Remember their names.
+            if(scalar(@f)==9)
+            {
+                my @features = map {s/=.*//; $_} (split(/\|/, $f[8]));
+                foreach my $feature (@features)
+                {
+                    $feature_names{$feature}++;
+                }
+            }
+            push(@data, \@f);
+        }
+    }
+    # Split the features so that each has its own column.
+    my @fnames = sort(keys(%feature_names));
+    splice(@headers, $#headers, 1, @fnames);
+    foreach my $row (@data)
+    {
+        my @features = split(/\|/, pop(@{$row}));
+        my %features;
+        foreach my $fv (@features)
+        {
+            if($fv =~ m/^(.+?)=(.+)$/)
+            {
+                $features{$1} = $2;
+            }
+        }
+        foreach my $f (@fnames)
+        {
+            if(defined($features{$f}))
+            {
+                push(@{$row}, $features{$f});
+            }
+            else
+            {
+                push(@{$row}, 'nan');
+            }
+        }
+    }
+    if($myfiles)
+    {
+        @ARGV = @oldargv;
+    }
+    # We may want to add new combined features but we will not want to output them;
+    # therefore we must save the original list of features.
+    my @infeatures = @headers;
+    my %data =
+    (
+        'infeatures' => \@infeatures,
+        'features'   => \@headers,
+        'table'      => \@data,
+        'nf'         => scalar(@headers),
+        'nl'         => scalar(@data)
+    );
+    return %data;
 }
 
 
