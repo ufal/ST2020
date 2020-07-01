@@ -1,3 +1,4 @@
+Reading WALS...
 Reading the training data...
 Found 193 headers.
 Found 1125 language lines.
@@ -9,9 +10,15 @@ Reading the blind test data...
 Found 191 headers.
 Found 149 language lines.
 Comparing training and development data...
+Checking data against WALS 2020...
+Feature value '1 Separate word, no double negation	Word&NoDoubleNeg' from the first dataset is not known in WALS.
+Feature value '2 Prefix, no double negation	Prefix&NoDoubleNeg' from the first dataset is not known in WALS.
 Comparing training and test data...
 Feature 'Obligatory_Double_Negation_in_SVO_languages' exists only in the first dataset.
 Feature 'Nasal_Vowels_in_West_Africa' exists only in the first dataset.
+Checking data against WALS 2020...
+Feature value '1 Separate word, no double negation	Word&NoDoubleNeg' from the first dataset is not known in WALS.
+Feature value '2 Prefix, no double negation	Prefix&NoDoubleNeg' from the first dataset is not known in WALS.
 Hashing the features and their cooccurrences...
 83 languages × 192 features would be 15936.
 Found 12141 nan values.
@@ -4148,10 +4155,10 @@ Per-feature accuracy:
     0 /   2 = 0.00% : The_Position_of_Negative_Morphemes_in_Object-Initial_Languages
 Writing the completed file...
 149 languages × 190 features would be 28310.
-Found 21899 nan values.
-Found 2410 ? values to be predicted.
-Found 4299 regular non-empty values.
-On average, a language has 28.8053691275168 non-empty features and 16.1744966442953 features to predict.
+Found 21888 nan values.
+Found 2417 ? values to be predicted.
+Found 4303 regular non-empty values.
+On average, a language has 28.8791946308725 non-empty features and 16.2214765100671 features to predict.
 Minimum knowledge is 9 non-empty features (language Garus); in that case, 6 features are to be predicted.
 Note that the non-empty features always include 8 non-typologic features: ord, code, name, latitude, longitude, genus, family, countrycodes.
 Predicting the masked features...
@@ -4641,7 +4648,7 @@ Language Ixil feature The_Velar_Nasal:
   predicted == 3 No velar nasal
 ----------------------------------------------------------------------
 Language jak (Jakaltek, Mayan/Mayan, nan):
-  133 features known, 7 features to be predicted.
+  134 features known, 8 features to be predicted.
 Language Jakaltek feature Exponence_of_Tense-Aspect-Mood_Inflection:
   predicted == 1 monoexponential TAM
 Language Jakaltek feature M_in_Second_Person_Singular:
@@ -4650,6 +4657,8 @@ Language Jakaltek feature Number_of_Possessive_Nouns:
   predicted == 1 None reported
 Language Jakaltek feature Other_Roles_of_Applied_Objects:
   predicted == 5 No applicative construction
+Language Jakaltek feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
+  predicted == 3 Immed preverbal
 Language Jakaltek feature Productivity_of_the_Antipassive_Construction:
   predicted == 4 no antipassive
 Language Jakaltek feature Suppletion_in_Imperatives_and_Hortatives:
@@ -5099,7 +5108,7 @@ Language Kuku-Yalanji feature Voicing_in_Plosives_and_Fricatives:
   predicted == 1 No voicing contrast
 ----------------------------------------------------------------------
 Language lac (Lacandón, Mayan/Mayan, nan):
-  31 features known, 6 features to be predicted.
+  32 features known, 7 features to be predicted.
 Language Lacandón feature Languages_with_two_Dominant_Orders_of_Subject,_Object,_and_Verb:
   predicted == 3 SVO or VSO
 Language Lacandón feature Minor_morphological_means_of_signaling_negation:
@@ -5108,6 +5117,8 @@ Language Lacandón feature Order_of_Negative_Morpheme_and_Verb:
   predicted == 1 NegV
 Language Lacandón feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
+Language Lacandón feature SVONeg_Order:
+  predicted == 4 No SVONeg
 Language Lacandón feature The_Position_of_Negative_Morphemes_in_SVO_Languages:
   predicted == 11 Other NegV
 Language Lacandón feature Verb-Initial_with_Negative_that_is_Immediately_Postverbal_or_between_Subject_and_Object:
@@ -5543,11 +5554,13 @@ Language Magar feature The_Position_of_Negative_Morphemes_in_SOV_Languages:
   predicted == 5 SO[Neg-V]
 ----------------------------------------------------------------------
 Language mam (Mam, Mayan/Mayan, nan):
-  63 features known, 4 features to be predicted.
+  64 features known, 5 features to be predicted.
 Language Mam feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Mam feature Order_of_Negative_Morpheme_and_Verb:
   predicted == 1 NegV
+Language Mam feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
+  predicted == 3 Immed preverbal
 Language Mam feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Mam feature Verb-Initial_with_Negative_that_is_Immediately_Postverbal_or_between_Subject_and_Object:
@@ -5641,7 +5654,7 @@ Language Mayi-Yapi feature Weight-Sensitive_Stress:
   predicted == 8 Fixed stress (no weight-sensitivity)
 ----------------------------------------------------------------------
 Language nan (Nandi, Eastern Sudanic/Nilotic, nan):
-  76 features known, 5 features to be predicted.
+  77 features known, 5 features to be predicted.
 Language Nandi feature Exponence_of_Tense-Aspect-Mood_Inflection:
   predicted == 1 monoexponential TAM
 Language Nandi feature Minor_morphological_means_of_signaling_negation:
@@ -6008,7 +6021,7 @@ Language Pokot feature Position_of_negative_words_relative_to_beginning_and_end_
 Language Pokot feature Prefixing_vs._Suffixing_in_Inflectional_Morphology:
   predicted == 4 Equal prefixing and suffixing
 Language Pokot feature Preverbal_Negative_Morphemes:
-  predicted == 1 NegV
+  predicted == 4 None
 Language Pokot feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Adjective_and_Noun:
   predicted == 4 VO and NAdj
 Language Pokot feature Relationship_between_the_Order_of_Object_and_Verb_and_the_Order_of_Relative_Clause_and_Noun:
@@ -6026,9 +6039,11 @@ Language Quiché feature Weight-Sensitive_Stress:
   predicted == 8 Fixed stress (no weight-sensitivity)
 ----------------------------------------------------------------------
 Language qum (Sipakapense, Mayan/Mayan, nan):
-  39 features known, 3 features to be predicted.
+  40 features known, 4 features to be predicted.
 Language Sipakapense feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
+Language Sipakapense feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
+  predicted == 3 Immed preverbal
 Language Sipakapense feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Sipakapense feature Verb-Initial_with_Negative_that_is_Immediately_Postverbal_or_between_Subject_and_Object:
@@ -6576,7 +6591,7 @@ Language Kuuk Thaayorre feature The_Position_of_Negative_Morphemes_in_SOV_Langua
   predicted == 3 SONegV
 ----------------------------------------------------------------------
 Language tna (Turkana, Eastern Sudanic/Nilotic, nan):
-  66 features known, 4 features to be predicted.
+  67 features known, 4 features to be predicted.
 Language Turkana feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Turkana feature Suppletion_in_Imperatives_and_Hortatives:
@@ -6653,7 +6668,7 @@ Language Tzeltal (Aguacatenango) feature Vowel_Quality_Inventories:
   predicted == 2 Average (5-6)
 ----------------------------------------------------------------------
 Language tzo (Tzotzil, Mayan/Mayan, nan):
-  39 features known, 4 features to be predicted.
+  40 features known, 4 features to be predicted.
 Language Tzotzil feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Tzotzil feature Order_of_Negative_Morpheme_and_Verb:
@@ -6664,7 +6679,7 @@ Language Tzotzil feature Verb-Initial_with_Negative_that_is_Immediately_Postverb
   predicted == 6 None
 ----------------------------------------------------------------------
 Language tzu (Tzutujil, Mayan/Mayan, nan):
-  79 features known, 8 features to be predicted.
+  80 features known, 9 features to be predicted.
 Language Tzutujil feature Languages_with_two_Dominant_Orders_of_Subject,_Object,_and_Verb:
   predicted == 3 SVO or VSO
 Language Tzutujil feature Minor_morphological_means_of_signaling_negation:
@@ -6675,6 +6690,8 @@ Language Tzutujil feature Position_of_negative_words_relative_to_beginning_and_e
   predicted == 3 Immed preverbal
 Language Tzutujil feature Productivity_of_the_Antipassive_Construction:
   predicted == 1 productive
+Language Tzutujil feature SNegVO_Order:
+  predicted == 1 Word&NoDoubleNeg
 Language Tzutujil feature SVONeg_Order:
   predicted == 4 No SVONeg
 Language Tzutujil feature The_Position_of_Negative_Morphemes_in_Verb-Initial_Languages:
@@ -7116,9 +7133,11 @@ Language Warao feature Zero_Marking_of_A_and_P_Arguments:
   predicted == 2 Non-zero marking
 ----------------------------------------------------------------------
 Language wrb (Warrnambool, Pama-Nyungan/Southeastern Pama-Nyungan, AU):
-  23 features known, 3 features to be predicted.
+  24 features known, 4 features to be predicted.
 Language Warrnambool feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
+Language Warrnambool feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
+  predicted == 3 Immed preverbal
 Language Warrnambool feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Warrnambool feature Verb-Initial_with_Negative_that_is_Immediately_Postverbal_or_between_Subject_and_Object:
@@ -7800,11 +7819,13 @@ Language Yao (in Malawi) feature The_Position_of_Negative_Morphemes_in_SVO_Langu
   predicted == 5 S[Neg-V]O
 ----------------------------------------------------------------------
 Language yap (Yapese, Austronesian/Yapese, FM):
-  72 features known, 4 features to be predicted.
+  73 features known, 5 features to be predicted.
 Language Yapese feature Minor_morphological_means_of_signaling_negation:
   predicted == 4 None
 Language Yapese feature Order_of_Negative_Morpheme_and_Verb:
   predicted == 1 NegV
+Language Yapese feature Position_of_negative_words_relative_to_beginning_and_end_of_clause_and_with_respect_to_adjacency_to_verb:
+  predicted == 3 Immed preverbal
 Language Yapese feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Yapese feature Verb-Initial_with_Negative_that_is_Immediately_Postverbal_or_between_Subject_and_Object:
@@ -8702,7 +8723,7 @@ Language Yansi feature Order_of_Genitive_and_Noun:
   predicted == 2 Noun-Genitive
 ----------------------------------------------------------------------
 Language yok (Yokuts (Yaudanchi), Penutian/Yokuts, nan):
-  36 features known, 2 features to be predicted.
+  37 features known, 2 features to be predicted.
 Language Yokuts (Yaudanchi) feature Preverbal_Negative_Morphemes:
   predicted == 1 NegV
 Language Yokuts (Yaudanchi) feature The_Position_of_Negative_Morphemes_in_Verb-Initial_Languages:
@@ -9422,5 +9443,5 @@ Language Zuni feature Weight-Sensitive_Stress:
   predicted == 8 Fixed stress (no weight-sensitivity)
 Language Zuni feature Weight_Factors_in_Weight-Sensitive_Stress_Systems:
   predicted == 1 No weight
-Predicted 2410 feature values. Accuracy is unknown because we cannot access the gold-standard data.
+Predicted 2417 feature values. Accuracy is unknown because we cannot access the gold-standard data.
 Writing the completed file...
