@@ -133,6 +133,14 @@ GetOptions
 
 my $data_folder = 'data';
 my $output_folder = 'outputs';
+my $wals_folder = 'data/wals-2020/cldf';
+my %wals;
+if(-d $wals_folder)
+{
+    print STDERR ("Reading WALS...\n");
+    %wals = Sigtypio::read_wals($wals_folder);
+    $wals{loaded} = 1;
+}
 print STDERR ("Reading the training data...\n");
 my %traindata = Sigtypio::read_csv("$data_folder/train_y.csv");
 Sigtypio::convert_table_to_lh(\%traindata, 0);
@@ -154,9 +162,9 @@ print STDERR ("Found $testdata{nf} headers.\n");
 print STDERR ("Found $testdata{nl} language lines.\n");
 # First compare, then merge. Otherwise the comparing function will complain that a language occurs in both sets.
 print STDERR ("Comparing training and development data...\n");
-compare_data_sets(\%traindata, \%devdata);
+compare_data_sets(\%traindata, \%devdata, \%wals);
 print STDERR ("Comparing training and test data...\n");
-compare_data_sets(\%traindata, \%testdata);
+compare_data_sets(\%traindata, \%testdata, \%wals);
 if($config{train_on_dev} eq 'blind')
 {
     merge_data(\%traindata, \%devdata);
@@ -1165,6 +1173,7 @@ sub compare_data_sets
 {
     my $d1 = shift; # hash ref
     my $d2 = shift; # hash ref
+    my $wals = shift; # optional hash ref (if defined, then it should have item loaded=1)
     my $f1 = $d1->{features};
     my $f2 = $d2->{features};
     my %hf1;
@@ -1202,6 +1211,36 @@ sub compare_data_sets
         if(exists($hl1{$lcode}))
         {
             print STDERR ("Language '$lcode' occurs in both sets.\n");
+        }
+    }
+    # If we have access to the current WALS data, check that the feature names are known.
+    if($wals->{loaded})
+    {
+        print STDERR ("Checking data against WALS 2020...\n");
+        # Invert the hash of parameters (features) so that we can search feature names.
+        my %wfeatures;
+        foreach $pid (keys(%{$wals->{parameters}}))
+        {
+            my $name = $wals->{parameters}{$pid}{name};
+            # Spaces are replaced with underscores in the SIGTYP shared task.
+            $name =~ s/\s+/_/g;
+            $wfeatures{$name} = $wals->{parameters}{$pid};
+        }
+        # Check that all features in d1 are known in WALS.
+        foreach my $feature (@{$f1})
+        {
+            if(!exists($wfeatures{$feature}))
+            {
+                print STDERR ("Feature '$feature' from the first dataset is not know in WALS.\n");
+            }
+        }
+        # Check that all features in d2 are known in WALS.
+        foreach my $feature (@{$f2})
+        {
+            if(!exists($wfeatures{$feature}))
+            {
+                print STDERR ("Feature '$feature' from the second dataset is not know in WALS.\n");
+            }
         }
     }
 }

@@ -402,4 +402,116 @@ sub convert_table_to_lh
 
 
 
+#------------------------------------------------------------------------------
+# Reads WALS data in the new format (set of CSV files), released March 2020.
+#------------------------------------------------------------------------------
+sub read_wals
+{
+    my $path = shift; # path to the folder with all the necessary CSV files: e.g. 'data/wals-2020/cldf'
+    # Read the languages and their core features (attributes).
+    my %languages_in = read_csv("$path/languages.csv");
+    # Hash the languages by their ids (WALS codes).
+    if(join(',', @{$languages_in{infeatures}}) ne 'ID,Name,Macroarea,Latitude,Longitude,Glottocode,ISO639P3code,Family,Subfamily,Genus,ISO_codes,Samples_100,Samples_200')
+    {
+        die("Unexpected headers in languages.csv");
+    }
+    my %languages;
+    foreach my $l (@{$languages_in{table}})
+    {
+        my %record =
+        (
+            'id'           => $l->[0],
+            'name'         => $l->[1],
+            'macroarea'    => $l->[2],
+            'latitude'     => $l->[3],
+            'longitude'    => $l->[4],
+            'glottocode'   => $l->[5],
+            'iso639p3code' => $l->[6],
+            'family'       => $l->[7],
+            'subfamily'    => $l->[8],
+            'genus'        => $l->[9],
+            'iso_codes'    => $l->[10],
+            'samples_100'  => $l->[11],
+            'samples_200'  => $l->[12]
+        );
+        $languages{$record{id}} = \%record;
+    }
+    # Read the feature ("parameter") names and codes.
+    my %parameters_in = read_csv("$path/parameters.csv");
+    # Hash the parameters by their ids.
+    if(join(',', @{$parameters_in{infeatures}}) ne 'ID,Name,Description,Contributor_ID,Chapter,Area')
+    {
+        die("Unexpected headers in parameters.csv");
+    }
+    my %parameters;
+    foreach my $p (@{$parameters_in{table}})
+    {
+        my %record =
+        (
+            'id'             => $p->[0],
+            'name'           => $p->[1],
+            'description'    => $p->[2],
+            'contributor_id' => $p->[3],
+            'chapter'        => $p->[4],
+            'area'           => $p->[5]
+        );
+        $parameters{$record{id}} = \%record;
+    }
+    # Read the feature value repertory ("codes").
+    my %codes_in = read_csv("$path/codes.csv");
+    # Hash the feature values by their ids.
+    if(join(',', @{$codes_in{infeatures}}) ne 'ID,Parameter_ID,Name,Description,Number,icon')
+    {
+        die("Unexpected headers in codes.csv");
+    }
+    my %codes;
+    foreach my $c (@{$codes_in{table}})
+    {
+        my %record =
+        (
+            'id'           => $c->[0],
+            'parameter_id' => $c->[1],
+            'name'         => $c->[2],
+            'description'  => $c->[3],
+            'number'       => $c->[4],
+            'icon'         => $c->[5]
+        );
+        $codes{$record{id}} = \%record;
+    }
+    # Read the values of the features of individual languages.
+    my %values_in = read_csv("$path/values.csv");
+    # Hash the feature values by their ids.
+    if(join(',', @{$values_in{infeatures}}) ne 'ID,Language_ID,Parameter_ID,Value,Code_ID,Comment,Source,Example_ID')
+    {
+        die("Unexpected headers in values.csv");
+    }
+    my %values;
+    foreach my $v (@{$values_in{table}})
+    {
+        my %record =
+        (
+            'id'           => $v->[0],
+            'language_id'  => $v->[1],
+            'parameter_id' => $v->[2],
+            'value'        => $v->[3],
+            'code_id'      => $v->[4],
+            'comment'      => $v->[5],
+            'source'       => $v->[6],
+            'example_id'   => $v->[7]
+        );
+        $values{$record{id}} = \%record;
+    }
+    # Package all the hashes in one and return it.
+    my %wals =
+    (
+        'languages'  => \%languages,
+        'parameters' => \%parameters,
+        'codes'      => \%codes,
+        'values'     => \%values
+    );
+    return %wals;
+}
+
+
+
 1;
