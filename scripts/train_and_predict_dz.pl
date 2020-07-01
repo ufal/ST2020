@@ -1265,6 +1265,10 @@ sub compare_data_sets
                     {
                         print STDERR ("Feature value '$value' from the first dataset is not known in WALS.\n");
                     }
+                    else
+                    {
+                        print STDERR ("Feature value '$value' is OK.\n");
+                    }
                 }
             }
         }
