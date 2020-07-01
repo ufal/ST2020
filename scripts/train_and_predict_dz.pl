@@ -1254,6 +1254,7 @@ sub compare_data_sets
             $wvalues{$name} = $wals->{codes}{$cid};
         }
         # Check that all feature values in d1 are known in WALS.
+        print STDERR ("The first dataset contains ", scalar(@{$d1->{table}}), " table lines.\n");
         foreach my $line (@{$d1->{table}})
         {
             for(my $i = 0; $i <= $#{$line}; $i++)
