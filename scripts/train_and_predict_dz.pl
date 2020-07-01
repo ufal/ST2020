@@ -1261,7 +1261,7 @@ sub compare_data_sets
                 if(exists($wfeatures{$feature}))
                 {
                     my $value = $d1->{lh}{$lcode}{$feature};
-                    next if($value eq 'nan');
+                    next if($value eq 'nan' || $value eq '?');
                     if(!exists($wvalues{$value}))
                     {
                         print STDERR ("Feature value '$value' from the first dataset is not known in WALS.\n");
@@ -1279,7 +1279,7 @@ sub compare_data_sets
                 if(exists($wfeatures{$feature}))
                 {
                     my $value = $d2->{lh}{$lcode}{$feature};
-                    next if($value eq 'nan');
+                    next if($value eq 'nan' || $value eq '?');
                     if(!exists($wvalues{$value}))
                     {
                         print STDERR ("Feature value '$value' from the second dataset is not known in WALS.\n");
