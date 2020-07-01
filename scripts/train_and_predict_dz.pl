@@ -1270,6 +1270,10 @@ sub compare_data_sets
                         print STDERR ("Feature value '$value' is OK.\n");
                     }
                 }
+                else
+                {
+                    print STDERR ("Not checking value of '$f1->[$i]'.\n");
+                }
             }
         }
         # Check that all feature values in d2 are known in WALS.
