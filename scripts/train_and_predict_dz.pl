@@ -1265,6 +1265,8 @@ sub compare_data_sets
                     if(!exists($wvalues{$value}))
                     {
                         print STDERR ("Feature value '$value' from the first dataset is not known in WALS.\n");
+                        # Add the value so that we do not report it again.
+                        $wvalues{$value}++;
                     }
                 }
             }
@@ -1281,6 +1283,8 @@ sub compare_data_sets
                     if(!exists($wvalues{$value}))
                     {
                         print STDERR ("Feature value '$value' from the second dataset is not known in WALS.\n");
+                        # Add the value so that we do not report it again.
+                        $wvalues{$value}++;
                     }
                 }
             }
