@@ -296,10 +296,33 @@ sub read_tab
             {
                 # Assume that it can be fixed by joining the last column with the extra columns.
                 # The tabulator seems to appear at the boundary of two features, and there is no vertical bar, so we should probably add '|'.
+                ###!!! WARNING! In fact, the shared task organizers made different flavors of this error in train+dev and in test_blinded data.
+                ###!!! The train and dev sets do contain the vertical bar (and it is preceded by a rest of the value of the feature that contains TAB).
+                ###!!! The test_blinded data omit the rest of the value and the vertical bar.
                 my $ntojoin = $n-$nf+1;
                 print STDERR ("Line $iline ($f[1]): Expected $nf fields, found $n. Joining the last $ntojoin fields.\n");
-                $f[$nf-1] = join('|', @f[($nf-1)..($n-1)]);
-                splice(@f, $nf);
+                if($ntojoin == 2)
+                {
+                    print STDERR ("Focused joining strategy.\n");
+                    if($f[$nf-1] =~ m/Verb-Initial_with_Preverbal_Negative=1 Separate word, no double negation$/ &&
+                       $f[$nf] !~ m/^Word\&NoDoubleNeg/)
+                    {
+                        $f[$nf-1] .= "\tWord\&NoDoubleNeg";
+                    }
+                    if($f[$nf-1] =~ m/Verb-Initial_with_Preverbal_Negative=2 Prefix, no double negation$/ &&
+                       $f[$nf] !~ m/^Prefix\&NoDoubleNeg/)
+                    {
+                        $f[$nf-1] .= "\tPrefix\&NoDoubleNeg";
+                    }
+                    $f[$nf-1] = join('|', @f[($nf-1)..$nf]);
+                    splice(@f, $nf);
+                }
+                else
+                {
+                    print STDERR ("Default joining strategy.\n");
+                    $f[$nf-1] = join("\t", @f[($nf-1)..($n-1)]);
+                    splice(@f, $nf);
+                }
             }
             # The original format has 8 columns, now 9 because we added the numeric index.
             # The ninth column contains all the features. Remember their names.
