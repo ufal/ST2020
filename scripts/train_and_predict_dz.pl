@@ -1229,6 +1229,8 @@ sub compare_data_sets
         # Check that all features in d1 are known in WALS.
         foreach my $feature (@{$f1})
         {
+            # Skip columns that are not treated as parameters in WALS.
+            next if($feature =~ m/^(index|wals_code|name|latitude|longitude|genus|family|countrycodes)$/);
             if(!exists($wfeatures{$feature}))
             {
                 print STDERR ("Feature '$feature' from the first dataset is not know in WALS.\n");
@@ -1237,6 +1239,8 @@ sub compare_data_sets
         # Check that all features in d2 are known in WALS.
         foreach my $feature (@{$f2})
         {
+            # Skip columns that are not treated as parameters in WALS.
+            next if($feature =~ m/^(index|wals_code|name|latitude|longitude|genus|family|countrycodes)$/);
             if(!exists($wfeatures{$feature}))
             {
                 print STDERR ("Feature '$feature' from the second dataset is not know in WALS.\n");
