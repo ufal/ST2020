@@ -1261,6 +1261,7 @@ sub compare_data_sets
                 if(exists($wfeatures{$feature}))
                 {
                     my $value = $d1->{lh}{$lcode}{$feature};
+                    next if($value eq 'nan');
                     if(!exists($wvalues{$value}))
                     {
                         print STDERR ("Feature value '$value' from the first dataset is not known in WALS.\n");
@@ -1269,10 +1270,6 @@ sub compare_data_sets
                     {
                         print STDERR ("Feature value '$value' is OK.\n");
                     }
-                }
-                else
-                {
-                    print STDERR ("Not checking value of '$f1->[$i]'.\n");
                 }
             }
         }
