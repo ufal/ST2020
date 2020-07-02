@@ -148,6 +148,13 @@ while(<BLIND>)
             elsif($v !~ m/^\d+\s+.+$/)
             {
                 print STDERR ("WARNING: Language '$lname' feature '$f' strange value '$v'\n");
+                ###!!! Quick fix: there is one occurrence of this issue.
+                ###!!! WARNING: Language 'Turkana' feature 'Suppletion_in_Imperatives_and_Hortatives' strange value '? Prefix&NoDoubleNeg'
+                ###!!! Dan's prediction of that feature: 5 None (= no suppletive imperatives reported in the reference material)
+                if($f =~ m/Hortatives/i)
+                {
+                    $v = '5 None (= no suppletive imperatives reported in the reference material)';
+                }
             }
             # In the trial test data, feature names are lowercased.
             $fv = lc($f).'='.$v;
