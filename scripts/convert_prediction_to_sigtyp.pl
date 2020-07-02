@@ -84,8 +84,30 @@ while(<BLIND>)
     }
     elsif(scalar(@f) > 8)
     {
-        my $features = join('|', @f[7..$#f]);
-        splice(@f, 7, scalar(@f)-7, $features);
+        ###!!! WARNING! In fact, the shared task organizers made different flavors of this error in train+dev and in test_blinded data.
+        ###!!! The train and dev sets do contain the vertical bar (and it is preceded by a rest of the value of the feature that contains TAB).
+        ###!!! The test_blinded data omit the rest of the value and the vertical bar.
+        if(scalar(@f) == 9)
+        {
+            if($f[7] =~ m/Verb-Initial_with_Preverbal_Negative=1 Separate word, no double negation$/ &&
+               $f[8] !~ m/^Word\&NoDoubleNeg/)
+            {
+                $f[7] .= "\tWord\&NoDoubleNeg";
+            }
+            if($f[7] =~ m/Verb-Initial_with_Preverbal_Negative=2 Prefix, no double negation$/ &&
+               $f[8] !~ m/^Prefix\&NoDoubleNeg/)
+            {
+                $f[$nf-1] .= "\tPrefix\&NoDoubleNeg";
+            }
+            $f[7] = join('|', @f[7..8]);
+            splice(@f, 8);
+        }
+        else
+        {
+            print STDERR ("WARNING: We did not expect more than 9 columns!\n");
+            my $features = join("\t", @f[7..$#f]);
+            splice(@f, 7, scalar(@f)-7, $features);
+        }
     }
     my $lcode = $f[0];
     my $lname = $f[1];
