@@ -97,7 +97,7 @@ while(<BLIND>)
             if($f[7] =~ m/Verb-Initial_with_Preverbal_Negative=2 Prefix, no double negation$/ &&
                $f[8] !~ m/^Prefix\&NoDoubleNeg/)
             {
-                $f[$nf-1] .= "\tPrefix\&NoDoubleNeg";
+                $f[7] .= "\tPrefix\&NoDoubleNeg";
             }
             $f[7] = join('|', @f[7..8]);
             splice(@f, 8);
