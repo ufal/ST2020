@@ -294,6 +294,7 @@ sub read_csv1
                 elsif($line ne '')
                 {
                     print STDERR ("WARNING: Cell has ended, no comma found, ignoring the rest of the line: '$line'\n");
+                    $line = '';
                 }
                 else # nothing more on the line, and the last cell has been terminated
                 {
