@@ -235,6 +235,133 @@ sub process_quoted_commas
 
 
 #------------------------------------------------------------------------------
+# Reads the input CSV (comma-separated values) file: either from STDIN, or from
+# files supplied as arguments. Returns a list of column headers and a list of
+# table rows (both as array refs).
+#
+# This is a new implementation that tries to be more general (and in particular
+# suitable for reading WALS). Quoted values may contain line breaks, which
+# means that we cannot rely on processing the input one line at a time.
+#------------------------------------------------------------------------------
+sub read_csv1
+{
+    # @_ can optionally contain the list of files to read from.
+    # If it does not exist, @ARGV will be tried. If it is empty, read from STDIN.
+    my $myfiles = 0;
+    my @oldargv;
+    if(scalar(@_) > 0)
+    {
+        $myfiles = 1;
+        @oldargv = @ARGV;
+        @ARGV = @_;
+    }
+    my $iline = 0;
+    my $state = 'rowbegin'; # rowbegin | cellbegin | inquotes | cellend
+    my $buffer = '';
+    my @f = ();
+    my @data;
+    while(<>)
+    {
+        $iline++;
+        s/\r?\n$//;
+        my $line = $_;
+        while($line)
+        {
+            if($state =~ m/^(rowbegin|cellbegin)$/)
+            {
+                if($line =~ s/^"//) # "
+                {
+                    $state = 'inquotes';
+                }
+                else
+                {
+                    # Unquoted table cell. Read everything until the next comma or line end.
+                    if($line =~ s/^([^,]*)//)
+                    {
+                        $buffer = $1;
+                    }
+                    push(@f, $buffer);
+                    $buffer = '';
+                    $state = 'cellend';
+                }
+            }
+            elsif($state eq 'cellend')
+            {
+                if($line =~ s/^,//)
+                {
+                    $state = 'cellbegin';
+                }
+                elsif($line ne '')
+                {
+                    print STDERR ("WARNING: Cell has ended, no comma found, ignoring the rest of the line: '$line'\n");
+                }
+                else # nothing more on the line, and the last cell has been terminated
+                {
+                    my @row = @f;
+                    push(@data, \@row);
+                    @f = ();
+                    $state = 'rowbegin';
+                }
+            }
+            elsif($state eq 'inquotes')
+            {
+                # Double quotation mark serves as an escape for quotation mark.
+                if($line =~ s/^""//)
+                {
+                    $buffer .= '"';
+                }
+                elsif($line =~ s/^([^"]+)//) # "
+                {
+                    $buffer .= $1;
+                    # If we consumed the rest of the line now, the current cell will continue on the next line.
+                    if($line eq '')
+                    {
+                        $buffer .= "\n";
+                    }
+                }
+                elsif($line =~ s/^"//) # "
+                {
+                    push(@f, $buffer);
+                    $buffer = '';
+                    $state = 'cellend';
+                }
+            }
+        }
+    }
+    if($state ne 'rowbegin')
+    {
+        print STDERR ("WARNING: Reading the input ended in an unexpected state '$state'\n");
+    }
+    # The first row contains the headers.
+    my $headers = shift(@data);
+    if($myfiles)
+    {
+        @ARGV = @oldargv;
+    }
+    ###!!! The remaining adjustments are here because of compatibility with our earlier
+    ###!!! read_csv() function. They are specific to the SIGTYP shared task and they
+    ###!!! should not be in a general CSV reading function.
+    if(scalar(@headers) > 0 && $headers[0] eq '')
+    {
+        $headers[0] = 'index';
+    }
+    # We may want to add new combined features but we will not want to output them;
+    # therefore we must save the original list of features.
+    my @infeatures = @{$headers};
+    my %data =
+    (
+        'infeatures' => \@infeatures,
+        'features'   => $headers,
+        'table'      => \@data,
+        'nf'         => scalar(@infeatures),
+        'nl'         => scalar(@data)
+    );
+    return %data;
+}
+
+
+
+#------------------------------------------------------------------------------
 # Once the input line has been split to fields, the commas in the fields can be
 # restored.
 #------------------------------------------------------------------------------
@@ -432,7 +559,7 @@ sub read_wals
 {
     my $path = shift; # path to the folder with all the necessary CSV files: e.g. 'data/wals-2020/cldf'
     # Read the languages and their core features (attributes).
-    my %languages_in = read_csv("$path/languages.csv");
+    my %languages_in = read_csv1("$path/languages.csv");
     # Hash the languages by their ids (WALS codes).
     if(join(',', @{$languages_in{infeatures}}) ne 'ID,Name,Macroarea,Latitude,Longitude,Glottocode,ISO639P3code,Family,Subfamily,Genus,ISO_codes,Samples_100,Samples_200')
     {
@@ -460,7 +587,7 @@ sub read_wals
         $languages{$record{id}} = \%record;
     }
     # Read the feature ("parameter") names and codes.
-    my %parameters_in = read_csv("$path/parameters.csv");
+    my %parameters_in = read_csv1("$path/parameters.csv");
     # Hash the parameters by their ids.
     if(join(',', @{$parameters_in{infeatures}}) ne 'ID,Name,Description,Contributor_ID,Chapter,Area')
     {
@@ -481,7 +608,7 @@ sub read_wals
         $parameters{$record{id}} = \%record;
     }
     # Read the feature value repertory ("codes").
-    my %codes_in = read_csv("$path/codes.csv");
+    my %codes_in = read_csv1("$path/codes.csv");
     # Hash the feature values by their ids.
     if(join(',', @{$codes_in{infeatures}}) ne 'ID,Parameter_ID,Name,Description,Number,icon')
     {
@@ -502,7 +629,7 @@ sub read_wals
         $codes{$record{id}} = \%record;
     }
     # Read the values of the features of individual languages.
-    my %values_in = read_csv("$path/values.csv");
+    my %values_in = read_csv1("$path/values.csv");
     # Hash the feature values by their ids.
     if(join(',', @{$values_in{infeatures}}) ne 'ID,Language_ID,Parameter_ID,Value,Code_ID,Comment,Source,Example_ID')
     {
