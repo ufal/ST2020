@@ -154,9 +154,12 @@ while(<BLIND>)
         {
             my $f = $1;
             my $v = $2;
+            # The WALS data we have is newer than the data used in the shared task.
+            # There are 24 language-feature pairs in the shared task that do not exist in the new WALS.
+            # We should not be surprised if there are also differences in feature values.
             if($wals{loaded} && !exists($wals{lh}{$lcode}{$f}))
             {
-                print STDERR ("WARNING: Feature '$f' not found in WALS (language '$lname')\n");
+                print STDERR ("WARNING: Feature '$f' not found in WALS 2020 (language '$lname')\n");
             }
             if($v eq '?')
             {
