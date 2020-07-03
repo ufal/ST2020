@@ -282,7 +282,17 @@ sub read_csv1
                     }
                     push(@f, $buffer);
                     $buffer = '';
-                    $state = 'cellend';
+                    if($line eq '')
+                    {
+                        my @row = @f;
+                        push(@data, \@row);
+                        @f = ();
+                        $state = 'rowbegin';
+                    }
+                    else
+                    {
+                        $state = 'cellend';
+                    }
                 }
             }
             elsif($state eq 'cellend')
@@ -291,13 +301,10 @@ sub read_csv1
                 {
                     $state = 'cellbegin';
                 }
-                elsif($line ne '')
+                else
                 {
                     print STDERR ("WARNING: Cell has ended, no comma found, ignoring the rest of the line: '$line'\n");
                     $line = '';
-                }
-                else # nothing more on the line, and the last cell has been terminated
-                {
                     my @row = @f;
                     push(@data, \@row);
                     @f = ();
@@ -324,7 +331,17 @@ sub read_csv1
                 {
                     push(@f, $buffer);
                     $buffer = '';
-                    $state = 'cellend';
+                    if($line eq '')
+                    {
+                        my @row = @f;
+                        push(@data, \@row);
+                        @f = ();
+                        $state = 'rowbegin';
+                    }
+                    else
+                    {
+                        $state = 'cellend';
+                    }
                 }
             }
         }
