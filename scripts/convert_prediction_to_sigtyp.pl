@@ -56,6 +56,40 @@ if($n != 2)
     usage();
     die("Expected 2 arguments, found $n");
 }
+# Read WALS if available. We can use it to evaluate the accuracy of the data we are preparing to submission.
+my $wals_folder = 'data/wals-2020/cldf';
+my %wals;
+if(-d $wals_folder)
+{
+    print STDERR ("Reading WALS...\n");
+    %wals = Sigtypio::read_wals($wals_folder);
+    $wals{loaded} = 1;
+    # We need a hash that will map language code + our feature name to the correct feature value.
+    # Create a mapping from feature codes to our feature names.
+    my %feature_names;
+    foreach my $pid (keys(%{$wals{parameters}}))
+    {
+        my $name = $wals{parameters}{$pid}{name};
+        $name =~ s/\s+/_/g;
+        $feature_names{$pid} = $name;
+    }
+    # For each language code and feature name, store the WALS value.
+    my %lh;
+    foreach my $vid (keys(%{$wals{values}}))
+    {
+        my $lcode = $wals{values}{$vid}{language_id};
+        my $fcode = $wals{values}{$vid}{parameter_id};
+        if(exists($feature_names{$fcode}))
+        {
+            $lh{$lcode}{$feature_names{$fcode}} = $wals{values}{$vid}{code_id};
+        }
+        else
+        {
+            print STDERR ("WARNING: WALS integrity: Unknown parameter code '$fcode'\n");
+        }
+    }
+    $wals{lh} = \%lh;
+}
 # Read the predicted data and store it in a hash so that the feature values can be accessed easily.
 my %predicted = Sigtypio::read_csv($ARGV[1]);
 Sigtypio::convert_table_to_lh(\%predicted, 0);
@@ -120,6 +154,10 @@ while(<BLIND>)
         {
             my $f = $1;
             my $v = $2;
+            if($wals{loaded} && !exists($wals{lh}{$lcode}{$f}))
+            {
+                print STDERR ("WARNING: Feature '$f' not found in WALS (language '$lname')\n");
+            }
             if($v eq '?')
             {
                 if(exists($predicted{lh}{$lcode}{$f}))
