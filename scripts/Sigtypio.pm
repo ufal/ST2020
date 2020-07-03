@@ -282,17 +282,7 @@ sub read_csv1
                     }
                     push(@f, $buffer);
                     $buffer = '';
-                    if($line eq '')
-                    {
-                        my @row = @f;
-                        push(@data, \@row);
-                        @f = ();
-                        $state = 'rowbegin';
-                    }
-                    else
-                    {
-                        $state = 'cellend';
-                    }
+                    $state = 'cellend';
                 }
             }
             elsif($state eq 'cellend')
@@ -305,10 +295,6 @@ sub read_csv1
                 {
                     print STDERR ("WARNING: Cell has ended, no comma found, ignoring the rest of the line: '$line'\n");
                     $line = '';
-                    my @row = @f;
-                    push(@data, \@row);
-                    @f = ();
-                    $state = 'rowbegin';
                 }
             }
             elsif($state eq 'inquotes')
@@ -331,18 +317,21 @@ sub read_csv1
                 {
                     push(@f, $buffer);
                     $buffer = '';
-                    if($line eq '')
-                    {
-                        my @row = @f;
-                        push(@data, \@row);
-                        @f = ();
-                        $state = 'rowbegin';
-                    }
-                    else
-                    {
-                        $state = 'cellend';
-                    }
+                    $state = 'cellend';
                 }
+            }
+            # If we are at the end of the line and we are not in quotes, terminate the row.
+            if($line eq '' && $state ne 'inquotes')
+            {
+                # If we were expecting one more cell (because the last character was a comma), add an empty cell.
+                if($state eq 'cellbegin')
+                {
+                    push(@f, '');
+                }
+                my @row = @f;
+                push(@data, \@row);
+                @f = ();
+                $state = 'rowbegin';
             }
         }
     }
