@@ -73,19 +73,31 @@ if(-d $wals_folder)
         $name =~ s/\s+/_/g;
         $feature_names{$pid} = $name;
     }
+    # Create a mapping from feature value codes to our feature values.
+    my %feature_values;
+    foreach my $cid (keys(%{$wals{codes}}))
+    {
+        my $name = $wals{codes}{$cid}{number}.' '.$wals{codes}{$cid}{name};
+        $feature_values{$cid} = $name;
+    }
     # For each language code and feature name, store the WALS value.
     my %lh;
     foreach my $vid (keys(%{$wals{values}}))
     {
         my $lcode = $wals{values}{$vid}{language_id};
         my $fcode = $wals{values}{$vid}{parameter_id};
-        if(exists($feature_names{$fcode}))
+        my $vcode = $wals{values}{$vid}{code_id};
+        if(!exists($feature_names{$fcode}))
         {
-            $lh{$lcode}{$feature_names{$fcode}} = $wals{values}{$vid}{code_id};
+            print STDERR ("WARNING: WALS integrity: Unknown parameter code '$fcode'\n");
+        }
+        elsif(!exists($feature_values{$vcode}))
+        {
+            print STDERR ("WARNING: WALS integrity: Unknown value code '$vcode'\n");
         }
         else
         {
-            print STDERR ("WARNING: WALS integrity: Unknown parameter code '$fcode'\n");
+            $lh{$lcode}{$feature_names{$fcode}} = $feature_values{$vcode};
         }
     }
     $wals{lh} = \%lh;
@@ -179,6 +191,19 @@ while(<BLIND>)
                 else
                 {
                     print STDERR ("WARNING: No available prediction for language '$lname' feature '$f'\n");
+                }
+            }
+            else
+            {
+                if($wals{loaded} && exists($wals{lh}{$lcode}{$f}))
+                {
+                    # Zkontrolovat hodnotu od organizátorů soutěže proti hodnotě z WALSu.
+                    if($v ne $wals{lh}{$lcode}{$f})
+                    {
+                        print STDERR ("WARNING: Language '$lname' feature '$f' gold value does not match WALS:\n");
+                        print STDERR ("         Shared task gold standard: '$v'\n");
+                        print STDERR ("         WALS 2020 gold standard:   '$wals{lh}{$lcode}{$f}'\n");
+                    }
                 }
             }
             # Final sanity check.
