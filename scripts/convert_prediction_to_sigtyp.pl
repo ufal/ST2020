@@ -118,6 +118,8 @@ if($headers !~ m/^wals_code/)
 }
 print("wals_code\tname\tfamily\tfeatures\n");
 my $n_predicted = 0;
+my $n_checked = 0;
+my $n_correct = 0;
 while(<BLIND>)
 {
     my $line = $_;
@@ -188,6 +190,21 @@ while(<BLIND>)
                     {
                         $v = $vp;
                         $n_predicted++;
+                        if($wals{loaded} && exists($wals{lh}{$lcode}{$f}))
+                        {
+                            $n_checked++;
+                            # Check the predicted value against the WALS value.
+                            if($v ne $wals{lh}{$lcode}{$f})
+                            {
+                                print STDERR ("Wrong prediction: Language '$lname' feature '$f':\n");
+                                print STDERR ("    Predicted: '$v'\n");
+                                print STDERR ("    WALS 2020: '$wals{lh}{$lcode}{$f}'\n");
+                            }
+                            else
+                            {
+                                $n_correct++;
+                            }
+                        }
                     }
                 }
                 else
@@ -199,7 +216,7 @@ while(<BLIND>)
             {
                 if($wals{loaded} && exists($wals{lh}{$lcode}{$f}))
                 {
-                    # Zkontrolovat hodnotu od organizátorů soutěže proti hodnotě z WALSu.
+                    # Check the value from the shared task organizers against the WALS value.
                     if($v ne $wals{lh}{$lcode}{$f})
                     {
                         print STDERR ("WARNING: Language '$lname' feature '$f' gold value does not match WALS:\n");
@@ -230,3 +247,7 @@ while(<BLIND>)
 }
 close(BLIND);
 print STDERR ("Predicted $n_predicted feature values in total.\n");
+if($n_checked > 0)
+{
+    printf STDERR ("Checked $n_checked of the predicted values, $n_correct correct, accuracy = %.2f%%\n", $n_correct/$n_checked*100);
+}
