@@ -78,6 +78,8 @@ if(-d $wals_folder)
     foreach my $cid (keys(%{$wals{codes}}))
     {
         my $name = $wals{codes}{$cid}{number}.' '.$wals{codes}{$cid}{name};
+        # Known deviations: Two values in the old WALS contain the TAB character, the new WALS has a space instead.
+        $name =~ s/negation (Prefix|Word)\&NoDoubleNeg/negation\t$1\&NoDoubleNeg/;
         $feature_values{$cid} = $name;
     }
     # For each language code and feature name, store the WALS value.
