@@ -1,8 +1,12 @@
 Repozitář github.com/ufal/ST2020 (založil Ruda).
 
-TO DO:
+TO DO (i do článku):
 
 Spočítat dílčí úspěšnost pro každý jazyk a každý rys.
+
+Jak často mi pomohl který zdrojový rys? Vyhodnotit.
+
+Nějak se zmínit (a vyhodnotit) o možnostech zapojení žádných, celých, nebo děravých vývojových dat.
 
 Countrycodes by možná byly užitečnější, kdybych rozsekal případy, kdy jeden jazyk má několik zemí, na binární
 rysy (countryCZ = yes).
