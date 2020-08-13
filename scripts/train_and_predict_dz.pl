@@ -191,7 +191,7 @@ print STDERR ("DATA PROBES FOR THE PAPER\n");
 #my $srcf = 'Minor_morphological_means_of_signaling_negation';
 #my $srcv = '4 None';
 my $srcf = 'longitude';
-my $srcv = '0';
+my $srcv = '15.0';
 my $tgtf = 'Order_of_Adjective_and_Noun';
 my $tgtv = '2 Noun-Adjective';
 if(exists($traindata{fvcount}{$srcf}))
