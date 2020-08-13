@@ -193,14 +193,12 @@ my $tgtv = '2 Noun-Adjective';
 if(exists($traindata{fvcount}{$srcf}))
 {
     print STDERR ("$srcf\n");
-    my @srcvalues = keys(%{$traindata{fvcount}{$srcf}});
-    my $sumc = 0;
+    my @srcvalues = sort {$traindata{fvcount}{$srcf}{b} <=> $traindata{fvcount}{$srcf}{a}} (keys(%{$traindata{fvcount}{$srcf}}));
     foreach my $v (@srcvalues)
     {
-        print STDERR ("    $v ... c = $traindata{fvcount}{$srcf}{$v}\n");
-        $sumc += $traindata{fvcount}{$srcf}{$v};
+        print STDERR ("    $v ... c = $traindata{fvcount}{$srcf}{$v}, p = $traindata{fvprob}{$srcf}{$v}\n");
     }
-    print STDERR ("    TOTAL c = $sumc\n");
+    print STDERR ("    TOTAL c = $traindata{fcount}{$srcf}\n");
 }
 else
 {
