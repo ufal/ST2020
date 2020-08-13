@@ -209,7 +209,7 @@ else
 if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
 {
     print STDERR ("$srcf == $srcv => $tgtf == ?\n");
-    my @tgtvalues = keys(%{$traindata{cprob}{$srcf}{$srcv}{$tgtf}});
+    my @tgtvalues = sort {$traindata{cooc}{$srcf}{$srcv}{$tgtf}{$b} <=> $traindata{cooc}{$srcf}{$srcv}{$tgtf}{$a}} (keys(%{$traindata{cprob}{$srcf}{$srcv}{$tgtf}}));
     my $sumc = 0;
     foreach my $v (@tgtvalues)
     {
