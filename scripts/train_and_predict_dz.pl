@@ -194,6 +194,7 @@ if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
 {
     print STDERR ("$srcf == $srcv => $tgtf == ?\n");
     my @tgtvalues = keys(%{$traindata{cprob}{$srcf}{$srcv}{$tgtf}});
+    my $sumc = 0;
     foreach my $v (@tgtvalues)
     {
         my %record =
@@ -207,8 +208,10 @@ if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
         $record{plogc} = $record{p} * log($record{c});
         $record{plogcinf} = $record{plogc} * $traindata{information}{$srcf}{$tgtf};
         $record{information} = $traindata{information}{$srcf}{$tgtf};
-        print STDERR ("    $v ... p = $record{p}\n");
+        print STDERR ("    $v ... p = $record{p}; c = $record{c}\n");
+        $sumc += $record{c};
     }
+    print STDERR ("    TOTAL c = $sumc\n");
 }
 else
 {
