@@ -183,6 +183,39 @@ if($config{print_hi})
 {
     print_hi(\%traindata);
 }
+# Data probes for the system description paper.
+print STDERR ("-------------------------\n");
+print STDERR ("DATA PROBES FOR THE PAPER\n");
+my $srcf = 'Order_of_Subject,_Object_and_Verb';
+my $srcv = '3 VSO';
+my $tgtf = 'Order_of_Adjective_and_Noun';
+my $tgtv = '2 Noun-Adjective';
+if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
+{
+    print STDERR ("$srcf == $srcv => $tgtf == ?\n");
+    my @tgtvalues = keys(%{$traindata{cprob}{$srcf}{$srcv}{$tgtf}});
+    foreach my $v (@tgtvalues)
+    {
+        my %record =
+        (
+            'p' => $traindata{cprob}{$srcf}{$srcv}{$tgtf}{$v},
+            'c' => $traindata{cooc}{$srcf}{$srcv}{$tgtf}{$v},
+            'v' => $v,
+            'rf' => $srcf,
+            'rv' => $srcv
+        );
+        $record{plogc} = $record{p} * log($record{c});
+        $record{plogcinf} = $record{plogc} * $traindata{information}{$srcf}{$tgtf};
+        $record{information} = $traindata{information}{$srcf}{$tgtf};
+        print STDERR ("    $v ... p = $record{p}\n");
+    }
+}
+else
+{
+    die("No correlation between VSO and order of adjective and noun found.");
+}
+print STDERR ("-------------------------\n");
+# End of data probes.
 my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
