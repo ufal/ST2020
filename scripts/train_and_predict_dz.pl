@@ -188,8 +188,10 @@ print STDERR ("-------------------------\n");
 print STDERR ("DATA PROBES FOR THE PAPER\n");
 #my $srcf = 'Order_of_Subject,_Object_and_Verb';
 #my $srcv = '3 VSO';
-my $srcf = 'Minor_morphological_means_of_signaling_negation';
-my $srcv = '4 None';
+#my $srcf = 'Minor_morphological_means_of_signaling_negation';
+#my $srcv = '4 None';
+my $srcf = 'Optional_Double_Negation_in_SOV_languages';
+my $srcv = '13 (Neg)SOVNeg/S(Neg)OVNeg/SO(Neg)VNeg';
 my $tgtf = 'Order_of_Adjective_and_Noun';
 my $tgtv = '2 Noun-Adjective';
 if(exists($traindata{fvcount}{$srcf}))
