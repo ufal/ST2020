@@ -190,6 +190,22 @@ my $srcf = 'Order_of_Subject,_Object_and_Verb';
 my $srcv = '3 VSO';
 my $tgtf = 'Order_of_Adjective_and_Noun';
 my $tgtv = '2 Noun-Adjective';
+if(exists($traindata{fvcount}{$srcf}))
+{
+    print STDERR ("$srcf\n");
+    my @srcvalues = keys(%{$traindata{fvcount}{$srcf}});
+    my $sumc = 0;
+    foreach my $v (@srcvalues)
+    {
+        print STDERR ("    $v ... c = $traindata{fvcount}{$srcf}{$v}\n");
+        $sumc += $traindata{fvcount}{$srcf}{$v};
+    }
+    print STDERR ("    TOTAL c = $sumc\n");
+}
+else
+{
+    die("Feature '$srcf' not found.");
+}
 if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
 {
     print STDERR ("$srcf == $srcv => $tgtf == ?\n");
@@ -215,7 +231,7 @@ if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
 }
 else
 {
-    die("No correlation between VSO and order of adjective and noun found.");
+    die("No correlation between '$srcf==$srcv' and '$tgtf' found.");
 }
 print STDERR ("-------------------------\n");
 # End of data probes.
