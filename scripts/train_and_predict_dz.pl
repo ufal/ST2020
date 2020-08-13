@@ -233,7 +233,22 @@ if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
 }
 else
 {
-    die("No correlation between '$srcf==$srcv' and '$tgtf' found.");
+    # There is no correlation between $srcf==$srcv and $tgtf.
+    # Let's see what other values of $srcf may correlate with $tgtf.
+    print STDERR ("$srcf\n");
+    my @srcvalues = sort(keys(%{$traindata{cprob}{$srcf}}));
+    foreach my $sv (@srcvalues)
+    {
+        print STDERR ("    == $sv\n");
+        print STDERR ("    => $tgtf\n");
+        my @tgtvalues = sort {$traindata{cooc}{$srcf}{$sv}{$tgtf}{$b} <=> $traindata{cooc}{$srcf}{$sv}{$tgtf}{$a}} (keys(%{$traindata{cprob}{$srcf}{$sv}{$tgtf}}));
+        foreach my $tv (@tgtvalues)
+        {
+            my $p = $traindata{cprob}{$srcf}{$sv}{$tgtf}{$tv};
+            my $c = $traindata{cooc}{$srcf}{$sv}{$tgtf}{$tv};
+            print STDERR ("       == $tv ... p = $p; c = $c\n");
+        }
+    }
 }
 print STDERR ("-------------------------\n");
 # End of data probes.
