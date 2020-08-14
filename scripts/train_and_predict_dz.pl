@@ -238,12 +238,12 @@ for(my $i = $maxi-2; $i <= $maxi; $i++)
 {
     printf STDERR ("  %d. %s ... %d\n", $i+1, $features_by_n_langs[$i], $feature_n_langs{$features_by_n_langs[$i]});
 }
-#my $srcf = 'Order_of_Subject,_Object_and_Verb';
-#my $srcv = '3 VSO';
+my $srcf = 'Order_of_Subject,_Object_and_Verb';
+my $srcv = 'NONE';#'3 VSO';
 #my $srcf = 'Minor_morphological_means_of_signaling_negation';
 #my $srcv = '4 None';
-my $srcf = 'longitude';
-my $srcv = '15.0';
+#my $srcf = 'longitude';
+#my $srcv = '15.0';
 my $tgtf = 'Order_of_Adjective_and_Noun';
 my $tgtv = '2 Noun-Adjective';
 if(exists($traindata{fvcount}{$srcf}))
