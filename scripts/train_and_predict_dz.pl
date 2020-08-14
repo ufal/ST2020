@@ -165,25 +165,10 @@ print STDERR ("Comparing training and development data...\n");
 compare_data_sets(\%traindata, \%devdata, \%wals);
 print STDERR ("Comparing training and test data...\n");
 compare_data_sets(\%traindata, \%testdata, \%wals);
-if($config{train_on_dev} eq 'blind')
-{
-    merge_data(\%traindata, \%devdata);
-}
-elsif($config{train_on_dev} eq 'gold')
-{
-    merge_data(\%traindata, \%devgdata);
-}
-merge_data(\%traindata, \%testdata);
-# Everything is read. Now organize the data better.
-print STDERR ("Hashing the features and their cooccurrences...\n");
-# Hash the observed features and values.
-hash_features(\%traindata);
-compute_pairwise_cooccurrence(\%traindata);
-if($config{print_hi})
-{
-    print_hi(\%traindata);
-}
+
+
 # Data probes for the system description paper.
+# Do this before merging the dev data into the training data!
 print STDERR ("-------------------------\n");
 print STDERR ("DATA PROBES FOR THE PAPER\n");
 # Count non-empty values vs. languages.
@@ -296,6 +281,26 @@ else
 }
 print STDERR ("-------------------------\n");
 # End of data probes.
+
+
+if($config{train_on_dev} eq 'blind')
+{
+    merge_data(\%traindata, \%devdata);
+}
+elsif($config{train_on_dev} eq 'gold')
+{
+    merge_data(\%traindata, \%devgdata);
+}
+merge_data(\%traindata, \%testdata);
+# Everything is read. Now organize the data better.
+print STDERR ("Hashing the features and their cooccurrences...\n");
+# Hash the observed features and values.
+hash_features(\%traindata);
+compute_pairwise_cooccurrence(\%traindata);
+if($config{print_hi})
+{
+    print_hi(\%traindata);
+}
 my $ndevlangs = $devdata{nl};
 my $ndevfeats = $devdata{nf}-1; # first column is ord number; except for that, counting everything including the language code and name
 my $ndevlangfeats = $ndevlangs*$ndevfeats;
