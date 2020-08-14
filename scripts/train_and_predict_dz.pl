@@ -66,6 +66,7 @@ $config{train_on_test} = 'yes';
 #   plogcinf ... plogc × mutual information between source and target features
 $config{score} = 'plogcinf'; # what number should be used to score predictions
 # Possible models:
+#   baseline ... do not look at the language, take the most probable value of the feature (overall)
 #   strongest ... take the prediction with the highest score, ignore the others
 #   vote ... each prediction is counted as a vote weighted by its score; the prediction with most votes wins
 #   infovote ... take three source features with highest mutual information with the target feature; let their best predictions vote, ignore the rest
@@ -426,7 +427,12 @@ sub predict_masked_features
             {
                 # Save the winning prediction in the language-feature hash.
                 # The global parameter $config{model} tells us how to use the scores to obtain the winner.
-                if($config{model} eq 'strongest')
+                if($config{model} eq 'baseline')
+                {
+                    my @values = sort {$traindata->{fvprob}{$qf}{$b} <=> $traindata->{fvprob}{$qf}{$a}} (keys(%{$traindata->{fvprob}{$qf}}));
+                    $lhl->{$qf} = $values[0];
+                }
+                elsif($config{model} eq 'strongest')
                 {
                     ($lhl->{$qf}, $blinddata->{scores}{$language}{$qf}) = model_take_strongest(@model);
                 }
