@@ -186,6 +186,50 @@ if($config{print_hi})
 # Data probes for the system description paper.
 print STDERR ("-------------------------\n");
 print STDERR ("DATA PROBES FOR THE PAPER\n");
+# Count non-empty values vs. languages.
+my %feature_n_langs;
+my %language_n_feats;
+foreach my $l (keys(%{$traindata{lhclean}}))
+{
+    foreach my $f (keys(%{$traindata{lhclean}{$l}}))
+    {
+        $feature_n_langs{$f}++;
+        $language_n_feats{$l}++;
+    }
+}
+my @languages_by_n_feats = sort {$language_n_feats{$b} <=> $language_n_feats{$a}} (keys(%language_n_feats));
+my @features_by_n_langs = sort {$feature_n_langs{$b} <=> $feature_n_langs{$a}} (keys(%feature_n_langs));
+print STDERR ("Number of known features for a language in training data:\n");
+my $mini = 0;
+my $maxi = $#languages_by_n_feats;
+my $medi = int($maxi/2);
+for(my $i = $mini; $i <= $mini+2; $i++)
+{
+    printf STDERR ("  %d. %s ... %d\n", $i+1, $languages_by_n_feats[$i], $language_n_feats{$languages_by_n_feats[$i]});
+}
+for(my $i = $medi-1; $i <= $medi+1; $i++)
+{
+    printf STDERR ("  %d. %s ... %d\n", $i+1, $languages_by_n_feats[$i], $language_n_feats{$languages_by_n_feats[$i]});
+}
+for(my $i = $maxi-2; $i <= $maxi; $i++)
+{
+    printf STDERR ("  %d. %s ... %d\n", $i+1, $languages_by_n_feats[$i], $language_n_feats{$languages_by_n_feats[$i]});
+}
+print STDERR ("Number of languages where a particular feature is known:\n");
+$maxi = $#features_by_n_langs;
+$medi = int(($maxi-7)/2)+7;
+for(my $i = $mini; $i <= $mini+9; $i++)
+{
+    printf STDERR ("  %d. %s ... %d\n", $i+1, $features_by_n_langs[$i], $feature_n_langs{$features_by_n_langs[$i]});
+}
+for(my $i = $medi-1; $i <= $medi+1; $i++)
+{
+    printf STDERR ("  %d. %s ... %d\n", $i+1, $features_by_n_langs[$i], $feature_n_langs{$features_by_n_langs[$i]});
+}
+for(my $i = $maxi-2; $i <= $maxi; $i++)
+{
+    printf STDERR ("  %d. %s ... %d\n", $i+1, $features_by_n_langs[$i], $feature_n_langs{$features_by_n_langs[$i]});
+}
 #my $srcf = 'Order_of_Subject,_Object_and_Verb';
 #my $srcv = '3 VSO';
 #my $srcf = 'Minor_morphological_means_of_signaling_negation';
