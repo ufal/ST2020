@@ -1,0 +1,6 @@
+Dan's evaluation of the combined system on the development data (this is the system that we used to generate our submission on the test data).
+
+[16:01:18]blackbird:/net/work/people/zeman/sigtyptask/scripts(master)> ../scripts/evaluate_from_csv.sh ../outputs/merge-dev.csv
++ python3 evaluate_from_csv.py --input_file ../data/dev_x.csv --output_file ../outputs/merge-dev.csv --golden_file ../data/dev_y.csv
+Accuracy is 75.50%
+
