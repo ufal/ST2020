@@ -54,6 +54,10 @@ $config{print_hi} = 0; # print entropy of each feature and mutual information of
 #   blind (default) ... use the information that was left visible in the blinded development data
 #   gold ... use the full development set as additional training data
 $config{train_on_dev} = 'blind';
+# Possible train-on-test values:
+#   no ... do not merge the non-blind part of the test data to the training data
+#   yes ... merge it
+$config{train_on_test} = 'yes';
 # Possible scores:
 #   c ... how many times we observed that target feature = x and source feature = y in the same language
 #   p ... conditional probability that target feature = x given that source feature = y
@@ -90,6 +94,7 @@ GetOptions
     'debug=i'  => \$config{debug},
     'print_hi' => \$config{print_hi},
     'train_on_dev=s' => \$config{train_on_dev},
+    'train_on_test=s' => \$config{train_on_test},
     'score=s'  => \$config{score},
     'model=s'  => \$config{model},
     'countrycodes=s' => \$config{countrycodes},
@@ -173,7 +178,10 @@ elsif($config{train_on_dev} eq 'gold')
 {
     merge_data(\%traindata, \%devgdata);
 }
-merge_data(\%traindata, \%testdata);
+if($config{train_on_test} ne 'no')
+{
+    merge_data(\%traindata, \%testdata);
+}
 # Everything is read. Now organize the data better.
 print STDERR ("Hashing the features and their cooccurrences...\n");
 # Hash the observed features and values.
