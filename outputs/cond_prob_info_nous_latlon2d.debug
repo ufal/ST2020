@@ -13,13 +13,91 @@ Comparing training and development data...
 Checking data against WALS 2020...
 Feature value '1 Separate word, no double negation	Word&NoDoubleNeg' from the first dataset is not known in WALS.
 Feature value '2 Prefix, no double negation	Prefix&NoDoubleNeg' from the first dataset is not known in WALS.
+Feature value '7 Pharyngeals and th' from the first dataset is not known in WALS.
 Comparing training and test data...
 Feature 'Obligatory_Double_Negation_in_SVO_languages' exists only in the first dataset.
 Feature 'Nasal_Vowels_in_West_Africa' exists only in the first dataset.
 Checking data against WALS 2020...
 Feature value '1 Separate word, no double negation	Word&NoDoubleNeg' from the first dataset is not known in WALS.
 Feature value '2 Prefix, no double negation	Prefix&NoDoubleNeg' from the first dataset is not known in WALS.
+Feature value '7 Pharyngeals and th' from the first dataset is not known in WALS.
 Hashing the features and their cooccurrences...
+-------------------------
+DATA PROBES FOR THE PAPER
+Number of known features for a language in training data:
+  1. eng ... 168
+  2. fre ... 167
+  3. ger ... 166
+  678. snn ... 34
+  679. uby ... 34
+  680. sta ... 34
+  1355. yun ... 9
+  1356. coi ... 9
+  1357. ysl ... 9
+Number of languages where a particular feature is known:
+  1. latitude ... 1357
+  2. latlon ... 1357
+  3. genus ... 1357
+  4. family ... 1357
+  5. index ... 1357
+  6. name ... 1357
+  7. longitude ... 1357
+  8. wals_code ... 1356
+  9. countrycodes ... 1111
+  10. Order_of_Object_and_Verb ... 878
+  100. 'Want'_Complement_Subjects ... 187
+  101. Occurrence_of_Nominal_Plurality ... 186
+  102. Plurality_in_Independent_Personal_Pronouns ... 182
+  192. Languages_with_different_word_order_in_negative_clauses ... 13
+  193. Double_negation_in_verb-initial_languages ... 12
+  194. The_Position_of_Negative_Morphemes_in_Object-Initial_Languages ... 9
+Order_of_Subject,_Object_and_Verb
+    2 SVO ... c = 331, p = 0.412718204488778
+    1 SOV ... c = 254, p = 0.316708229426434
+    7 No dominant order ... c = 128, p = 0.159600997506234
+    3 VSO ... c = 61, p = 0.0760598503740648
+    4 VOS ... c = 19, p = 0.0236907730673317
+    5 OVS ... c = 7, p = 0.00872817955112219
+    6 OSV ... c = 2, p = 0.00249376558603491
+    TOTAL c = 802, H = 1.36321924180982
+Order_of_Subject,_Object_and_Verb
+    == 1 SOV
+    => Order_of_Adjective_and_Noun
+       == 2 Noun-Adjective ... p = 0.529411764705882; c = 108
+       == 1 Adjective-Noun ... p = 0.426470588235294; c = 87
+       == 3 No dominant order ... p = 0.0245098039215686; c = 5
+       == 4 Only internally-headed relative clauses ... p = 0.0196078431372549; c = 4
+    == 2 SVO
+    => Order_of_Adjective_and_Noun
+       == 2 Noun-Adjective ... p = 0.809859154929577; c = 230
+       == 1 Adjective-Noun ... p = 0.137323943661972; c = 39
+       == 3 No dominant order ... p = 0.0528169014084507; c = 15
+    == 3 VSO
+    => Order_of_Adjective_and_Noun
+       == 2 Noun-Adjective ... p = 0.518518518518518; c = 28
+       == 1 Adjective-Noun ... p = 0.351851851851852; c = 19
+       == 3 No dominant order ... p = 0.12962962962963; c = 7
+    == 4 VOS
+    => Order_of_Adjective_and_Noun
+       == 2 Noun-Adjective ... p = 0.733333333333333; c = 11
+       == 1 Adjective-Noun ... p = 0.2; c = 3
+       == 3 No dominant order ... p = 0.0666666666666667; c = 1
+    == 5 OVS
+    => Order_of_Adjective_and_Noun
+       == 1 Adjective-Noun ... p = 0.5; c = 2
+       == 2 Noun-Adjective ... p = 0.5; c = 2
+    == 6 OSV
+    => Order_of_Adjective_and_Noun
+       == 1 Adjective-Noun ... p = 1; c = 1
+    == 7 No dominant order
+    => Order_of_Adjective_and_Noun
+       == 2 Noun-Adjective ... p = 0.489795918367347; c = 48
+       == 1 Adjective-Noun ... p = 0.326530612244898; c = 32
+       == 3 No dominant order ... p = 0.173469387755102; c = 17
+       == 4 Only internally-headed relative clauses ... p = 0.0102040816326531; c = 1
+    == NONE
+    => Order_of_Adjective_and_Noun
+-------------------------
 83 languages × 192 features would be 15936.
 Found 12141 nan values.
 Found 1596 ? values to be predicted.
