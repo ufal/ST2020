@@ -1,0 +1,38 @@
+[16:58:08]blackbird:/net/work/people/zeman/sigtyptask(master *+)> scripts/score.py outputs/ufal-probabilistic_constrained.tsv data/test_gold.csv data/test_blinded.csv
+
+# Averaging: micro
+
+submission      Madang  Mahakiranti     Mayan   Nilotic Northern Pama-Nyungan   Tucanoan        other genera
+number of languages  9  13  17  15      24      8      63
+ufal-probabilistic_constrained  0.7595628415300546     0.6615384615384615       0.7431192660550459      0.6555891238670695      0.7535885167464115      0.6830985915492958      0.715605749486653
+test_gold.csv   1.0  1.0    1.0 1.0     1.0     1.0    1.0
+test_blinded.csv     0.0    0.0 0.0     0.0     0.0    0.0    0.0
+
+overall:
+ufal-probabilistic_constrained  0.7107985105502689
+test_gold.csv   1.0
+test_blinded.csv     0.0
+
+# Errors
+
+
+
+
+[17:01:44]blackbird:/net/work/people/zeman/sigtyptask(master +)> scripts/score.py outputs/ufal-neural_constrained.tsv data/test_gold.csv data/test_blinded.csv
+
+# Averaging: micro
+
+submission      Madang  Mahakiranti     Mayan   Nilotic Northern Pama-Nyungan   Tucanoan        other genera
+number of languages  9  13  17  15      24      8      63
+ufal-neural_constrained 0.6830601092896175      0.7423076923076923      0.7339449541284404      0.6586102719033232      0.6913875598086124      0.6901408450704225      0.702258726899384
+test_gold.csv   1.0  1.0    1.0 1.0     1.0     1.0    1.0
+test_blinded.csv     0.0    0.0 0.0     0.0     0.0    0.0    0.0
+
+overall:
+ufal-neural_constrained 0.6979726934215971
+test_gold.csv   1.0
+test_blinded.csv     0.0
+
+# Errors
+
+
