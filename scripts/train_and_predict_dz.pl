@@ -260,6 +260,20 @@ else
 {
     die("Feature '$srcf' not found.");
 }
+if(exists($traindata{fvcount}{$tgtf}))
+{
+    print STDERR ("$tgtf\n");
+    my @srcvalues = sort {$traindata{fvcount}{$tgtf}{$b} <=> $traindata{fvcount}{$tgtf}{$a}} (keys(%{$traindata{fvcount}{$tgtf}}));
+    foreach my $v (@srcvalues)
+    {
+        print STDERR ("    $v ... c = $traindata{fvcount}{$tgtf}{$v}, p = $traindata{fvprob}{$tgtf}{$v}\n");
+    }
+    print STDERR ("    TOTAL c = $traindata{fcount}{$tgtf}, H = $traindata{fentropy}{$tgtf}\n");
+}
+else
+{
+    die("Feature '$tgtf' not found.");
+}
 if(exists($traindata{cprob}{$srcf}{$srcv}{$tgtf}))
 {
     print STDERR ("$srcf == $srcv => $tgtf == ?\n");
