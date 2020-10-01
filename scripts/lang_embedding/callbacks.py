@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_distances
+from sklearn.metrics.pairwise import euclidean_distances
 from collections import Counter
 import evaluate
 
@@ -30,7 +30,7 @@ class KNN(tf.keras.callbacks.Callback):
         for n in self.neighbours:
             train = self.model.get_layer('langs').get_weights()[0][:1125]
             dev = self.model.get_layer('langs').get_weights()[0][1125:]
-            dist_matrix = cosine_distances(dev, train)
+            dist_matrix = euclidean_distances(dev, train)
 
             self.closest = []
             for i in dist_matrix:
@@ -73,6 +73,7 @@ class Filler(tf.keras.callbacks.Callback):
     def __init__(self, feature_maps, feature_maps_int):
         self.x_to_predict = pd.read_csv('../../data/dev_x.csv').drop(columns=['Unnamed: 0', 'wals_code', 'latitude', 'longitude', 'countrycodes']).to_numpy()
         self.golden = pd.read_csv('../../data/dev_y.csv').drop(columns=['Unnamed: 0', 'wals_code', 'latitude', 'longitude', 'countrycodes']).to_numpy()
+        self.test_x = pd.read_csv('../../data/test_x.csv').drop(columns=['Unnamed: 0', 'wals_code', 'latitude', 'longitude', 'countrycodes']).to_numpy()
         self.feature_maps = feature_maps
         self.feature_maps_int = feature_maps_int
 
@@ -82,20 +83,26 @@ class Filler(tf.keras.callbacks.Callback):
         self.columns = self.form.columns
 
     def on_epoch_end(self, epoch, logs=None):
+        result = self.fill(np.array(self.x_to_predict, copy=True), self.golden)
         print()
-        print('Filler: {}, best: {}'.format(self.fill(np.array(self.x_to_predict, copy=True), self.golden), self.best))
+        print('Filler: {}, best: {}'.format(result, self.best))
         print()
+        with open("logs.txt", "a") as myfile:
+            myfile.write('Filler: {}, best: {}\n'.format(result, self.best))
+
+
         
-    def write_results(self, predicted):
+    def write_results(self, predicted, name):
         form_copy = np.array(self.form.to_numpy(), copy=True)
-        result = np.concatenate([form_copy[:,:5], predicted], axis=1)
+        result = np.concatenate([form_copy[:,:8], predicted[:,3:]], axis=1)
         
         result = pd.DataFrame(data=result, columns=self.columns)
         result = result.fillna('nan')
-        result.to_csv('../../outputs/lang_embedding.csv', index=False)
+        result.to_csv(name, index=False)
 
 
     def fill(self, x_to_predict, golden):
+        fill_with_probs = np.array(x_to_predict, copy=True)
         tmp = np.array(x_to_predict, copy=True)
         cnt = 0
         for line in x_to_predict:
@@ -108,6 +115,7 @@ class Filler(tf.keras.callbacks.Callback):
                 prediction = np.argmax(prob)
                 predicted_feature = possible_values[prediction]
                 x_to_predict[cnt][j] = self.feature_maps_int[j][predicted_feature]
+                fill_with_probs[cnt][j] = np.max(prob)
             
             cnt += 1
 
@@ -115,5 +123,38 @@ class Filler(tf.keras.callbacks.Callback):
         if acc >= self.best:
             self.model.save_weights('best.h5')
             self.best = acc
-            self.write_results(x_to_predict)
+            self.write_results(x_to_predict, 'lang_embedding.csv')
+            self.write_results(fill_with_probs, 'lang_embedding_probs.csv')
+            self.fill_test()
         return acc
+
+    def fill_test(self):
+        tmp = np.array(self.test_x, copy=True)
+        fill_with_probs = np.array(self.test_x, copy=True)
+
+        cnt = 0
+        for line in self.test_x:
+            should_fill = np.argwhere(line == '?').flatten()
+            for j in should_fill:
+                possible_values = np.array(list(self.feature_maps[j].values()))
+                lang_ids = np.array([cnt+1208]*len(possible_values))
+                prob = self.model.predict_on_batch((lang_ids, possible_values))
+                prediction = np.argmax(prob)
+                predicted_feature = possible_values[prediction]
+                tmp[cnt][j] = self.feature_maps_int[j][predicted_feature]
+                fill_with_probs[cnt][j] = np.max(prob)
+            cnt += 1
+
+        form_copy = pd.read_csv('test_x.csv').to_numpy()
+        result = np.concatenate([form_copy[:,:8], tmp[:,3:]], axis=1)
+        
+        result = pd.DataFrame(data=result, columns=self.columns)
+        result = result.fillna('nan')
+        result.to_csv('test_filled.csv', index=False)
+
+        form_copy = pd.read_csv('test_x.csv').to_numpy()
+        result = np.concatenate([form_copy[:,:8], fill_with_probs[:,3:]], axis=1)
+        
+        result = pd.DataFrame(data=result, columns=self.columns)
+        result = result.fillna('nan')
+        result.to_csv('test_filled_probs.csv', index=False)
