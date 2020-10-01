@@ -145,14 +145,14 @@ class Filler(tf.keras.callbacks.Callback):
                 fill_with_probs[cnt][j] = np.max(prob)
             cnt += 1
 
-        form_copy = pd.read_csv('test_x.csv').to_numpy()
+        form_copy = pd.read_csv('../../data/test_x.csv').to_numpy()
         result = np.concatenate([form_copy[:,:8], tmp[:,3:]], axis=1)
         
         result = pd.DataFrame(data=result, columns=self.columns)
         result = result.fillna('nan')
         result.to_csv('test_filled.csv', index=False)
 
-        form_copy = pd.read_csv('test_x.csv').to_numpy()
+        form_copy = pd.read_csv('../../data/test_x.csv').to_numpy()
         result = np.concatenate([form_copy[:,:8], fill_with_probs[:,3:]], axis=1)
         
         result = pd.DataFrame(data=result, columns=self.columns)
